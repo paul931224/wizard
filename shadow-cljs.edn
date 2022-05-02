@@ -1,0 +1,15 @@
+{:builds
+ {:app        {:asset-path         "/js/core"
+               :devtools           {:watch-dir "resources/public"
+                                    :after-load    genesis.frontend/render-app!}
+               :modules            {:app {:init-fn genesis.frontend/start-app!}}
+               :output-dir         "resources/public/js/core"
+               :compiler-options   {:infer-externs :auto}
+               :target             :browser}
+  
+  :app-ready  {:modules            {:app {:init-fn genesis.frontend/start-app!}}
+               :compiler-options   {:infer-externs :auto}
+               :optimizations      :advanced
+               :asset-path         "/js/core"
+               :output-dir         "resources/public/js/core"
+               :target             :browser}}}

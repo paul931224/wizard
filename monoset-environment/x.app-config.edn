@@ -1,0 +1,33 @@
+{; App details
+ :author        "ZGen - Wizard"
+ :app-build     "0.9"
+ :app-home      "/admin"
+ :app-languages [:en :hu]
+ :app-themes    [{:id :light :name :light-theme}
+                 {:id :dark  :name :dark-theme}]
+ :app-title     "ZGen - Wizard"
+
+ ; Browser details
+ :theme-color "#111111"
+
+ ; SEO details
+ :meta-description "ZGen - Wizard"
+ :meta-keywords    ["wizard" "zgen"]
+ :og-preview-path  "/images/share.png"
+
+ ; CSS paths
+ :css-paths
+ []
+
+ ; Favicon paths
+ :favicon-paths
+ [{:uri "/images/favicon.png"  :cache-control? true :size "100x100"}]
+
+ ; JavaScript details
+ :core-js-dir     "/js/core"
+ :plugins-js-dir  "/js/plugins"
+ :default-core-js "app.js"
+
+ ; JavaScript paths
+ :plugin-js-paths
+ []}

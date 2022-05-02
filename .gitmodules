@@ -1,0 +1,3 @@
+[submodule "monoset"]
+  path = monoset
+  url = git@github.com:monotech-hq/monoset.git
