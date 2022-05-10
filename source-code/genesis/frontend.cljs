@@ -1,6 +1,5 @@
 (ns genesis.frontend
-  (:require [x.boot-loader.api :as boot-loader]
-            [site-frontend.core.view :as core]))
+  (:require [index.core :as index]))      
 
-(defn start-app!  [] (boot-loader/start-app!    #'core/app))
-(defn render-app! [] (boot-loader/render-app!   #'core/app))
+(defn start-app!  [] (index/start-app!))
+(defn render-app! [] (index/render-app!))   

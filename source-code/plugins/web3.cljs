@@ -1,5 +1,5 @@
 (ns plugins.web3
-  (:require [x.app-core.api     :as a]
+  (:require [re-frame.core :as r]
             [cljs.core.async.interop :refer-macros [<p!]]
             [cljs.core.async :refer [go]]
             [config.smart-contract :as smart-contract]))
@@ -52,7 +52,7 @@
       (let [provider (get-in db [:crypto :provider])
             eth      (eth ^js provider)
             balance  (<p! (.getBalance eth account))]
-        (a/dispatch [:db/set-item! [:crypto :balance]  balance])))))   
+        (r/dispatch [:db/set-item! [:crypto :balance]  balance])))))   
   
 
 (a/reg-event-fx
@@ -64,8 +64,8 @@
            eth      (eth ^js provider)
            accounts (<p! (.requestAccounts eth))
            account  (aget accounts 0)]
-        (a/dispatch [:web3/get-balance account])
-        (a/dispatch [:db/set-item!     [:crypto :account]  account])))
+        (r/dispatch [:web3/get-balance account])
+        (r/dispatch [:db/set-item!     [:crypto :account]  account])))
    {}))
 
 
@@ -77,7 +77,7 @@
               accounts (<p! (.getAccounts eth))]
           (if-not 
             (empty? accounts)
-            (a/dispatch [:web3/login]))))
+            (r/dispatch [:web3/login]))))
     {}))
     
 
@@ -85,8 +85,8 @@
   :web3/setup
   (fn [db [_]]
     ;; (go (let [infura-provider  (new js/Web3 "wss://ropsten.infura.io/ws/v3/e5ba6df109e346f8b7781225ffb4de44")]
-    ;;       (a/dispatch [:db/set-item! [:crypto :infura-provider] infura-provider])))
+    ;;       (r/dispatch [:db/set-item! [:crypto :infura-provider] infura-provider])))
     (go (let [provider         (new js/Web3 (<p! (js/detectEthereumProvider)))]
-          (a/dispatch [:db/set-item! [:crypto :provider]        provider])
-          (a/dispatch [:web3/get-accounts])))))
+          (r/dispatch [:db/set-item! [:crypto :provider]        provider])
+          (r/dispatch [:web3/get-accounts])))))
          
