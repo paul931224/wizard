@@ -8,11 +8,17 @@
 (def color-one "#f4b41a")
 (def color-two "#143d59")
 
+(def button-style {:padding "5px 15px" :border "1px solid white" :background :transparent :cursor :pointer})
+
 (defn get-guilds-button []
  [:div {:style {:display :flex :justify-content :center :padding "10px 0px"}} 
-   [:button {:style {:padding "5px 15px" :border "1px solid white" :background :transparent}
+   [:button {:style button-style
              :on-click #(dispatch [:guild/get-all-guilds])} "Get guilds"]])
  
+(defn connect-wallet-button []
+ [:div {:style {:display :flex :justify-content :center :padding "10px 0px"}} 
+   [:button {:style button-style
+             :on-click #(dispatch [:web3/login])} "Connect wallet"]])
 
 (defn title []
   [:h1 {:style {:margin 0 :width "100%" 
@@ -66,6 +72,7 @@
        [wrapper
         [:<>
          [title]
+         [connect-wallet-button]
          [get-guilds-button]
          [all-guilds]]])}))
     

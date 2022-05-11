@@ -14,7 +14,6 @@
 (reg-sub
  :db/get
  (fn [db [_ path]]
-   (println path "oi")
    (get-in db path)))
 
 (reg-event-fx

@@ -52,7 +52,7 @@
       (let [provider (get-in db [:crypto :provider])
             eth      (eth ^js provider)
             balance  (<p! (.getBalance eth account))]
-        (r/dispatch [:db/set-item! [:crypto :balance]  balance])))))   
+        (r/dispatch [:db/set [:crypto :balance]  balance])))))   
   
 
 (r/reg-event-fx
@@ -65,7 +65,7 @@
            accounts (<p! (.requestAccounts eth))
            account  (aget accounts 0)]
         (r/dispatch [:web3/get-balance account])
-        (r/dispatch [:db/set-item!     [:crypto :account]  account])))
+        (r/dispatch [:db/set     [:crypto :account]  account])))
    {}))
 
 
@@ -86,7 +86,7 @@
   (fn [db [_]]
     ;; (go (let [infura-provider  (new js/Web3 "wss://ropsten.infura.io/ws/v3/e5ba6df109e346f8b7781225ffb4de44")]
     ;;       (r/dispatch [:db/set-item! [:crypto :infura-provider] infura-provider])))
-    (go (let [provider         (new js/Web3 (<p! (js/detectEthereumProvider)))]
-          (r/dispatch [:db/set-item! [:crypto :provider]        provider])
-          (r/dispatch [:web3/get-accounts])))))
+    {:side-effect (go (let [provider         (new js/Web3 (<p! (js/detectEthereumProvider)))]
+                        (r/dispatch [:db/set [:crypto :provider]        provider])
+                        (r/dispatch [:web3/get-accounts])))}))
          

@@ -24,8 +24,8 @@
    (head)
    [:body {:class "body-container"}
     mount-target
-    (include-js "https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/index.min.js")
-    (include-js "https://cdn.jsdelivr.net/npm/web3@1.7.3/lib/index.min.js")
+    (include-js "/external-js/detect-provider.min.js")
+    (include-js "/external-js/web3.min.js")
     (include-js "/js/core/app.js")]))
         
 
