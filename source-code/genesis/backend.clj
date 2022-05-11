@@ -4,7 +4,6 @@
    [shadow.cljs.devtools.api    :as shadow]
    [index.core :refer [app]]
    [ring.adapter.jetty :refer [run-jetty]])
-
   (:gen-class))
 
 

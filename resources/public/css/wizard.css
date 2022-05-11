@@ -1,3 +1,7 @@
 body {
      font-family: Hack, monospace; 
+     margin: 0px;
+}
+button {
+     font-family: Hack, monospace; 
 }

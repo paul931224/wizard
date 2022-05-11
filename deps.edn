@@ -12,6 +12,7 @@
  :deps {;Core
         org.clojure/clojure                             {:mvn/version "1.11.1"}
         org.clojure/clojurescript                       {:mvn/version "1.11.4"}
+        org.clojure/core.async                          {:mvn/version "1.5.648"}
 
         ;HTTP/WSS
         cljs-ajax/cljs-ajax                             {:mvn/version "0.8.4"}

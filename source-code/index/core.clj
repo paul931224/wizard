@@ -12,7 +12,11 @@
 
 (defn head []
   [:head
+   [:title "Wizard"]
    [:meta {:charset "utf-8"}]
+   [:link {:rel "icon" 
+           :type "image/png"
+           :href "/images/favicon.png"}]
    (include-css "/css/wizard.css")])
 
 (defn loading-page []
@@ -20,7 +24,10 @@
    (head)
    [:body {:class "body-container"}
     mount-target
-    (include-js "/js/core/app.js")]))    
+    (include-js "https://cdn.jsdelivr.net/npm/@metamask/detect-provider@1.2.0/dist/index.min.js")
+    (include-js "https://cdn.jsdelivr.net/npm/web3@1.7.3/lib/index.min.js")
+    (include-js "/js/core/app.js")]))
+        
 
 
 (defn index-handler

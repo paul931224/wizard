@@ -45,7 +45,7 @@
 
 
 
-(a/reg-event-fx
+(r/reg-event-fx
   :web3/get-balance 
   (fn [{:keys [db]} [_ account]]
     (go 
@@ -55,7 +55,7 @@
         (r/dispatch [:db/set-item! [:crypto :balance]  balance])))))   
   
 
-(a/reg-event-fx
+(r/reg-event-fx
  :web3/login
  (fn [{:keys [db]} [_ theatre-rank]]
    (.log js/console "Web3 login")
@@ -69,7 +69,7 @@
    {}))
 
 
-(a/reg-event-fx 
+(r/reg-event-fx 
   :web3/get-accounts
   (fn [{:keys [db]} [_]]
     (go (let [provider (-> db :crypto :provider)
@@ -81,7 +81,7 @@
     {}))
     
 
-(a/reg-event-fx 
+(r/reg-event-fx 
   :web3/setup
   (fn [db [_]]
     ;; (go (let [infura-provider  (new js/Web3 "wss://ropsten.infura.io/ws/v3/e5ba6df109e346f8b7781225ffb4de44")]
