@@ -9,9 +9,19 @@
     
 
 (def color-one "#EEE")
-(def color-two "#143d59")
+(def color-two "#333")
 
-(def button-style {:padding "5px 15px" :border "1px solid white" :background :transparent :cursor :pointer})
+(def button-style {:padding "15px 30px" 
+                   :border "0px"
+                   :display :flex 
+                   :justify-content :center 
+                   :align-items :center
+                   :background "#333"
+                   :color :white
+                   :cursor :pointer
+                   :height "60px"
+                   :font-size "24px"
+                   :font-weight "500"})
 
 (defn get-all-guilds-button []
  [:div {:style {:display :flex :justify-content :center :padding "10px 0px"}} 
@@ -21,11 +31,15 @@
 
 
 (defn connect-wallet-button []
- [:div {:style {:display :flex :justify-content :center :padding "10px 0px" :flex-wrap :wrap}} 
-   [:button {:style button-style
-             :on-click #(dispatch [:web3/login])} "Connect wallet"]
-   [:div {:style {:width "100%" :text-align :center :padding "10px"}} 
-     (str @(subscribe [:db/get [:crypto :account]]))]])
+ [:div {:style {:display :flex 
+                :justify-content :center 
+                :align-items :center
+                :padding "10px 0px" 
+                :flex-wrap :wrap 
+                :height "100%"}}
+  [:button {:style button-style
+            :on-click #(dispatch [:web3/login])} "Connect wallet"]])
+   
 
 
 (defn hero-title []
@@ -39,14 +53,6 @@
                              :justify-content :center 
                              :padding "30px 0px"}}    
      "wizard.xyz"]])
-
-(defn header [label]
-  [:h2 {:style {:margin 0 :width "100%" 
-                :display :flex 
-                :justify-content :center 
-                :padding "15px 0px"}}
-                
-   label])
 
 (defn sidebar-add-button []
  (let [modal? (subscribe [:db/get [:modal]])] 
@@ -108,9 +114,13 @@
 (defn guild-block [guild]
  (let [the-name  (get guild "name")
        image     (get guild "imageUrl")]
-     [:div {:style {:width "200px" :padding "10px" :margin "10px" :border (str "1px solid " color-two)
-                    :border-radius "10px" 
-                    :cursor :pointer}}
+     [:div.guild-block 
+       {:style {:width "200px" :padding "10px" :margin "10px"
+                :border-radius "10px" 
+                :cursor :pointer 
+                ;:display :none
+                :background :white 
+                :box-shadow "5px 5px 15px -4px #000000"}}
        [guild-block-image image]
        [:div {:style {:padding "10px" :text-align :center}} 
         the-name]]))
@@ -118,27 +128,38 @@
 
 (defn your-guilds []
   (let [guilds (subscribe [:db/get [:your-guilds]])]
-     [:div {:style {:display :flex :flex-wrap :wrap :justify-content :center}}
-      (if @guilds [header "Your guilds"])
-      (map (fn [guild]
-            ^{:key (random-uuid)}[guild-block guild])
-           @guilds)]))
+     [:div#guild-block-container {:style {:display :none
+                                          :padding "15px"}}
+      (if @guilds 
+        [:h2 "Your guilds"]
+        [:h2 "Create some guilds first"])
+      [:div {:style {:display :flex :flex-wrap :wrap}}
+       (map (fn [guild]
+             ^{:key (random-uuid)}[guild-block guild])
+            (take 5 (repeat (first @guilds))))]]))
 
 (defn all-guilds []
- (let [guilds (subscribe [:db/get [:all-guilds]])]
-  [:div {:style {:display :flex :flex-wrap :wrap :justify-content :center}}
-   (if @guilds [header "All guilds"])
-   (map (fn [guild]
-         [guild-block guild])
-        @guilds)]))
+  (let [guilds (subscribe [:db/get [:all-guilds]])]
+     [:div {:style {:padding "15px"}}
+       (if @guilds [:h2 "All guilds"])
+       [:div {:style {:display :flex :flex-wrap :wrap :justify-content :center}}
+        (map (fn [guild]
+              [guild-block guild])
+            @guilds)]]))
+
 
 (defn modal []
- [:div#modal {:style {:position :absolute
-                      :top 0
-                      :display :none
-                      :background "#DDD" :width "100%" :height "100%"}}
-  [connect-wallet-button]
-  [your-guilds]])
+ (let [account (subscribe [:db/get [:crypto :account]])] 
+  [:div#modal {:style {:position :absolute
+                       :top 0
+                       :display :none
+                       :background "#CCC" :width "100%" :height "100%"}}
+   (if @account
+    [:<> 
+     [your-guilds]]
+     ;[all-guilds]]
+    [connect-wallet-button])]))
+    
 
 (defn view []
   (reagent/create-class
@@ -149,9 +170,5 @@
         [:div {:style {:flex-grow 1}}
          [hero-title]
          [modal]]])}))
-         ;[connect-wallet-button]]])}))
-         ;[get-all-guilds-button]
-         ;[get-your-guilds-button]]])}))
-         ;
-         ;[all-guilds]]])}))
+    
     

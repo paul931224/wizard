@@ -3,9 +3,14 @@
    [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-sub]] 
    ["gsap" :as gsap])) 
 
-
-
-
+(defn show-guild-blocks! []
+ (let [timeline (gsap/TimelineMax.)]
+  (-> timeline 
+   (.set "#guild-block-container"  (clj->js {:display :block}))
+   (.from ".guild-block" (clj->js {:margin-left -100
+                                   :opacity 0
+                                   :stagger "0.2"}))))) 
+                                   
 
 (defn open-modal! []
  (let [modal         (.getElementById js/document "modal")
@@ -17,7 +22,6 @@
                              :opacity 0}))
        (.to modal 0.4
             (clj->js {:ease       "power3.inOut"
-                      :background "#DDD" 
                       :opacity 1}))
                       
        (.to modal-button 0.3 (clj->js {:ease       "power3.inOut" 
@@ -25,7 +29,8 @@
        (.to hero-title 0.3   (clj->js {:ease       "power3.inOut" 
                                        :transform  "scale(30)"
                                        :opacity 0}) 0) 
-       (.set hero-title (clj->js {:display :none})))))
+       (.set hero-title (clj->js {:display :none})))
+   (show-guild-blocks!)))
        
 
 (defn close-modal! []
@@ -37,7 +42,6 @@
        
        (.to modal 0.4
             (clj->js {:ease  "power3.inOut"
-                      :background "#DDD"
                       :opacity 0
                       :onComplete (fn [a] 
                                    (.set timeline modal 
@@ -51,6 +55,11 @@
                                      :opacity 1
                                      :transform "scale(1)"}) 0.4))))
        
+
+(reg-event-fx
+ :animation/show-guild-blocks!
+ (fn [db [_]]
+   {:side-effect (show-guild-blocks!)}))
 
 (reg-event-fx
  :animation/open-modal!

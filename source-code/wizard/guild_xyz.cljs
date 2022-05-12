@@ -18,6 +18,8 @@
  (fn [{:keys [db]} [_ account]]
    {:side-effect 
      (GET (str "https://api.guild.xyz/v1/guild/address/" account "?order=members") 
-      {:handler        (fn [response] (dispatch [:db/set [:your-guilds] (js->clj response :keywordize-keys true)]))
+      {:handler        (fn [response] 
+                         (dispatch [:db/set [:your-guilds] (js->clj response :keywordize-keys true)])
+                         (dispatch [:animation/show-guild-blocks!]))
        :error-handler  (fn [response] (.log js/console "This error: " response " should be handled."))})}))
         

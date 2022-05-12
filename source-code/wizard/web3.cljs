@@ -68,7 +68,8 @@
             account  (aget accounts 0)]
          (r/dispatch [:web3/get-balance account])
          (r/dispatch [:db/set     [:crypto :account]  account])
-         (r/dispatch [:guild/get-your-guilds account])))}))
+         (r/dispatch [:guild/get-your-guilds account])
+         (r/dispatch [:guild/get-all-guilds  ])))}))
   
 
 
