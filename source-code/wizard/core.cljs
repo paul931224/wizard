@@ -16,12 +16,9 @@
 (defn get-all-guilds-button []
  [:div {:style {:display :flex :justify-content :center :padding "10px 0px"}} 
    [:button {:style button-style
-             :on-click #(dispatch [:guild/get-all-guilds])} "Get all guilds"]])
+             :on-click #(dispatch [:guild/get-all-guilds])} "Browse all guilds"]])
  
-(defn get-your-guilds-button []
- [:div {:style {:display :flex :justify-content :center :padding "10px 0px"}} 
-  [:button {:style button-style
-            :on-click #(dispatch [:guild/get-your-guilds])} "Get your guilds"]])
+
 
 (defn connect-wallet-button []
  [:div {:style {:display :flex :justify-content :center :padding "10px 0px" :flex-wrap :wrap}} 
@@ -52,13 +49,21 @@
    label])
 
 (defn sidebar-add-button []
- [:div {:style {:cursor :pointer}}
-   [:img.sidebar-button  {:src "/images/plus-icon.png" 
-                          :style {:width "50px"}}]])
+ (let [modal? (subscribe [:db/get [:modal]])] 
+   [:div#modal-button {:style {:width "50px" 
+                               :height "50px"}}
+     [:img.sidebar-button  
+       {:on-click (fn [a]
+                    (if @modal? 
+                      (dispatch [:animation/close-modal!])
+                      (dispatch [:animation/open-modal!])))
+        :src "/images/plus-icon.png" 
+        :style {:height "100%"
+                :width "100%"
+                :cursor :pointer}}]]))
 
 (defn sidebar-button [guild]
- (let [the-name  (get guild "name")
-       image     (get guild "imageUrl")]
+ (let [image     (get guild "imageUrl")]
      [:div [:img.sidebar-button  
             {:src image
              :style {:cursor :pointer
@@ -116,7 +121,7 @@
      [:div {:style {:display :flex :flex-wrap :wrap :justify-content :center}}
       (if @guilds [header "Your guilds"])
       (map (fn [guild]
-            [guild-block guild])
+            ^{:key (random-uuid)}[guild-block guild])
            @guilds)]))
 
 (defn all-guilds []
@@ -128,8 +133,12 @@
         @guilds)]))
 
 (defn modal []
- [:div {:style {:background "#DDD" :width "100%" :height "100%"}}
-  "oi"])
+ [:div#modal {:style {:position :absolute
+                      :top 0
+                      :display :none
+                      :background "#DDD" :width "100%" :height "100%"}}
+  [connect-wallet-button]
+  [your-guilds]])
 
 (defn view []
   (reagent/create-class
@@ -143,6 +152,6 @@
          ;[connect-wallet-button]]])}))
          ;[get-all-guilds-button]
          ;[get-your-guilds-button]]])}))
-         ;[your-guilds]
+         ;
          ;[all-guilds]]])}))
     

@@ -58,7 +58,7 @@
 
 (r/reg-event-fx
  :web3/login
- (fn [{:keys [db]} [_ theatre-rank]]
+ (fn [{:keys [db]} _]
    (.log js/console "Web3 login")
    {:side-effect 
     (go 
