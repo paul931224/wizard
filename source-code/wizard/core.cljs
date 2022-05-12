@@ -114,11 +114,10 @@
 (defn guild-block [guild]
  (let [the-name  (get guild "name")
        image     (get guild "imageUrl")]
-     [:div.guild-block 
+     [:div.guild-block
        {:style {:width "200px" :padding "10px" :margin "10px"
                 :border-radius "10px" 
-                :cursor :pointer 
-                ;:display :none
+                :cursor :pointer                 
                 :background :white 
                 :box-shadow "5px 5px 15px -4px #000000"}}
        [guild-block-image image]

@@ -20,6 +20,6 @@
      (GET (str "https://api.guild.xyz/v1/guild/address/" account "?order=members") 
       {:handler        (fn [response] 
                          (dispatch [:db/set [:your-guilds] (js->clj response :keywordize-keys true)])
-                         (dispatch [:animation/show-guild-blocks!]))
+                         (js/window.setTimeout #(dispatch [:animation/show-guild-blocks!]) 500))
        :error-handler  (fn [response] (.log js/console "This error: " response " should be handled."))})}))
         
