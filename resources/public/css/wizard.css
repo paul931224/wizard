@@ -5,3 +5,13 @@ body {
 button {
      font-family: Hack, monospace; 
 }
+
+.sidebar-button{
+     transform: scale(0.9);
+     transition:  0.3s ease-in;
+}
+
+.sidebar-button:hover{
+     transition:  0.2s ease-in;
+     transform: scale(1.0);
+}

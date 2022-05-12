@@ -1,4 +1,4 @@
-(ns plugins.web3
+(ns wizard.web3
   (:require [re-frame.core :as r]
             [cljs.core.async.interop :refer-macros [<p!]]
             [cljs.core.async :refer [go]]
@@ -48,37 +48,40 @@
 (r/reg-event-fx
   :web3/get-balance 
   (fn [{:keys [db]} [_ account]]
-    (go 
-      (let [provider (get-in db [:crypto :provider])
-            eth      (eth ^js provider)
-            balance  (<p! (.getBalance eth account))]
-        (r/dispatch [:db/set [:crypto :balance]  balance])))))   
+    {:side-effect 
+      (go 
+        (let [provider (get-in db [:crypto :provider])
+              eth      (eth ^js provider)
+              balance  (<p! (.getBalance eth account))]
+          (r/dispatch [:db/set [:crypto :balance]  balance])))}))   
   
 
 (r/reg-event-fx
  :web3/login
  (fn [{:keys [db]} [_ theatre-rank]]
    (.log js/console "Web3 login")
-   (go 
-     (let [provider (get-in db [:crypto :provider])
-           eth      (eth ^js provider)
-           accounts (<p! (.requestAccounts eth))
-           account  (aget accounts 0)]
-        (r/dispatch [:web3/get-balance account])
-        (r/dispatch [:db/set     [:crypto :account]  account])))
-   {}))
+   {:side-effect 
+    (go 
+      (let [provider (get-in db [:crypto :provider])
+            eth      (eth ^js provider)
+            accounts (<p! (.requestAccounts eth))
+            account  (aget accounts 0)]
+         (r/dispatch [:web3/get-balance account])
+         (r/dispatch [:db/set     [:crypto :account]  account])
+         (r/dispatch [:guild/get-your-guilds account])))}))
+  
 
 
 (r/reg-event-fx 
   :web3/get-accounts
   (fn [{:keys [db]} [_]]
-    (go (let [provider (-> db :crypto :provider)
-              eth      (eth ^js provider)
-              accounts (<p! (.getAccounts eth))]
-          (if-not 
-            (empty? accounts)
-            (r/dispatch [:web3/login]))))
-    {}))
+    {:side-effect (go (let [provider (-> db :crypto :provider)
+                            eth      (eth ^js provider)
+                            accounts (<p! (.getAccounts eth))]
+                        (if-not 
+                          (empty? accounts)
+                          (r/dispatch [:web3/login]))))}))
+    
     
 
 (r/reg-event-fx 
