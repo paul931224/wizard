@@ -10,7 +10,8 @@
 (defn open-modal! []
  (let [modal         (.getElementById js/document "modal")
        modal-button  (.getElementById js/document "modal-button")
-       timeline (gsap/TimelineMax. (clj->js {:delay "0.1"}))]    
+       hero-title    (.getElementById js/document "hero-title")
+       timeline (gsap/TimelineMax.)]
    (-> timeline
        (.set modal (clj->js {:display :block 
                              :opacity 0}))
@@ -19,23 +20,37 @@
                       :background "#DDD" 
                       :opacity 1}))
                       
-       (.to modal-button 0.4 (clj->js {:ease       "power3.inOut" 
-                                       :transform  "rotate(45deg)"}) 0))))
+       (.to modal-button 0.3 (clj->js {:ease       "power3.inOut" 
+                                       :transform  "rotate(135deg)"}) 0)
+       (.to hero-title 0.3   (clj->js {:ease       "power3.inOut" 
+                                       :transform  "scale(30)"
+                                       :opacity 0}) 0) 
+       (.set hero-title (clj->js {:display :none})))))
+       
 
 (defn close-modal! []
  (let [modal (.getElementById js/document "modal")
        modal-button  (.getElementById js/document "modal-button")
-       timeline       (gsap/TimelineMax. (clj->js {:delay "0.1"}))]    
+       hero-title    (.getElementById js/document "hero-title")
+       timeline       (gsap/TimelineMax.)]  
    (-> timeline
+       
        (.to modal 0.4
             (clj->js {:ease  "power3.inOut"
                       :background "#DDD"
+                      :opacity 0
                       :onComplete (fn [a] 
                                    (.set timeline modal 
                                     (clj->js {:display :none})))}))
-       (.to modal-button 0.4 (clj->js {:ease       "power3.inOut" 
-                                       :transform  "rotate(0deg)"}) 0))))
-                      
+       (.to modal-button 0.3 (clj->js {:ease       "power3.inOut" 
+                                       :transform  "rotate(0deg)"}) 0)
+       (.set hero-title (clj->js {:transform "scale(30)"
+                                  :opacity 0 
+                                  :display :flex}))
+       (.to hero-title 0.3 (clj->js {:ease       "power3.inOut" 
+                                     :opacity 1
+                                     :transform "scale(1)"}) 0.4))))
+       
 
 (reg-event-fx
  :animation/open-modal!

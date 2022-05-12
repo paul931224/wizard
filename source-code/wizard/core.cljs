@@ -34,10 +34,10 @@
                  :display :flex 
                  :justify-content :center 
                  :align-items :center}} 
-    [:h1 {:style {:margin 0 :width "100%" 
-                  :display :flex 
-                  :justify-content :center 
-                  :padding "30px 0px"}}    
+    [:h1#hero-title {:style {:margin 0 :width "100%" 
+                             :display :flex 
+                             :justify-content :center 
+                             :padding "30px 0px"}}    
      "wizard.xyz"]])
 
 (defn header [label]
