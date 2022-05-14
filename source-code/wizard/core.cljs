@@ -135,7 +135,7 @@
       [:div {:style {:display :flex :flex-wrap :wrap}}
        (map (fn [guild]
              ^{:key (random-uuid)}[guild-block guild])
-            (take 5 (repeat (first @guilds))))]]))
+            @guilds)]]))
 
 (defn all-guilds []
   (let [guilds (subscribe [:db/get [:all-guilds]])]
