@@ -1,0 +1,794 @@
+{:system
+   {:type
+    {:email "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$"
+     }}
+
+   :theme
+   {
+    :colors
+    {:main {:r 5, :g 2, :b 25},
+     :primary {:r 0, :g 0, :b 30},
+     :secondary {:r 250, :g 250, :b 250},
+     :highlight {:r 110, :g 140, :b 190},
+     :invert {:r 255, :g 255, :b 255}
+     :warning {:r 0 :g 255 :b 255}
+     :error {:r 255 :g 0 :b 0}
+     :success {:r 0 :g 255 :b 0}}
+    
+    :typography
+    {:fonts
+     {:primary "Montserrat",
+      :display "DM Serif Text",
+      :handwriting nil,
+      :monospace nil},
+ :h1 {:size [2 "em"], :weight 400, :font :display},
+ :h2 {:size [1.5 "em"], :weight 400, :font :display},
+ :h3 {:size [1.17 "em"], :weight 400, :font :display},
+ :h4 {:size [1 "em"], :weight 400, :font :display},
+ :h5 {:size [0.83 "em"], :weight 400, :font :primary},
+ :h6 {:size [0.67 "em"], :weight 400, :font :primary},
+ :p {:weight 400, :font :primary}
+ :label {:weight 700 :uppercase? true :font :primary}
+ :button {:weight 700 :uppercase? true :font :primary}
+ }
+    
+    :style
+    {
+     :transition {:duration 0.6 :timing "cubic-bezier(0.215, 0.61, 0.355, 1)"}
+     :border 
+     {:default {:size [2 "px"] :style "solid" :radius [0 "px"] :color :secondary :opacity 0.05}
+      ;TODO other border styles
+      }
+     :shadow 
+     {:small
+      {:h-offset [0 "px"] :v-offset [0 "px"] 
+       :blur [0 "px"] :spread [0 "px"]
+       :color :main :opacity 0}
+      ;:medium
+      ;:large
+      }
+     }
+    }
+
+   :pages
+
+   {"root"
+    {:name :container
+     :meta {:type "root"}
+     :layout 
+     {:width [1 1]
+      :min-height [100 "vh"]
+      :responsive? true
+      :areas
+      [["header" "header"]
+       ["main" "main"]
+       ["footer" "footer"]]
+      :queue ["header" "main" "footer"]
+      :rows [[100 "px"] [1 "fr"] ["auto"]]
+      :columns [1 "fr"]
+      :gap [0 "px"]
+      :padding [0 "px"]}
+     :content 
+     {"header" {:name :container :container "header" :tag :header}
+      "main" {:name :container :container [:env :route] :tag :main}
+      "footer" {:name :container :container "footer" :tag :footer}}}
+   
+    "sideroot"
+    {:name :container
+     :meta {:type "root"}
+     :layout
+     {:width [1 1]
+      :height [1 1]
+      :background {:color :invert :color-opacity 1}}
+     :style
+     {:overflow "auto"
+      :padding "20px"
+      :padding-top "110px"}
+     :content
+     {"close"
+      {:name :i :icon {:name "close-outline"}
+       :mobile-style {:position "absolute" :right "10px" :top "10px"}
+       :on-click []
+       :effects [:toggle-sideroot]}
+      "navigation"
+      {:name :navigation}}}
+
+    "loading"
+    {:name :container
+     :meta {:title {"en" "Loading.."}
+            :type "page"
+            :hidden? true}
+     :content {}}
+
+    "home"
+    {:name :container
+     :meta {:title {"en" "Homepage" "hu" "Főoldal"}
+            :type "page"
+            :menu-title {"en" "Homepage" "hu" "Főoldal"}
+            :page-title {"en" "Homepage" "hu" "Főoldal"}}
+     :layout 
+     {:background {:color :invert}
+      :align "center"
+      :direction "column"
+      :queue ["welcome" "table"]}
+     :content {"welcome" ;{:name :network}
+               {:name :container :container "welcome"}
+               }}
+
+    "welcome"
+    {:name :container
+     :meta {:type "component"} 
+     :layout 
+     {:background {:color :invert :gradient {:color :secondary :type :radial} :color-opacity 1}
+      :align "center"
+      :direction "column"
+      :responsive? true
+      :queue ["mt" "pa" "yo"]
+      :padding [10 "vw"]
+      :padding-top [6 "vh"]
+      :padding-bottom [6 "vh"]
+      }
+     :mobile-style {:min-height "100%"}
+     :content {"mt"
+               {:name :h1 :text {"hu" "Üdvözöllek a tesztoldalon!" "en" "Welcome to the test page!"}
+                :animation {:name "fade-up" :delay 100}
+                :style {:margin 0}
+                :gradient :highlight
+                }
+               "pa"
+              {:name :p :text {"hu" "Support: kapcsolat@zgen.hu" "en" "Support: contact@zgen.hu"}}
+              "yo"
+             ; {:name :grid
+             ;  :content
+             ;  {"a" {:name :h1 :text "Teszt" :position {:x 0 :y 0 :w 2 :h 2 :minW 2 :maxW 4}}
+             ;   "b" {:name :p :text "asdgasdfasdfasdfa sdfasdfasdf asdfasdfasdf asdfasdfasdf" :position {:x 2 :y 0 :w 3 :h 2}}
+             ;   }
+             ;  }
+              {:name :button
+               :text {"hu" "Teszt" "en" "Test"}
+               ;:effects [:reload]
+               :on-click [[:open-modal "test-modal"]]
+               }   
+              }}
+
+    "test-modal"
+    {:name :container
+     :meta {:type "modal"}
+     :layout {:background {:color :invert}
+              :align "center"}
+     :content {
+               "test" {:name :h3 :text {"hu" "Ez egy felugró ablak!" "en" "This is a modal!"}}
+               }}
+
+    "navigation"
+    {:name :container
+     :meta {:type "component"}
+     :layout
+     {:fillout? false
+      :align "center"
+      :direction "row"
+      :queue ["lang" "pa"]
+      }
+     :content {
+               "lang" {:name :dropdown :on-select [:env :locale]
+                       :logic [:not-equal [:env :mobile?] true]
+                       :style {:margin-right "20px"}
+                       :content [{:text {"hu" "Magyar" "en" "Hungarian"} :icon "flags/hu.svg" :value "hu"}                       
+                                 {:text {"hu" "Angol" "en" "English"} :icon "flags/en.svg" :value "en"}]}
+               "pa" {:name :navigation
+                     :dropdown true
+                     }
+               }}
+
+    "about"
+    {:name :container
+     :meta {:title {"hu" "Vendégkönyv" "en" "Guestbook"}
+            :type "page"}
+     :layout 
+     {:background {:color :invert :gradient {:color :secondary :type :radial} :color-opacity 1}
+      :align "center"
+      :direction "column"
+      :responsive? true
+      :queue ["mt"]
+      }
+     :content {"mt"
+               {:name :container 
+                :container "contact"
+                }
+                 }}
+
+     "user"
+    {:name :container
+     :meta {:title {"hu" "Bejelentkezés" "en" "Login"}
+            :type "page"}
+     :layout 
+     {:background {:color :invert :gradient {:color :secondary :type :radial} :color-opacity 1}
+      :align "center"
+      :direction "column"
+      :responsive? true
+      :queue ["mt"]
+      }
+     :content {"mt"
+               {:name :container 
+                :container "login"
+                }
+                 }}
+    "login"
+    {:name :container
+     :meta {:type "component"}
+     :layout 
+     {:background {:color :invert}
+      :width [1 1]
+      :align "center"
+      :direction "column"
+      :responsive? true
+      
+      :areas
+      [["mt" "mt"]
+       ["email" "email"]
+       ["password" "password"]
+       ["send" "send"]
+       ]
+      :rows [[100 "px"]
+             ["auto"]
+             ["auto"]
+             ["auto"]]
+      :columns [[1 "fr"][1 "fr"]]
+      :gap [40 "px"]
+      
+      :queue ["mt" "email" "password" "send"]
+      :padding [10 "vw"]
+      :padding-top [6 "vh"]
+      :padding-bottom [6 "vh"]
+      }
+     :content {"mt"
+               {:name :h1 :text {"hu" "Jelentkezz be!" "en" "Login now!"}
+                :animation {:name "fade-up" :delay 100}
+                :style {:margin 0}
+                :gradient :highlight
+                }
+               "email"
+               {:name :input
+                :text {"hu" "Felhasználónév" "en" "User ID"}
+                :on-change [:ram :login :user-id]}
+               "password"
+               {:name :input
+                :text {"hu" "Jelszó" "en" "Password"}
+                :type "password"
+                :on-change [:ram :login :password]}
+               "send"
+               {:name :button
+                :text {"hu" "Belépés" "en" "Enter"}
+                :position "bottom-right" 
+                :on-click [{:action "login"
+                            :user-id [:ram :login :user-id]
+                            :password [:ram :login :password]}
+                           [:ram-dissoc :login]
+                           :re-render
+                           ]
+                :valid [
+                        [[:ram :login :user-id] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg felhasználónevet!"}}]]]
+                        [[:ram :login :password] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg jelszót!"}}]]]
+                        ]
+                }
+
+               }}
+
+    "admin"
+    {:name :container
+     :meta {:title {"hu" "Adminfelület" "en" "Admin Panel"}
+            :type "page"}
+     :layout 
+     {:background {:color :invert}
+      :width [1 1]
+      :align "center"
+      :direction "column"
+      :responsive? true
+      
+      :areas
+      [
+       ["table"]
+       ]
+      :rows [
+             ["auto"]]
+      :columns [[1 "fr"]]
+      :gap [40 "px"]
+      
+      :queue ["data" "table"]
+      :padding [10 "vw"]
+      :padding-top [6 "vh"]
+      :padding-bottom [6 "vh"]
+      }
+     :content {
+               "table"
+               {:name :table
+                 :on-mount 
+                 [[:react
+                   [:ram
+                    ["application"
+                     {:environment :id}]]
+                    [:re-render]]
+                  {:action "request-service",
+                   :service-key "application"}],
+                :complex? true
+                :head-element {:name :h4}
+                :head
+                [{:title "Name" :key :full-name
+                  :element {:name :p} :content-key :text
+                  }
+                 {:title "Email" :key :email
+                  :element {:name :p} :content-key :text
+                  }
+                 {:title "Message" :key :message
+                  :element {:name :p} :content-key :text
+                  }
+                 ]
+                :content-iteration
+                {:id "application"
+                 :source [:ram ["application" {:environment :id}]]}
+                :content []}
+               }}
+
+     "gyik"
+    {:name :container
+     :meta {:title {"hu" "Gyakran Ismételt Kérdések" "en" "Frequently Asked Questions"}
+            :type "page"}
+     :layout 
+     {:background {:color :invert}
+      :width [1 1]
+      :align "center"
+      :direction "column"
+      :responsive? true
+      
+      :areas
+      [
+       ["accordion"]
+       ]
+      :rows [
+             ["auto"]]
+      :columns [[1 "fr"]]
+      :gap [40 "px"]
+      
+      :queue ["data" "table"]
+      :padding [10 "vw"]
+      :padding-top [6 "vh"]
+      :padding-bottom [6 "vh"]
+      }
+     :content {
+               "accordion"
+               {:name :accordion
+                :content [
+                          {:title "Első" :container {:name :container :container "welcome"}}
+                          {:title "Második" :container {:name :container :container "welcome"}}
+                          ]}
+               }}
+
+     "create"
+     {:name :container
+     :meta {:title {"hu" "Regisztráció" "en" "Registration"}
+            :type "page"}
+     :layout 
+     {:background {:color :invert :gradient {:color :secondary :type :radial} :color-opacity 1}
+      :align "center"
+      :direction "column"
+      :responsive? true
+      :queue ["mt"]
+      }
+     :content {"mt"
+               {:name :container 
+                :container "register"
+                }
+                 }}
+
+      "charts"
+      {:name :container
+       :meta {:type "page"
+              :title {"hu" "Charts" "en" "Charts"}}
+       :layout {:padding [20 "vw"]
+                :queue ["im" "tab" "c1" "c2" "c3" "c4" "c5" "c6" "c7"]}
+       :content {"im"
+                 {:name :img
+                  :href "https://en.wikipedia.org/wiki/Linux"
+                  :newtab? true
+                  :src "https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg"}
+                 "tab"
+                 {:name :table,
+                  :style {:margin-top "30px" :margin-bottom "30px"}
+                    :head-element {:name :h4,
+                                   :style {:text-align "center"}},
+                    :head [{:title "Ország",
+                            :key :orszag
+                            :element {:name :h6,
+                                      :style {:margin 0},
+                                      :formatted? true},
+                            :content-key :text}
+                           {:title "Csirke",
+                            :key :csirke
+                            :element {:name :h6,
+                                      :style {:margin 0},
+                                      :formatted? true},
+                            :content-key :text}
+                           {:title "Kacsa",
+                            :key :kacsa,
+                            :element {:name :h6,
+                                      :style {:margin 0},
+                                      :formatted? true},
+                            :content-key :text}
+                           {:title "Liba",
+                            :key :liba
+                            :element {:name :h6,
+                                      :style {:margin 0},
+                                      :formatted? true},
+                            :content-key :text}
+                           ],
+                    :spanning {[0 :orszag] 2}
+                    :content [
+                              {:orszag "Magyarország" :csirke 123 :kacsa 200 :liba 56}
+                              {:csirke 230 :kacsa 187 :liba 330}
+                              {:orszag "Szlovákia" :csirke 176 :kacsa 32 :liba 287}
+                              {:orszag "Szlovénia" :csirke 256 :kacsa 120 :liba 67}
+                              {:orszag "Ukrajna" :csirke 89 :kacsa 120 :liba 200}
+                              {:orszag "Románia" :csirke 330 :kacsa 200 :liba 34}
+                              ],
+                  }
+                 
+                 "c1" {:name :chart 
+                       :ctype "line" 
+                       :padding-bottom [100 "px"]
+                       :title "Line"
+                       :label ["Egy főre eső csirkék száma" "Egy főre eső kacsák száma" "Egy főre eső libák száma"]
+                       :color ["rgba(20,170,20,0.5)" "rgba(220,70,220,0.5)" "rgba(220,170,120,0.5)"]
+                       :data {"Magyarország" [123 200 56] "Horvátország" [230 187 330] "Szlovákia" [176 32 287] "Szlovénia" [256 120 67] "Ukrajna" [89 120 200] "Románia" [330 200 34]}}
+                 "c2" {:name :chart
+                       :ctype "bar"
+                       :title "Bar"
+                       :label ["Egy főre eső csirkék száma" "Egy főre eső kacsák száma"]
+                       :color ["rgba(20,170,20,0.5)" "rgba(220,70,220,0.5)"]
+                       :padding-bottom [100 "px"]
+                       :data {"Magyarország" [123 200] "Horvátország" [230 187] "Szlovákia" [176 32] "Szlovénia" [256 120] "Ukrajna" [89 120] "Románia" [330 20]}}
+                 "c3" {:name :chart
+                       :ctype "radar"
+                       :title "Radar"
+                       :padding-bottom [100 "px"]
+                       :data {"Magyarország" [123] "Horvátország" [230] "Szlovákia" [176] "Szlovénia" [256] "Ukrajna" [89] "Románia" [330]}}
+                 "c4" {:name :chart
+                       :ctype "pie"
+                       :title "Pie"
+                       :color [["red" "green" "yellow" "blue" "black" "purple"]]
+                       :padding-bottom [100 "px"]
+                       :data {"Magyarország" [123] "Horvátország" [230] "Szlovákia" [176] "Szlovénia" [256] "Ukrajna" [89] "Románia" [330]}}
+                 "c5" {:name :chart
+                       :ctype "doughnut"
+                       :title "Doughnut"
+                       :padding-bottom [100 "px"]
+                       :data {"Magyarország" [123] "Horvátország" [230] "Szlovákia" [176] "Szlovénia" [256] "Ukrajna" [89] "Románia" [330]}}
+                 "c6" {:name :chart
+                       :ctype "polarArea"
+                       :title "PolarArea"
+                       :padding-bottom [100 "px"]
+                       :data {"Magyarország" [123] "Horvátország" [230] "Szlovákia" [176] "Szlovénia" [256] "Ukrajna" [89] "Románia" [330]}}
+                 "c7"
+                 {:name :network
+                  :style {:height "500px"}
+               :nodes [
+                       {:id 1 :label "Node 1"}
+                       {:id 2 :label "Node 2"}
+                       {:id 3 :label "Node 3"}
+                       {:id 4 :label "Node 4"}
+                       {:id 5 :label "Node 5"}
+                       ]
+               :edges [
+                       {:from 1 :to 3}
+                       {:from 1 :to 2}
+                       {:from 2 :to 4}
+                       {:from 2 :to 5}
+                       ]
+               :options {}
+               }
+                 ;"c7" {:name :chart
+                  ;     :ctype "bubble"
+                   ;    :padding-bottom [100 "px"]
+                    ;   :data {:x 20 :y 30 :r 10}}
+                 }
+       }
+
+
+     "register"
+     {:name :container
+     :meta {:type "component"}
+     :layout 
+     {:background {:color :invert}
+      :width [1 1]
+      :align "center"
+      :direction "column"
+      :responsive? true
+      
+      :areas
+      [["mt"]
+       ["userid"]
+       ["email"]
+       ["display"]
+       ["bio"]
+       ["password"]
+       ["password2"]
+       ["send"]
+       ]
+      :rows [[100 "px"]
+             ["auto"]
+             ["auto"]
+             ["auto"]
+             ["auto"]
+             ["auto"]]
+      :columns [[1 "fr"]]
+      :gap [40 "px"]
+      
+      :queue ["mt" "userid" "email" "display" "bio" "password" "password2" "send"]
+      :padding [10 "vw"]
+      :padding-top [6 "vh"]
+      :padding-bottom [6 "vh"]
+      }
+     :content {"mt"
+               {:name :h1 :text {"hu" "Új Felhasználó" "en" "Create Account"}
+                :animation {:name "fade-up" :delay 100}
+                :style {:margin 0}
+                :gradient :highlight
+                }
+               "userid"
+               {:name :input
+                :text {"hu" "Felhasználónév" "en" "User ID"} 
+                :on-change [:ram :login :user-id]}
+               "email"
+               {:name :input
+                :text {"hu" "Email cím" "en" "Email"}
+                :on-change [:ram :login :email]
+                ;:valid [[[:ram :login :email] :email {"hu" "Kérlek valódi email címet adj meg!"}]]
+                }
+               "display"
+               {:name :input
+                :text {"hu" "Teljes Név" "en" "Display Name"}
+                :on-change [:ram :login :display-name]}
+               "bio"
+               {:name :input
+                :text {"hu" "Bemutatkozás" "en" "About you"}
+                :on-change [:ram :login :bio]}
+               "password"
+               {:name :input
+                :text {"hu" "Jelszó" "en" "Password"}
+                :type "password"
+                :on-change [:ram :login :password]}
+               "password2"
+               {:name :input
+                :text {"hu" "Jelszó újra" "en" "Repeat Password"}
+                :type "password"
+                :on-change [:ram :login :password2]}
+               "send"
+               {:name :button
+                :text {"hu" "Regisztráció" "en" "Register"}
+                :position "bottom-right" 
+                :on-click [{:action "register"
+                            :user-id [:ram :login :user-id]
+                            :email [:ram :login :email]
+                            :display-name [:ram :login :display-name]
+                            :bio [:ram :login :bio]
+                            :password [:ram :login :password]
+                            }
+                           [:ram-dissoc :login]
+                           :re-render
+                           ]
+                :valid [
+                        [[:ram :login :user-id] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg felhasználónevet!"}}]]]
+                        [[:ram :login :email] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg email címet!"}}]]]
+                        [[:ram :login :password] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg jelszót!"}}]]]
+                        [[:ram :login :password] [:ram :login :password2]
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "A megadott jelszavak nem egyeznek!"}}]]]
+                        ]
+                }
+
+               }}
+
+
+    "contact"
+    {:name :container
+     :meta {:type "component"}
+     :layout 
+     {:background {:color :invert}
+      :width [1 1]
+      :align "center"
+      :direction "column"
+      :responsive? true
+      
+      :areas
+      [["mt" "mt" "mt" "mt"]
+       ["name" "name" "email" "email"]
+       ["text" "text" "text" "text"]
+       [nil nil "send" "send"]
+       ["title" "title""title""title"]
+       [nil "hr""hr" nil]
+       ["guestbook" "guestbook" "guestbook" "guestbook"]
+       ]
+      :rows [[100 "px"]
+             ["auto"]
+             [260 "px"]
+             ["auto"]
+             ["auto"]]
+      :columns [[1 "fr"][1 "fr"][1 "fr"][1 "fr"]]
+      :gap [40 "px"]
+      
+      :queue ["mt" "name" "email" "text" "send"]
+      :padding [10 "vw"]
+      :padding-top [6 "vh"]
+      :padding-bottom [6 "vh"]
+      }
+     :content {"mt"
+               {:name :h1 :text {"hu" "Hagyj üzenetet!" "en" "Message Us!"}
+                :animation {:name "fade-up" :delay 100}
+                :style {:margin 0}
+                :gradient :highlight
+                }
+               "name"
+               {:name :input
+                :text {"hu" "Név" "en" "Full Name"}
+                :on-change [:ram :message :full-name]}
+               "email"
+               {:name :input
+                :text {"hu" "Email cím" "en" "Email"}
+                :on-change [:ram :message :email]}
+               "text"
+               {:name :textarea
+                :text {"hu" "Üzenet" "en" "Message"}
+                :on-change [:ram :message :message]}
+               "send"
+               {:name :button
+                :text {"hu" "Elküldés" "en" "Submit"}
+                :position "bottom-right" 
+                :on-click [{:action "insert-service"
+                            :service-key "application"
+                            :effects [{:name :email :subject "Teszt" :to :email :body "Email szöveg"}]
+                            :full-name [:ram :message :full-name]
+                            :email [:ram :message :email]
+                            :message [:ram :message :message]}
+                           [:ram-dissoc :message]
+                           ;:re-render
+                           [:notify {:type :success 
+                                     :title {"hu" "Üzenet elküldve!" "en" "Message sent!"}
+                                     :text {"hu" "Kollégáink hamarosan válaszolnak!"
+                                            "en" "Our team get back to You soon!"}}]]
+                :valid [
+                        [[:ram :message :full-name] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg nevet!"}}]]]
+                        [[:ram :message :email] true
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg emailt!"}}]]]
+                        [[:ram :message :message] true 
+                         [[:notify {:type :error
+                                    :title {"hu" "Hiba" "en" "Error"}
+                                    :text {"hu" "Nem adtál meg üzenetet!"}}]]]
+                        ]
+                }
+
+               "title" {:name :h3 
+                        :position "center" 
+                        :style {:margin-top "100px"}
+                        :text {"hu" "Ti írtátok:" "en" "Your messages:"}}
+               "hr" {:name :hr} 
+               "guestbook"
+               {:name :container
+                :logic [:equal [:ram :admin?] true]
+                :container "guestbook"}
+                 
+               }}
+
+    "guestcard"
+    {:name :container
+     :meta {:type "component"}
+     :layout
+     {:background {:color :invert} 
+      :depth 2
+      :align "center"
+      :direction "column"
+      :queue ["name" "separator" "message" "delete"]}
+     :style {:padding "5px"}
+     :content
+     {"name" {:name :h4 :text "Username" :style {:margin "0px"}}
+      "separator" {:name :hr :style {:opacity "0.3"}}
+      "message" {:name :p :text "Message"}
+      "delete" {:name :i :icon {:name "trash-2-outline"} :logic [:equal [:ram :admin?] true]}}}
+
+    "guestbook"
+    {:name :container
+     :meta {:type "component"}
+     :on-mount
+     [[:react [:ram ["application" {:environment :id}]] [:re-render]]
+      {:action "request-service"
+       :service-key "application"}]
+     :layout
+     {:background {:color :invert}
+      :width [1 1]
+      :min-height [50 "vh"]
+      :gap [10 "px"]
+      :align "top-between"
+      :direction "row"
+      :responsive? true}
+     :content-iteration
+     {:id "application"
+      :source [:ram ["application" {:environment :id}]]
+      :pattern
+      {:name :container
+       :container "guestcard"
+       :layout {:min-width [1 6]}
+       :content
+       {"name" {}
+        "message" {}
+        "delete" {:on-click {:action "delete-service" :service-key "application"}}}}
+      :join
+      {:full-name [:content "name" :text]
+       :message [:content "message" :text]
+       :id [:content "delete" :on-click :service-id]}}
+     :content {}}
+
+    "header"
+    {:name :container
+     :meta {:type "component"}
+     :layout
+     {:responsive? true
+      :align "center-between"
+      :direction "row"
+      :queue ["main-title" "navi"]
+      :depth 2
+      :background {:color :invert :opacity 1}
+      :padding [5 "vw"]}
+     :content {"main-title" 
+               {:name :h3
+                :text {"hu" [[:ram :domain] " / " [:ram :essence :pages {:environment :route} :meta :title]]
+                       "en" [[:ram :domain] " / " [:ram :essence :pages {:environment :route} :meta :title]]}
+                :position "center" 
+                :on-click [:navigate "home"],
+                :motion {:draggable true}
+                }
+               "navi" {:name :container :container "navigation"} 
+               }}
+    
+    "footer"
+    {:name :container
+     :meta {:type "component"}
+     :layout 
+     {:responsive? true
+      :align "center"
+      :background {:color :invert :color-opacity 1}
+      :depth 4
+      :areas [["f" "f" "f"]]
+      :queue ["f"]
+      :mobile-rows [[100 "px"]]
+      :columns [[1 "fr"] [1 "fr"] [1 "fr"]]
+      :rows [[100 "px"]]
+      :gap [30 "px"] 
+      :padding [10 "vh"]
+      }
+     :content {
+               "f" {:name :h2 
+                :position "center" 
+                :text {"hu" [[:ram :domain]" - "[:ram :time :year]]
+                       "en" [[:ram :domain]" - "[:ram :time :year]]}}
+               }}
+
+    }}

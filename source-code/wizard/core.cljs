@@ -4,6 +4,7 @@
     [wizard.guild-xyz]
     [wizard.utils]
     [wizard.web3]
+    [wizard.editor.core :as editor]
     [reagent.core     :as reagent]
     [re-frame.core    :refer [dispatch subscribe]]))
     
@@ -137,6 +138,7 @@
              ^{:key (random-uuid)}[guild-block guild])
             @guilds)]]))
 
+
 (defn all-guilds []
   (let [guilds (subscribe [:db/get [:all-guilds]])]
      [:div {:style {:padding "15px"}}
@@ -161,13 +163,16 @@
     
 
 (defn view []
-  (reagent/create-class
-   {:component-did-mount (fn [e] (dispatch [:web3/setup]))
-    :reagent-render 
-    (fn []
-       [wrapper
-        [:div {:style {:flex-grow 1}}
-         [hero-title]
-         [modal]]])}))
+  (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
+   (reagent/create-class
+    {:component-did-mount (fn [e] (dispatch [:web3/setup]))
+     :reagent-render 
+     (fn []
+        [wrapper
+         [:div {:style {:flex-grow 1}}
+          (if @guild-selected 
+            [hero-title] 
+            [editor/view])
+          [modal]]])})))
     
     

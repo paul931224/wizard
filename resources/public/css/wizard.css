@@ -15,3 +15,16 @@ button {
      transition:  0.2s ease-in;
      transform: scale(1.0);
 }
+
+#editor > div{
+   background:white; 
+   cursor: pointer; 
+   transition: 0.4s linear;
+   transition-delay: 0.5s;
+}
+
+#editor > div:hover{
+     background:  red;
+     transition: 0.2s ease;
+     
+  }
