@@ -16,14 +16,14 @@ button {
      transform: scale(1.0);
 }
 
-#editor > div{
+.editor-particle{
    background:white; 
    cursor: pointer; 
    transition: 0.4s linear;
    transition-delay: 0.5s;
 }
 
-#editor > div:hover{
+.editor-particle:hover{
      background:  red;
      transition: 0.2s ease;
      
