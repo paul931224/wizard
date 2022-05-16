@@ -55,6 +55,30 @@
                                      :opacity 1
                                      :transform "scale(1)"}) 0.4))))
        
+(defn open-sidebar! []
+ (let [sidebar        (.getElementById js/document "sidebar")
+       timeline       (gsap/TimelineMax.) 
+       sidebar-container  (.getElementById js/document "sidebar-container")]
+    (-> timeline
+       (.set sidebar-container (clj->js {:display :block}))
+       (.to sidebar 0.4
+            (clj->js {:ease  "power3.inOut"
+                      :opacity 1 
+                      :right "0"})))))
+
+(defn close-sidebar! []
+ (let [sidebar            (.getElementById js/document "sidebar")
+       sidebar-container  (.getElementById js/document "sidebar-container")
+       timeline       (gsap/TimelineMax.)]
+    (-> timeline
+       (.set sidebar-container (clj->js {:display :none}))
+       (.to sidebar 0.4
+            (clj->js {:ease  "power3.inOut"
+                      :opacity 0 
+                      :right "-100%"})))))
+                      
+  
+
 
 (reg-event-fx
  :animation/show-guild-blocks!
@@ -73,3 +97,15 @@
    {:dispatch [:db/set [:modal] nil]
     :side-effect (close-modal!)}))
    
+
+(reg-event-fx
+ :animation/open-sidebar!
+ (fn [db [_]]
+   {:dispatch [:db/set [:sidebar] true]
+    :side-effect (open-sidebar!)}))
+
+(reg-event-fx
+ :animation/close-sidebar!
+ (fn [db [_]]
+   {:dispatch [:db/set [:sidebar] nil]
+    :side-effect (close-sidebar!)}))
