@@ -26,6 +26,8 @@ button {
 .editor-particle:hover{
      animation: rainbow-bg 5s linear;
      animation-iteration-count: infinite;
+     animation-delay: 0.3s;
+     background: rgb(0, 255, 221);
      transition: 0.2s ease;
      
   }
