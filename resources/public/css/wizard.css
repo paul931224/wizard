@@ -19,6 +19,7 @@ button {
 .editor-particle{
    background:white; 
    cursor: pointer; 
+   border: 1px solid #ddddde;
    transition: 0.4s linear;
    transition-delay: 0.5s;
 }
@@ -26,9 +27,13 @@ button {
 .editor-particle:hover{
      animation: rainbow-bg 5s linear;
      animation-iteration-count: infinite;
-     animation-delay: 0.3s;
+     border-color:  transparent;
+     z-index: 1000;
      background: rgb(0, 255, 221);
      transition: 0.2s ease;
+     border-radius: 50%;
+     transform: scale(1.5);
+
      
   }
 

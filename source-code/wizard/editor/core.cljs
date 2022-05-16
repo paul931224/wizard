@@ -1,19 +1,29 @@
 (ns wizard.editor.core
- (:require  [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-sub]]))
+ (:require  [re-frame.core :refer [dispatch subscribe]]))
 
 
 (defn editor-particle [col-index row-index]
  [:div 
-  {:class ["editor-particle"
+  {:on-mouse-enter (fn [a] (dispatch [:db/set [:editor :hovered-particle] 
+                                      {:col col-index 
+                                       :row row-index}]))
+   :class ["editor-particle"
            (str "col-" col-index)
            (str "row-" row-index)]
-   :style {:flex-grow 1
-           :height "100%" 
-           :border "1px solid white"}}])
+   :style {:flex-grow 1}}])
+            
+          
                 
+(defn editor-status []
+ (let [editor (subscribe [:db/get [:editor]])] 
+  [:div {:style {:position :fixed 
+                 :top 0 
+                 :right 0}}
+      (str @editor)]))  
 
 (defn editor-wrapper [content]
- [:div {:style {:display :flex :justify-content :center}} 
+ [:div {:style {:display :flex :justify-content :center :margin-top "60px"}} 
+  [editor-status]
   [:div#editor {:style {:max-width "1200px" :display :flex :flex-wrap :wrap}}
    content]])
 
