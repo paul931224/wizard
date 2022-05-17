@@ -16,6 +16,18 @@ button {
      transform: scale(1.0);
 }
 
+
+.wizard-component {
+     transform: scale(0.95);
+     transition: 0.2s ease-out;
+}
+
+.wizard-component:hover {
+     transition: 0.3s ease-in;
+     transform: scale(1);
+}
+
+
 .editor-particle{
    background:white; 
    cursor: pointer; 
