@@ -12,7 +12,8 @@
                   :left   (str (* col col-width) "px")
                   :width  (str (* width  col-width) "px")
                   :height (str (* height row-height) "px")
-                  :background :white}}         
+                  :background :white 
+                  :pointer-events "auto"}}         
       [:div.component "Plain text"]]))
 
 (defn navbar [key-and-comp]
@@ -26,9 +27,11 @@
                   :height    (str (* height row-height) "px")
                   :display :flex 
                   :align-items :center 
-                  :padding-left "10px"}}
+                  :pointer-events "auto"}}  
+                  
          
-     [:h2 "Navbar"]]))       
+     [:h2 {:style {:padding-left (str (* 1 col-width) "px")}} 
+      "Navbar"]]))       
 
 
 (defn component-router [comp-state]
