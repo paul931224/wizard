@@ -1,7 +1,8 @@
 (ns wizard.editor.components
   (:require  [re-frame.core :refer [dispatch subscribe]]
              [wizard.editor.config :refer [row-height col-width]]
-             [wizard.editor.rich-text-editor.core :as rtf]))
+             [wizard.editor.rich-text-editor.core :as rtf]
+             [reagent-hickory.sweet :refer [html->hiccup]]))
 
 
 
@@ -16,7 +17,7 @@
                   :height (str (* height row-height) "px")
                   :background :white 
                   :pointer-events "auto"}}         
-      [:div.component content]
+      [:div.component (html->hiccup content)]
       [rtf/view {:value-path [:editor :components the-key :content]}]]))
       
 

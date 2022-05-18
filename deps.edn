@@ -26,6 +26,8 @@
         reagent-utils/reagent-utils                     {:mvn/version "0.3.4"}
         pez/clerk                                       {:mvn/version "1.0.0"}
         venantius/accountant                            {:mvn/version "0.2.5"}
+        paul931224/reagent-hickory-modified             {:git/url "https://github.com/paul931224/reagent-hickory-modified"
+                                                         :sha     "0f6a0adf3af86c2107110560172972affed2f013"}
 
         ;Ring
         http-kit/http-kit                               {:mvn/version "2.3.0"}

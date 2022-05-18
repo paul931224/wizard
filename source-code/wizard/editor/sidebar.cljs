@@ -22,7 +22,7 @@
    [:h2 "Choose component"]
    [component-block {:type :plain 
                      :name "Plain"
-                     :width 10 
+                     :width 30 
                      :height 10
                      :content "Plain text"}]
    [component-block {:type :navbar
