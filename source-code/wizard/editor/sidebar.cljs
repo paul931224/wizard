@@ -23,7 +23,10 @@
    [component-block {:type :plain 
                      :name "Plain"
                      :width 10 
-                     :height 10}]]))
+                     :height 10}]
+   [component-block {:type :navbar
+                     :name "Navbar"
+                     :height 3}]]))
    
 
 (defn view []
