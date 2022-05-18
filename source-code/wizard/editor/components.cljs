@@ -1,12 +1,14 @@
 (ns wizard.editor.components
   (:require  [re-frame.core :refer [dispatch subscribe]]
-             [wizard.editor.config :refer [row-height col-width]]))
+             [wizard.editor.config :refer [row-height col-width]]
+             [wizard.editor.rich-text-editor.core :as rtf]))
 
 
 
 (defn plain [key-and-comp]
- (let [comp-state                     (second key-and-comp)
-       {:keys [col row width height]}  comp-state]
+ (let [the-key                        (first key-and-comp)
+       comp-state                     (second key-and-comp)
+       {:keys [content col row width height]}  comp-state]
    [:div {:style {:position :absolute
                   :top    (str (* row row-height) "px")
                   :left   (str (* col col-width) "px")
@@ -14,7 +16,9 @@
                   :height (str (* height row-height) "px")
                   :background :white 
                   :pointer-events "auto"}}         
-      [:div.component "Plain text"]]))
+      [:div.component content]
+      [rtf/view {:value-path [:editor :components the-key :content]}]]))
+      
 
 (defn navbar [key-and-comp]
  (let [comp-state                     (second key-and-comp)
@@ -28,8 +32,6 @@
                   :display :flex 
                   :align-items :center 
                   :pointer-events "auto"}}  
-                  
-         
      [:h2 {:style {:padding-left (str (* 1 col-width) "px")}} 
       "Navbar"]]))       
 
