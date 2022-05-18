@@ -1,20 +1,22 @@
 (ns wizard.editor.core
  (:require  [re-frame.core :refer [dispatch subscribe]]
-            [wizard.editor.sidebar :as sidebar]))
+            [wizard.editor.components :as components]
+            [wizard.editor.sidebar :as sidebar]
+            [wizard.editor.events]
+            [wizard.editor.config :refer [row-height col-width]]))
 
-(def col-height 20)
-(def col-width  20)
+
 
 (defn selected-particle []
  (let [pos (subscribe [:db/get [:editor :selected-particle]])] 
   [:div#selected-particle 
     {:style {:position :absolute
              :width  (str col-width  "px")
-             :height (str col-height "px")
+             :height (str row-height "px")
              :background "red"
              :left   (str (* col-width  (:col @pos))
                           "px")
-             :top    (str (* col-height (:row @pos)) 
+             :top    (str (* row-height (:row @pos)) 
                       "px")}}]))
 
 (defn editor-particle [col-index row-index]
@@ -56,20 +58,29 @@
 
 (defn row-wrapper [content]
   [:div {:style {:width "100%" :display :flex 
-                 :height (str col-height "px")}}
+                 :height (str row-height "px")}}
     content])    
  
-(defn view [] 
+(defn editor-grid []
  (let [width-particles   (range 60)
        height-particles  (range 240)]
-   [page-wrapper 
+  [:div {:style {:width "100%" 
+                 :display :flex
+                 :flex-wrap :wrap}}
+   (map
+    (fn [row-index]
+      ^{:key row-index} [row-wrapper
+                         (map (fn [col-index] ^{:key (str row-index "-" col-index)}
+                                               [editor-particle col-index row-index])
+                              width-particles)])
+    height-particles)])) 
+ 
+(defn view [] 
+ [page-wrapper 
     [editor-wrapper 
       [:<> 
-        [selected-particle]
-        (map 
-         (fn [row-index]
-           ^{:key row-index}[row-wrapper
-                              (map (fn [col-index] ^{:key (str row-index "-" col-index)}
-                                                   [editor-particle col-index row-index])
-                                   width-particles)])
-         height-particles)]]]))
+        [selected-particle] 
+        [components/view]
+        [editor-grid]]]])       
+        
+        

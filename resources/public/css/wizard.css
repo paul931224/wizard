@@ -27,13 +27,9 @@ button {
      transform: scale(1);
 }
 
-
 .editor-particle{
-   background:white; 
    cursor: pointer; 
-   border: 1px solid #ddddde;
-   transition: 0.4s linear;
-   transition-delay: 0.5s;
+   border: 1px solid #dddddeDD;
 }
 
 .editor-particle:hover{
@@ -45,8 +41,6 @@ button {
      transition: 0.2s ease;
      border-radius: 50%;
      transform: scale(1.5);
-
-     
   }
 
 

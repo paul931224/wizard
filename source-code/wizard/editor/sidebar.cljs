@@ -4,23 +4,26 @@
 
 
 
-(defn plain-component [editor]
- (let [data {}]
+(defn component-block [{:keys [name] :as component-data}]
+ (let [pos (subscribe [:db/get [:editor :selected-particle]])]
   [:div.wizard-component 
-    {:on-click (fn [e] (.log js/console (:selected-particle editor)))
+    {:on-click (fn [e] (dispatch [:editor/add! (merge component-data @pos)]))
      :style {:color "#333" 
              :cursor :pointer
              :padding "5px"
              :border-radius "5px"
              :background "white"}}
-    [:h3 "Plain"]]))
-    ;[:div (str editor)]]))
+    [:h3 name]]))
+    
 
 (defn sidebar []
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
    [:h2 "Choose component"]
-   [plain-component @editor]]))
+   [component-block {:type :plain 
+                     :name "Plain"
+                     :width 10 
+                     :height 10}]]))
    
 
 (defn view []
