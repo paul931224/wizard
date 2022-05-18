@@ -6,6 +6,8 @@
 
 
 
+
+
 (defn plain [key-and-comp]
  (let [the-key                        (first key-and-comp)
        comp-state                     (second key-and-comp)
@@ -17,8 +19,8 @@
                   :height (str (* height row-height) "px")
                   :background :white 
                   :pointer-events "auto"}}         
-      [:div.component (html->hiccup content)]
-      [rtf/view {:value-path [:editor :components the-key :content]}]]))
+      [:div.component (html->hiccup content)]]))
+      ;[rtf/view {:value-path [:editor :components the-key :content]}]]))
       
 
 (defn navbar [key-and-comp]
@@ -37,11 +39,33 @@
       "Navbar"]]))       
 
 
+(defn grid-fractions [numbers-vec]
+ (str 
+  (clojure.string/join "fr " numbers-vec) "fr"))
+
+(defn grid [comp-state]
+ (let [grid-rows    (:grid-rows    (second comp-state))
+       grid-columns (:grid-columns (second comp-state))]
+   [:div.grid 
+     {:style {:display :grid
+              :grid-template-columns (grid-fractions grid-columns)
+              :grid-template-rows    (grid-fractions grid-rows)
+              :pointer-events "auto"}}
+     [:div "dslajdlksajldkasjldkj"
+      [:div "oi"]]
+     [:div 2]
+     [:div 3]
+     [:div 4]
+     [:div 5]
+     [:div 6]
+     [:div 7]]))
+
 (defn component-router [comp-state]
  (let [type (:type (second comp-state))]
   (case type 
-   :plain  [plain comp-state]
+   :plain  [plain  comp-state]
    :navbar [navbar comp-state]
+   :grid   [grid   comp-state]
    [plain comp-state])))
  
 

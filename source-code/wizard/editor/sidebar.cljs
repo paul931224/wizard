@@ -19,7 +19,7 @@
 (defn sidebar []
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
-   [:h2 "Choose component"]
+   [:h3 "Absolute"]
    [component-block {:type :plain 
                      :name "Plain"
                      :width 30 
@@ -27,7 +27,14 @@
                      :content "Plain text"}]
    [component-block {:type :navbar
                      :name "Navbar"
-                     :height 3}]]))
+                     :height 3}]
+   [:h3 "Relative"]
+   [component-block {:type :grid
+                     :name "Grid"
+                     :grid-columns [2 2 4]
+                     :grid-rows    [2 2 2]
+                     :height 20
+                     :content "Plain text"}]]))
    
 
 (defn view []
