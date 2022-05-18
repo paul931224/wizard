@@ -8,10 +8,15 @@
 
 (defn component-wrapper [key-and-comp]
  (let [col-index (:col (second key-and-comp))
-       row-index (:row (second key-and-comp))] 
+       row-index (:row (second key-and-comp))
+       width     (:width (second key-and-comp))
+       height     (:width (second key-and-comp))] 
    [:div {:style {:position :absolute
-                  :top   (str (* row-index row-height) "px")
-                  :left  (str (* col-index col-width) "px")}}
+                  :top    (str (* row-index row-height) "px")
+                  :left   (str (* col-index col-width) "px")
+                  :width  (str (* width  col-width) "px")
+                  :height (str (* height row-height) "px")
+                  :background :white}}
          
          [plain-component]]))
 
@@ -19,6 +24,6 @@
  (let [components (subscribe [:db/get [:editor :components]])] 
    [:<> 
       (map
-       (fn [comp-state] [component-wrapper comp-state])
+       (fn [comp-state] ^{:key (first comp-state)}[component-wrapper comp-state])
        @components)]))
             
