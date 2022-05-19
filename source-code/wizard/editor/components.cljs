@@ -15,7 +15,7 @@
     [:div {:on-click (fn [] (dispatch [:rich-text-editor/open! content-path]))
            :style {:pointer-events "auto"}}
      [:div.component
-      (html->hiccup content)]]))
+      [:<> (html->hiccup (str "<div>" content "</div>"))]]]))
 
 
 (defn plain [comp-router key-and-comp path]
