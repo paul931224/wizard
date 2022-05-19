@@ -32,7 +32,8 @@
    [component-block {:type :grid
                      :name "Grid"
                      :grid-columns [2 2 4]
-                     :grid-rows    [2 2 2]
+                     :grid-rows    [2 4 2]
+                     :sub-components {}
                      :height 20
                      :content "Plain text"}]]))
    

@@ -43,6 +43,11 @@
  (str 
   (clojure.string/join "fr " numbers-vec) "fr"))
 
+(defn component-wrapper [content]
+  [:div.component-wrapper {:style {:width "100%" :position :relative}}
+   [:div.component-menu "X"]
+   content])
+
 (defn grid [comp-state]
  (let [grid-rows    (:grid-rows    (second comp-state))
        grid-columns (:grid-columns (second comp-state))]
@@ -50,23 +55,20 @@
      {:style {:display :grid
               :grid-template-columns (grid-fractions grid-columns)
               :grid-template-rows    (grid-fractions grid-rows)
-              :pointer-events "auto"}}
-     [:div "dslajdlksajldkasjldkj"
-      [:div "oi"]]
-     [:div 2]
-     [:div 3]
-     [:div 4]
-     [:div 5]
-     [:div 6]
-     [:div 7]]))
+              :pointer-events "auto"
+              :gap "10px"}}
+     (map (fn [a] [component-wrapper [:div a]])
+          (range (* (count grid-rows) (count grid-columns))))]))
+     
 
 (defn component-router [comp-state]
  (let [type (:type (second comp-state))]
-  (case type 
-   :plain  [plain  comp-state]
-   :navbar [navbar comp-state]
-   :grid   [grid   comp-state]
-   [plain comp-state])))
+  [component-wrapper 
+   (case type 
+    :plain  [plain  comp-state]
+    :navbar [navbar comp-state]
+    :grid   [grid   comp-state]
+    [plain comp-state])]))
  
 
 (defn view []

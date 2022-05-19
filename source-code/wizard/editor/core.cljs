@@ -53,8 +53,8 @@
   [:div#editor {:style {:position :relative
                         :max-width "1200px" :display :flex :flex-wrap :wrap}}
               content]
-  [sidebar/view]
-  [editor-status]])
+  [sidebar/view]])
+  ;[editor-status]])
 
 (defn row-wrapper [content]
   [:div {:style {:width "100%" :display :flex 

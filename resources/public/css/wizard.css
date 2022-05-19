@@ -6,6 +6,18 @@ button {
      font-family: Hack, monospace; 
 }
 
+.component-wrapper:hover > .component-menu{
+     visibility: visible;
+}
+
+.component-menu {
+     position: absolute;
+     top: -10px;
+     background: red;
+     right: 0;
+     visibility: hidden;
+}
+
 .sidebar-button{
      transform: scale(0.9);
      transition:  0.3s ease-in;
