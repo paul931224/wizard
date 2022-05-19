@@ -31,8 +31,8 @@
    [:h3 "Relative"]
    [component-block {:type :grid
                      :name "Grid"
-                     :grid-columns [2 2 4]
-                     :grid-rows    [2 4 2]
+                     :grid-columns [1]
+                     :grid-rows    [1]
                      :components {}
                      :height 20
                      :content "Plain text"}]]))

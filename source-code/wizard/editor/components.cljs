@@ -10,9 +10,17 @@
 (defn block [comp-router key-and-comp path]
  (let [the-key                        (first key-and-comp)
        comp-state                     (second key-and-comp)
-       {:keys [content col row width height]}  comp-state]
-   [:div {:style {:pointer-events "auto"}}
-    [:div.component (html->hiccup content)]]))
+       {:keys [content col row width height]}  comp-state
+       content-path (vec (conj path :content))
+       fresh-content (subscribe [:db/get content-path])]
+   [:div {:on-click (fn [] (dispatch [:rich-text-editor/open! content-path]))
+          :style {:pointer-events "auto"}}
+    [:div.component 
+      (str content-path)
+      (html->hiccup (if @fresh-content 
+                      @fresh-content
+                      content))]]))
+        
 
 (defn plain [comp-router key-and-comp path]
  (let [the-key                        (first key-and-comp)
@@ -80,6 +88,7 @@
               :grid-template-rows    (grid-fractions grid-rows)
               :pointer-events "auto"
               :gap "10px"}}
+     
      (map (fn [a] 
            (let [id (str (random-uuid))]
              ^{:key id}[comp-router [id

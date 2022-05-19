@@ -3,7 +3,8 @@
             [wizard.editor.components :as components]
             [wizard.editor.sidebar :as sidebar]
             [wizard.editor.events]
-            [wizard.editor.config :refer [row-height col-width]]))
+            [wizard.editor.config :refer [row-height col-width]]
+            [wizard.editor.rich-text-editor.core :as rtf]))
 
 
 
@@ -37,7 +38,7 @@
           
                 
 (defn editor-status []
- (let [editor (subscribe [:db/get [:editor]])] 
+ (let [editor (subscribe [:db/get [:editor :components]])] 
   [:div {:style {:position :fixed 
                  :top 0 
                  :right 0}}
@@ -53,8 +54,8 @@
   [:div#editor {:style {:position :relative
                         :max-width "1200px" :display :flex :flex-wrap :wrap}}
               content]
-  [sidebar/view]])
-  ;[editor-status]])
+  
+  [editor-status]])
 
 (defn row-wrapper [content]
   [:div {:style {:width "100%" :display :flex 
@@ -75,12 +76,23 @@
                               width-particles)])
     height-particles)])) 
  
+(defn rte-modal []
+ (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
+  [:div#rte-modal {:style {:background :white :position :fixed 
+                           :display :none}}
+    (str  @value-path)
+    (if @value-path 
+     [rtf/view {:value-path @value-path}])]))
+
 (defn view [] 
  [page-wrapper 
     [editor-wrapper 
       [:<> 
+        [rte-modal]
         [selected-particle] 
         [components/view]
-        [editor-grid]]]])       
+        [editor-grid]
+        [sidebar/view]]]])
+               
         
         

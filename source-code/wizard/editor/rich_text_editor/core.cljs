@@ -1,6 +1,7 @@
 (ns wizard.editor.rich-text-editor.core
   (:require
    [reagent.core :refer [create-class atom]]
+   [wizard.editor.rich-text-editor.events]
    [jodit-react :default JoditEditor]
    [re-frame.core :refer [dispatch subscribe]]))
 

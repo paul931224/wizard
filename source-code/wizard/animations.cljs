@@ -12,6 +12,26 @@
                                    :stagger "0.2"}))))) 
                                    
 
+(defn open-rte-modal! []
+  (let [rte-modal          (.getElementById js/document "rte-modal")
+        timeline           (gsap/TimelineMax.)]  
+     (-> timeline
+        (.set rte-modal (clj->js {:display :block}))
+        (.to rte-modal 0.4
+             (clj->js {:ease  "power3.inOut"
+                       :opacity 1
+                       :bottom "0"})))))
+
+(defn close-rte-modal! []
+  (let [rte-modal          (.getElementById js/document "rte-modal")
+        timeline       (gsap/TimelineMax.)]
+     (-> timeline
+        (.set rte-modal (clj->js {:display :none}))
+        (.to rte-modal 0.4
+             (clj->js {:ease  "power3.inOut"
+                       :opacity 0
+                       :bottom "-100%"})))))
+
 (defn open-modal! []
  (let [modal         (.getElementById js/document "modal")
        modal-button  (.getElementById js/document "modal-button")
@@ -84,6 +104,19 @@
  :animation/show-guild-blocks!
  (fn [db [_]]
    {:side-effect (show-guild-blocks!)}))
+
+(reg-event-fx
+ :animation/open-rte-modal!
+ (fn [db [_]]
+   {:dispatch [:db/set [:modal] true]
+    :side-effect (open-rte-modal!)}))
+
+(reg-event-fx
+ :animation/close-rte-modal!
+ (fn [db [_]]
+   {:dispatch [:db/set [:modal] nil]
+    :side-effect (close-rte-modal!)}))
+
 
 (reg-event-fx
  :animation/open-modal!
