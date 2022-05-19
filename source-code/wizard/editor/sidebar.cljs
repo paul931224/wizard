@@ -33,7 +33,7 @@
                      :name "Grid"
                      :grid-columns [2 2 4]
                      :grid-rows    [2 4 2]
-                     :sub-components {}
+                     :components {}
                      :height 20
                      :content "Plain text"}]]))
    

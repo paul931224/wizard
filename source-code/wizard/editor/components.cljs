@@ -7,8 +7,14 @@
 
 
 
+(defn block [comp-router key-and-comp path]
+ (let [the-key                        (first key-and-comp)
+       comp-state                     (second key-and-comp)
+       {:keys [content col row width height]}  comp-state]
+   [:div {:style {:pointer-events "auto"}}
+    [:div.component (html->hiccup content)]]))
 
-(defn plain [key-and-comp]
+(defn plain [comp-router key-and-comp path]
  (let [the-key                        (first key-and-comp)
        comp-state                     (second key-and-comp)
        {:keys [content col row width height]}  comp-state]
@@ -23,7 +29,7 @@
       ;[rtf/view {:value-path [:editor :components the-key :content]}]]))
       
 
-(defn navbar [key-and-comp]
+(defn navbar [comp-router key-and-comp path]
  (let [comp-state                     (second key-and-comp)
        {:keys [height]}  comp-state]
    [:div {:style {:position  :relative 
@@ -43,12 +49,15 @@
  (str 
   (clojure.string/join "fr " numbers-vec) "fr"))
 
-(defn component-wrapper [content]
-  [:div.component-wrapper {:style {:width "100%" :position :relative}}
-   [:div.component-menu "X"]
-   content])
+(defn component-wrapper [content path]
+  (let [path-depth (dec (quot (dec (count path)) 2))] 
+   [:div.component-wrapper 
+    {:style {:width "100%" :position :relative}}
+    [:div.component-menu {:style {:right (* path-depth 30)}}
+     "X" path-depth]
+    content]))
 
-(defn grid [comp-state]
+(defn grid [comp-router comp-state path]
  (let [grid-rows    (:grid-rows    (second comp-state))
        grid-columns (:grid-columns (second comp-state))]
    [:div.grid 
@@ -57,18 +66,26 @@
               :grid-template-rows    (grid-fractions grid-rows)
               :pointer-events "auto"
               :gap "10px"}}
-     (map (fn [a] [component-wrapper [:div a]])
+     (map (fn [a] 
+           (let [id (str (random-uuid))]
+             ^{:key id}[comp-router [id
+                                     {:type :block
+                                      :content "A block"}]
+                                    (vec (concat path [:components id]))]))
           (range (* (count grid-rows) (count grid-columns))))]))
      
 
-(defn component-router [comp-state]
+(defn component-router [comp-state path]
  (let [type (:type (second comp-state))]
   [component-wrapper 
    (case type 
-    :plain  [plain  comp-state]
-    :navbar [navbar comp-state]
-    :grid   [grid   comp-state]
-    [plain comp-state])]))
+    :block  [block  component-router comp-state path]
+    :plain  [plain  component-router comp-state path]
+    :navbar [navbar component-router comp-state path]
+    :grid   [grid   component-router comp-state path]
+    [plain component-router comp-state path])
+   path]))
+  
  
 
 (defn view []
@@ -79,6 +96,9 @@
                   :height "100%"}}  
      [:<> 
         (map
-         (fn [comp-state] ^{:key (first comp-state)}[component-router comp-state])
+         (fn [comp-state] ^{:key (first comp-state)}
+                          [component-router 
+                           comp-state
+                           [:editor :components (first comp-state)]])
          @components)]]))
             

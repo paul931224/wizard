@@ -6,6 +6,7 @@ button {
      font-family: Hack, monospace; 
 }
 
+
 .component-wrapper:hover > .component-menu{
      visibility: visible;
 }
@@ -16,6 +17,8 @@ button {
      background: red;
      right: 0;
      visibility: hidden;
+     padding: 5px;
+     cursor: pointer;
 }
 
 .sidebar-button{
