@@ -49,12 +49,26 @@
  (str 
   (clojure.string/join "fr " numbers-vec) "fr"))
 
+(defn component-menu-button [image-src]
+ [:div.component-menu-button 
+  [:img {:src image-src
+         :style {:height "25px" :width "25px"}}]])
+  
+
+(defn component-menu [path]
+ (let [path-depth (dec (quot (dec (count path)) 2))]
+  [:div.component-menu {:style {:right 0 
+                                :top (* path-depth 30)}}   
+   [component-menu-button "/images/reorder-icon.png"]
+   [component-menu-button "/images/resize-icon.png"]
+   [component-menu-button "/images/remove-icon.png"]]))
+   
+
 (defn component-wrapper [content path]
   (let [path-depth (dec (quot (dec (count path)) 2))] 
    [:div.component-wrapper 
     {:style {:width "100%" :position :relative}}
-    [:div.component-menu {:style {:right (* path-depth 30)}}
-     "X" path-depth]
+    [component-menu path]
     content]))
 
 (defn grid [comp-router comp-state path]

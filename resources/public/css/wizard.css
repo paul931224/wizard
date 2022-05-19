@@ -9,18 +9,24 @@ button {
 
 .component-wrapper:hover > .component-menu{
      visibility: visible;
+     opacity: 1;
+     transition: 0.3s;  
+}
+
+.component-menu-button{
+     cursor: pointer;
 }
 
 .component-menu {
      position: absolute;
      top: -10px;
      z-index: 1000;
-     background: red;
      right: 0;
-     visibility: hidden;
-     padding: 5px;
-     cursor: pointer;
+     visibility: hidden;     
+     opacity: 0;
+     transition: 0.3s;  
      pointer-events: auto;
+     display: flex;
 }
 
 .sidebar-button{
