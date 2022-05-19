@@ -16,6 +16,28 @@
     [:h3 name]]))
     
 
+(defn generate-blocks [elements]
+ (reduce merge 
+    (map 
+      (fn [a] (assoc {} (str (random-uuid)) {:type :block 
+                                             :content "Grid Block"}))
+      elements)))
+ 
+
+(defn grid-block []
+ (let [grid-cols [1]
+       grid-rows [1]
+       grid-elements (range (* 
+                             (count grid-rows)
+                             (count grid-cols)))] 
+  [component-block {:type :grid
+                    :name "Grid"
+                    :grid-columns grid-cols
+                    :grid-rows    grid-rows
+                    :components (generate-blocks grid-elements)
+                    :height 20
+                    :content "Plain text"}]))
+
 (defn sidebar []
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
@@ -29,13 +51,7 @@
                      :name "Navbar"
                      :height 3}]
    [:h3 "Relative"]
-   [component-block {:type :grid
-                     :name "Grid"
-                     :grid-columns [1]
-                     :grid-rows    [1]
-                     :components {}
-                     :height 20
-                     :content "Plain text"}]]))
+   [grid-block]]))
    
 
 (defn view []

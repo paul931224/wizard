@@ -39,23 +39,22 @@
                 
 (defn editor-status []
  (let [editor (subscribe [:db/get [:editor :components]])] 
-  [:div {:style {:position :fixed 
-                 :top 0 
-                 :right 0}}
-      (str @editor)]))  
+  [:div (str @editor)]))  
 
 (defn page-wrapper [content]
- [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
-  content])
+ [:div 
+  [editor-status]
+  [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
+   content]])
  
 
 (defn editor-wrapper [content]
  [:<> 
   [:div#editor {:style {:position :relative
                         :max-width "1200px" :display :flex :flex-wrap :wrap}}
-              content]
+              content]])
   
-  [editor-status]])
+  
 
 (defn row-wrapper [content]
   [:div {:style {:width "100%" :display :flex 
