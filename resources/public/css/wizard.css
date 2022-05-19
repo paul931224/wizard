@@ -14,11 +14,13 @@ button {
 .component-menu {
      position: absolute;
      top: -10px;
+     z-index: 1000;
      background: red;
      right: 0;
      visibility: hidden;
      padding: 5px;
      cursor: pointer;
+     pointer-events: auto;
 }
 
 .sidebar-button{
