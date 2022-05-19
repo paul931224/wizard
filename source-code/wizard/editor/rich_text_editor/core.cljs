@@ -1,6 +1,6 @@
 (ns wizard.editor.rich-text-editor.core
   (:require
-   [reagent.core :refer [create-class atom]]
+   [reagent.core :refer [create-class atom] :as reagent]
    [wizard.editor.rich-text-editor.events]
    [jodit-react :default JoditEditor]
    [re-frame.core :refer [dispatch subscribe]]))
@@ -15,7 +15,7 @@
 
 
 (def jodit-settings {:language "en"
-                     :minHeight "400"
+                     :minHeight "300"
                      :cleanHTML true
                      :cleanWhitespace true})
 
@@ -24,22 +24,24 @@
    {:config    jodit-settings
     :value     @editor-content
     :tabIndex  1
-    :onBlur    (fn [new-html]
-                 (.log js/console (str (remove-most-whitespace new-html)))
-                 (dispatch
-                  [:db/set value-path (remove-most-whitespace new-html)]))}])
+    :onChange    (fn [new-html]
+                   (.log js/console (str (remove-most-whitespace new-html)))
+                   (dispatch
+                    [:db/set value-path (remove-most-whitespace new-html)]))}])
 
 
 (defn view [{:keys [value-path]}]
   (let [local-editor-content              (atom "")
-        editor-content                    (subscribe [:db/get value-path])]
+        editor-content                    (fn [value-path] 
+                                            (subscribe [:db/get value-path]))]
     (create-class
-     {:component-did-mount #(let [original  @editor-content
-                                  local     @local-editor-content]
+     {:component-did-mount #(let [original  @(editor-content value-path)]
                               (reset! local-editor-content (or original "")))
-      :component-did-update #(let [original  @editor-content
-                                   local     @local-editor-content]
-                               (reset! local-editor-content (or original "")))
+      :component-did-update (fn [this old-arg] 
+                              (let [new-argv (rest (reagent/argv this))
+                                    new-value-path (:value-path (first new-argv))
+                                    original  @(editor-content new-value-path)]                              
+                                (reset! local-editor-content (or original ""))))
       :reagent-render
       (fn [{:keys [value-path]}]
         [jodit value-path local-editor-content])})))

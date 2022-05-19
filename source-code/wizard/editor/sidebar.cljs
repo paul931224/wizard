@@ -25,8 +25,8 @@
  
 
 (defn grid-block []
- (let [grid-cols [1]
-       grid-rows [1]
+ (let [grid-cols [2 3 4]
+       grid-rows [2 3 4]
        grid-elements (range (* 
                              (count grid-rows)
                              (count grid-cols)))] 
