@@ -43,7 +43,7 @@
 
 (defn page-wrapper [content]
  [:div 
-  [editor-status]
+  ;[editor-status]
   [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
    content]])
  

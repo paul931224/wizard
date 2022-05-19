@@ -17,6 +17,7 @@
 (def jodit-settings {:language "en"
                      :minHeight "300"
                      :cleanHTML true
+                     :enter "div"
                      :cleanWhitespace true})
 
 (defn jodit [value-path editor-content]
