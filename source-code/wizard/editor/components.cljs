@@ -53,9 +53,10 @@
   (str
    (clojure.string/join "fr " numbers-vec) "fr"))
 
-(defn component-menu-button [image-src]
+(defn component-menu-button [on-click image-src]
   [:div.component-menu-button
-   [:img {:src image-src
+   [:img {:on-click on-click
+          :src image-src
           :style {:height "25px" :width "25px"}}]])
 
 
@@ -63,9 +64,9 @@
   (let [path-depth (dec (quot (dec (count path)) 2))]
     [:div.component-menu {:style {:right 0
                                   :top (* path-depth 30)}}
-     [component-menu-button "/images/reorder-icon.png"]
-     [component-menu-button "/images/resize-icon.png"]
-     [component-menu-button "/images/remove-icon.png"]]))
+     [component-menu-button #() "/images/reorder-icon.png"]
+     [component-menu-button #() "/images/resize-icon.png"]
+     [component-menu-button #(dispatch [:editor/remove! path]) "/images/remove-icon.png"]]))
 
 
 (defn component-wrapper [content path]
