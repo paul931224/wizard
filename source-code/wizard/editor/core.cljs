@@ -78,19 +78,19 @@
 (defn rte-modal []
  (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
   [:div#rte-modal {:style {:position :fixed 
-                           :display :none 
+                           
                            :bottom "-100%"
                            :left 0
                            :width "100%"}}
     [:div 
-     {:style {:display :flex :justify-content :right}}
-     [:img {:on-click #(dispatch [:rich-text-editor/close!])
-            :height "25px"
-            :width "25px"
-            :src "/images/remove-icon.png"}]]
-    [:div {:style {:background :white}}
-      (if @value-path 
-       [rtf/view {:value-path @value-path}])]]))
+     {:style {:display :flex :justify-content :right
+              :height "100vh" 
+              :flex-direction :column}}
+     [:div {:style {:flex-grow 1 :width "100vw"}
+            :on-click #(dispatch [:rich-text-editor/close!])}]
+     [:div {:style {:background :white}}
+       (if @value-path 
+        [rtf/view {:value-path @value-path}])]]]))
 
 (defn view [] 
  [page-wrapper 

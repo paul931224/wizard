@@ -16,7 +16,8 @@
   (let [rte-modal          (.getElementById js/document "rte-modal")
         timeline           (gsap/TimelineMax.)]  
      (-> timeline
-        (.set rte-modal (clj->js {:display :block}))
+        (.set rte-modal (clj->js {:visibility :visible 
+                                  :pointer-events :auto}))
         (.to rte-modal 0.4
              (clj->js {:ease  "power3.inOut"
                        :opacity 1
@@ -26,11 +27,13 @@
   (let [rte-modal          (.getElementById js/document "rte-modal")
         timeline       (gsap/TimelineMax.)]
      (-> timeline
-        (.set rte-modal (clj->js {:display :none}))
-        (.to rte-modal 0.4
+        (.to rte-modal 0.7
              (clj->js {:ease  "power3.inOut"
                        :opacity 0
-                       :bottom "-100%"})))))
+                       :bottom "-100%"
+                       :onComplete #(.set rte-modal (clj->js {:visibility     :hidden 
+                                                              :pointer-events :none}))})))))
+                       
 
 (defn open-modal! []
  (let [modal         (.getElementById js/document "modal")

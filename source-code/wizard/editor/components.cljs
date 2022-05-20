@@ -71,7 +71,7 @@
 (defn component-wrapper [content path]
   (let [path-depth (dec (quot (dec (count path)) 2))]
     [:div.component-wrapper
-     {:style {:width "100%" :position :relative}}
+     {:style {:position :relative}}
      [component-menu path]
      content]))
 
@@ -84,6 +84,7 @@
               :grid-template-columns (grid-fractions grid-columns)
               :grid-template-rows    (grid-fractions grid-rows)
               :pointer-events "auto"
+              :justify-items :center
               :gap "10px"}}
      ;(str path " - "  (vec (concat path [:components (first comp-state)])))
      (map (fn [component]
