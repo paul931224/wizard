@@ -57,6 +57,11 @@
   [grid-block]])
 
 
+(defn component-label [label]
+ [:span {:style {:background "#333" :color "#ddd" 
+                 :padding "2px"}}
+  (str label)])
+
 (defn component-hierarchy [component-data path]
  (let [components (:components component-data)
        this-name (:name component-data)
@@ -66,8 +71,13 @@
     [:div {:style {:margin-top "10px"
                    :background :white 
                    :padding "10px 5px"
-                   :color "#222"}}
-          (str this-type)]
+                   :color "#222"
+                   :display :flex 
+                   :justify-content :space-between}}
+          [component-label (str this-type)]
+          [:img {:src "/images/arrow-down-icon.png" 
+                 :width "25px"
+                 :height "25px"}]]
     (map
      (fn [component]
         (let [component-key    (first component)
