@@ -4,6 +4,11 @@
 
 
 (reg-event-db
+ :editor/modify!
+ (fn [db [_ new-component]]
+   (assoc-in db [:editor :components (str (random-uuid))] new-component)))
+
+(reg-event-db
  :editor/remove!
  (fn [db [_ path]]
    (let [path-to-key (vec (butlast path))

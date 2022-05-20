@@ -1,4 +1,4 @@
-(ns wizard.editor.sidebar
+(ns wizard.editor.sidebar.core
   (:require  [re-frame.core :refer [dispatch subscribe]]))
 
 
@@ -7,7 +7,9 @@
 (defn component-block [{:keys [name] :as component-data}]
  (let [pos (subscribe [:db/get [:editor :selected-particle]])]
   [:div.wizard-component 
-    {:on-click (fn [e] (dispatch [:editor/add! (merge component-data @pos)]))
+    {:on-click (fn [e] 
+                (dispatch [:editor/add! (merge component-data @pos)])
+                (dispatch [:animation/close-sidebar!]))
      :style {:color "#333" 
              :cursor :pointer
              :padding "5px"
@@ -40,22 +42,49 @@
                     :grid-background "#EEE"
                     :content "Plain text"}]))
 
+(defn elements []
+ [:div
+  [:h3 "Absolute"]
+  [component-block {:type :plain
+                    :name "Plain"
+                    :width 30
+                    :height 10
+                    :content "Plain text"}]
+  [component-block {:type :navbar
+                    :name "Navbar"
+                    :height 3}]
+  [:h3 "Relative"]
+  [grid-block]])
+
+
+(defn component-hierarchy [component-data path]
+ (let [components (:components component-data)
+       this-name (:name component-data)
+       this-type (:type component-data)
+       path-depth (count path)]
+   [:div {:style {:margin-left (str (* path-depth 10) "px")}}
+    [:div {:style {:margin-top "10px"
+                   :background :white 
+                   :padding "10px 5px"
+                   :color "#222"}}
+          (str this-type)]
+    (map
+     (fn [component]
+        (let [component-key    (first component)
+              component-value  (second component)]
+          [component-hierarchy 
+             component-value 
+             (vec (concat path [:components component-key]))]))            
+     components)]))     
+ 
+  
+
 (defn sidebar []
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
-   [:h3 "Absolute"]
-   [component-block {:type :plain 
-                     :name "Plain"
-                     :width 30 
-                     :height 10
-                     :content "Plain text"}]
-   [component-block {:type :navbar
-                     :name "Navbar"
-                     :height 3}]
-   [:h3 "Relative"]
-   [grid-block]]))
+    [component-hierarchy @editor []]
+    [elements]]))
    
-
 (defn view []
  [:div 
   [:div#sidebar-container 
@@ -64,6 +93,7 @@
              :top 0 
              :cursor :pointer
              :left 0 
+             
              :height "100vh"
              :width  "100vw"
              :display :none 
@@ -73,8 +103,9 @@
                          :right "-100%" 
                          :z-index 100 
                          :color :white
-                         :width "300px"
-                         :height "100vh" 
+                         :width "500px"
+                         :height "100vh"
+                         :overflow-y :scroll 
                          :background "#333" 
                          :padding "10px"}} 
     [sidebar]]])

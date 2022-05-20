@@ -1,7 +1,7 @@
 (ns wizard.editor.core
  (:require  [re-frame.core :refer [dispatch subscribe]]
             [wizard.editor.components :as components]
-            [wizard.editor.sidebar :as sidebar]
+            [wizard.editor.sidebar.core :as sidebar]
             [wizard.editor.events]
             [wizard.editor.config :refer [row-height col-width]]
             [wizard.editor.rich-text-editor.core :as rtf]))
@@ -43,7 +43,7 @@
 
 (defn page-wrapper [content]
  [:div 
-  ;[editor-status]
+  [editor-status]
   [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
    content]])
  

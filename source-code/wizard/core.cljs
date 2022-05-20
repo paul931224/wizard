@@ -165,7 +165,9 @@
 (defn view []
   (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
    (reagent/create-class
-    {:component-did-mount (fn [e] (dispatch [:web3/setup]))
+    {:component-did-mount (fn [e] 
+                           (dispatch [:web3/setup])
+                           (dispatch [:db/init]))                 
      :reagent-render 
      (fn []
         [wrapper

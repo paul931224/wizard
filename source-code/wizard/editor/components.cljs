@@ -65,7 +65,7 @@
     [:div.component-menu {:style {:right 0
                                   :top (* path-depth 30)}}
      [component-menu-button #() "/images/reorder-icon.png"]
-     [component-menu-button #() "/images/resize-icon.png"]
+     [component-menu-button #(dispatch [:sidebar/component-editor path]) "/images/type-icon.png"]
      [component-menu-button #(dispatch [:editor/remove! path]) "/images/remove-icon.png"]]))
 
 
