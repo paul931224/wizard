@@ -78,7 +78,7 @@
 (defn rte-modal []
  (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
   [:div#rte-modal {:style {:position :fixed 
-                           
+                           :z-index 2000
                            :bottom "-100%"
                            :left 0
                            :width "100%"}}

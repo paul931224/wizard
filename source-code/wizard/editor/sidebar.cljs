@@ -36,6 +36,8 @@
                     :grid-rows    grid-rows
                     :components (generate-blocks grid-elements)
                     :height 20
+                    :grid-padding 20
+                    :grid-background "#EEE"
                     :content "Plain text"}]))
 
 (defn sidebar []

@@ -76,16 +76,21 @@
      content]))
 
 (defn grid [comp-router comp-state path]
-  (let [grid-rows    (:grid-rows     (second comp-state))
-        grid-columns (:grid-columns  (second comp-state))
-        grid-components (:components (second comp-state))]
+  (let [value            (second comp-state)
+        grid-rows        (:grid-rows     value)
+        grid-columns     (:grid-columns  value)
+        grid-components  (:components    value)
+        grid-padding     (:grid-padding  value)
+        grid-background  (:grid-background  value)]
     [:div.grid
      {:style {:display :grid
               :grid-template-columns (grid-fractions grid-columns)
               :grid-template-rows    (grid-fractions grid-rows)
               :pointer-events "auto"
               :justify-items :center
-              :gap "10px"}}
+              :gap "10px"              
+              :padding (str grid-padding "px")
+              :background grid-background}}
      ;(str path " - "  (vec (concat path [:components (first comp-state)])))
      (map (fn [component]
             ^{:key (first component)} [comp-router component

@@ -31,8 +31,8 @@
              (clj->js {:ease  "power3.inOut"
                        :opacity 0
                        :bottom "-100%"
-                       :onComplete #(.set rte-modal (clj->js {:visibility     :hidden 
-                                                              :pointer-events :none}))})))))
+                       :onComplete #(.set timeline rte-modal (clj->js {:visibility     :hidden 
+                                                                       :pointer-events :none}))})))))
                        
 
 (defn open-modal! []
