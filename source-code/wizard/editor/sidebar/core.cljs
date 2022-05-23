@@ -1,5 +1,6 @@
 (ns wizard.editor.sidebar.core
-  (:require  [re-frame.core :refer [dispatch subscribe]]))
+  (:require  [re-frame.core :refer [dispatch subscribe]]
+             [plugins.drag-and-drop :as dnd]))
 
 
 
@@ -93,7 +94,8 @@
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
     [component-hierarchy @editor []]
-    [elements]]))
+    [elements]
+    [dnd/view]]))
    
 (defn view []
  [:div 
