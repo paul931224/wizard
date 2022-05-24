@@ -17,6 +17,8 @@
     (update-in db path-to-key dissoc the-key))))
 
 (reg-event-db
- :editor/add!
+ :editor/add! 
  (fn [db [_ component]]
-   (assoc-in db [:editor :components (str (random-uuid))] component)))
+   (let [next-comp-count (count (-> db :editor :components))] 
+    (assoc-in db [:editor :components (str (random-uuid))] 
+     (assoc component :position next-comp-count)))))

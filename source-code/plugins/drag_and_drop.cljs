@@ -58,14 +58,14 @@
                   :style (sortable-style transform transition)}
                  attributes
                  listeners)
-     (str (:item props))]))
+     [(:component props) (:item props)]]))
 
 (defn get-item-with-id [items id]
  (first (filter 
           (fn [item] (= (:id item) id))
           items)))
 
-(defn sortable-example [prop-items value-path]
+(defn sortable-example [prop-items value-path component]
   (let [[activeId, setActiveId]  (react/useState nil)
         [items, setItems] (react/useState (clj->js prop-items))
         sensors (useSensors
@@ -86,17 +86,18 @@
                             (setItems new-order-js)))
                         (setActiveId nil))]
     [dnd-context {:sensors  sensors
-                   :collisionDetection closestCenter
-                   :onDragEnd     handleDragEnd
-                   :onDragStart  (fn [e] 
-                                  (setActiveId (get (js->clj (aget e "active")) "id")))}
+                  :collisionDetection closestCenter
+                  :onDragEnd     handleDragEnd
+                  :onDragStart  (fn [e] 
+                                 (setActiveId (get (js->clj (aget e "active")) "id")))}
           [sortable-context {:items    items
                              :strategy verticalListSortingStrategy}
            (map (fn [item] (let [clj-item (to-clj-map item)] 
                             [:f> sortable-item {:id   (:id clj-item)
                                                 :key  (:id clj-item)
                                                 :item clj-item 
-                                                :value-path value-path}]))
+                                                :component component}])) 
+                                                
                 items)]]))
        ;[drag-overlay [:f> drag-overlay-item {:id (if activeId activeId nil)}]]]))
 
@@ -119,8 +120,8 @@
    when-in-may))
                
 
-(defn view [{:keys [value-path]}]
+(defn view [{:keys [value-path component]}]
   (let [items (subscribe [:db/get value-path])] 
-   [:div (str @items) 
-    (if @items 
-     [:f> sortable-example (id-map->ordered-vector @items) value-path])]))
+    [:div (str @items)
+     (if @items 
+      ^{:key (str @items)}[:f> sortable-example (id-map->ordered-vector @items) value-path component])]))

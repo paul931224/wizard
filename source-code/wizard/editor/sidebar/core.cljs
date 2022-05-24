@@ -21,9 +21,10 @@
 
 (defn generate-blocks [elements]
  (reduce merge 
-    (map 
-      (fn [a] (assoc {} (str (random-uuid)) {:type :block 
-                                             :content "Grid Block"}))
+    (map-indexed 
+      (fn [index a] (assoc {} (str (random-uuid)) {:type :block 
+                                                   :position index
+                                                   :content "Grid Block"}))
       elements)))
  
 
@@ -63,6 +64,9 @@
                  :padding "2px"}}
   (str label)])
 
+(defn dnd-component [props]
+  [:div "oi " (str props)])
+
 (defn component-hierarchy [component-data path]
  (let [components (:components component-data)
        this-name (:name component-data)
@@ -79,23 +83,28 @@
           [:img {:src "/images/arrow-down-icon.png" 
                  :width "25px"
                  :height "25px"}]]
-    (map
-     (fn [component]
-        (let [component-key    (first component)
-              component-value  (second component)]
-          [component-hierarchy 
-             component-value 
-             (vec (concat path [:components component-key]))]))            
-     components)]))     
+    ;[:div (str (count @(subscribe [:db/get [:editor :components]])))]
+    [dnd/view {:value-path [:editor :components]
+               :component dnd-component}]]))
+    ;; (map-indexed
+    ;;  (fn [index component]
+    ;;     (let [component-key    (first component)
+    ;;           component-value  (second component)]
+    ;;       ^{:key index}[component-hierarchy 
+    ;;                       component-value 
+    ;;                       (vec (concat path [:components component-key]))]))            
+    ;;  components)]))     
  
   
+ 
 
 (defn sidebar []
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
     [component-hierarchy @editor []]
     [elements]
-    [dnd/view {:value-path [:example]}]]))
+    [dnd/view {:value-path [:example] 
+               :component  dnd-component}]]))    
    
 (defn view []
  [:div 
