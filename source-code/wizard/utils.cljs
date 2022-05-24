@@ -5,8 +5,11 @@
 
 (reg-event-db
  :db/init
- (fn db [_]
+ (fn [db [_]]
    (-> db 
+    (assoc :example [{:id 1 :name "hello1" :type :block}
+                     {:id 2 :name "hello2" :type :block}
+                     {:id 3 :name "hello3" :type :block}])
     (assoc-in [:editor :type] :root)
     (assoc-in [:editor :name] "Root"))))
 

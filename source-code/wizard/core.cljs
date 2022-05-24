@@ -6,7 +6,8 @@
     [wizard.web3]
     [wizard.editor.core :as editor]
     [reagent.core     :as reagent]
-    [re-frame.core    :refer [dispatch subscribe]]))
+    [re-frame.core    :refer [dispatch subscribe]]
+    [plugins.drag-and-drop :as dnd]))
     
 
 (def color-one "#EEE")
@@ -170,11 +171,13 @@
                            (dispatch [:db/init]))                 
      :reagent-render 
      (fn []
-        [wrapper
-         [:div {:style {:flex-grow 1}}
-          (if @guild-selected 
-            [hero-title] 
-            [editor/view])
-          [modal]]])})))
+        [:div 
+         [wrapper
+          [:div {:style {:flex-grow 1}}
+           (if @guild-selected 
+             [hero-title] 
+             [editor/view])
+           [modal]]]])})))
+         
     
     

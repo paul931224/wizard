@@ -95,7 +95,7 @@
   [:div 
     [component-hierarchy @editor []]
     [elements]
-    [dnd/view]]))
+    [dnd/view {:value-path [:example]}]]))
    
 (defn view []
  [:div 
@@ -105,7 +105,6 @@
              :top 0 
              :cursor :pointer
              :left 0 
-             
              :height "100vh"
              :width  "100vw"
              :display :none 
