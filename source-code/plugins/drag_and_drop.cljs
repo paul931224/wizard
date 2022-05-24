@@ -25,6 +25,21 @@
 (defn to-clj-map [hash-map]
   (js->clj hash-map :keywordize-keys true))
 
+(defn id-map->ordered-vector [coll]
+  (let [pos-to-index (fn [[item-id item-value]]
+                        [(:position item-value)
+                         (assoc item-value :id item-id)])]
+     (mapv second
+          (sort-by first
+                   (map pos-to-index coll)))))
+
+(defn ordered-vector->id-map [coll]
+  (let [index-to-pos (fn [index item]
+                       {(:id item)   (-> item 
+                                         (dissoc :id)
+                                         (assoc  :position index))})]
+    (reduce merge (map-indexed index-to-pos coll))))
+
 (defn sortable-style [transform transition]
  {:transform (.toString (.-Transform CSS) (clj->js transform))
   :transition transition
@@ -43,13 +58,12 @@
                   :style (sortable-style transform transition)}
                  attributes
                  listeners)
-     (str props)]))
+     (str (:item props))]))
 
 (defn get-item-with-id [items id]
  (first (filter 
           (fn [item] (= (:id item) id))
           items)))
-
 
 (defn sortable-example [prop-items value-path]
   (let [[activeId, setActiveId]  (react/useState nil)
@@ -66,10 +80,9 @@
                                 over-item    (get-item-with-id items over-index)
                                 oldIndex     (.indexOf items active-item)
                                 newIndex     (.indexOf items over-item)
-                                new-order    (js->clj (arrayMove (clj->js items) oldIndex newIndex))
-                                new-order-js (clj->js new-order)]
-                            (js/console.log oldIndex " - "items)
-                            (dispatch [:db/set (:value-path prop-items) new-order])
+                                new-order    (to-clj-map (arrayMove (clj->js items) oldIndex newIndex))
+                                new-order-js (clj->js new-order)]                            
+                            (dispatch [:db/set value-path (ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
                         (setActiveId nil))]
     [dnd-context {:sensors  sensors
@@ -88,7 +101,26 @@
        ;[drag-overlay [:f> drag-overlay-item {:id (if activeId activeId nil)}]]]))
 
 
+
+
+
+
+(def when-in-may {"id3" {:type :grid
+                         :position 1}
+                  "id2" {:type :grid
+                         :position 0}
+                  "id4" {:type :grid 
+                         :position 2}
+                  "id5" {:type :grid
+                         :position 3}}) 
+
+(ordered-vector->id-map 
+ (id-map->ordered-vector 
+   when-in-may))
+               
+
 (defn view [{:keys [value-path]}]
   (let [items (subscribe [:db/get value-path])] 
-   (if @items 
-    [:f> sortable-example @items value-path])))
+   [:div (str @items) 
+    (if @items 
+     [:f> sortable-example (id-map->ordered-vector @items) value-path])]))
