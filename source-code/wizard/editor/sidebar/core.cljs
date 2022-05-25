@@ -78,19 +78,9 @@
        this-type (:type component-data)
        path-depth (count path)]
    [:div {:style {:margin-left (str (* path-depth 10) "px")}}
-    ;; [:div {:style {:margin-top "10px"}
-    ;;             :background :white 
-    ;;               :padding "10px 5px"
-    ;;               :color "#222"
-    ;;             :display :flex 
-    ;;               :justify-content :space-between}
-    ;;       [component-label (str this-type)]
-    ;;    [:img {:src "/images/arrow-down-icon.png" 
-    ;;              :width "25px"
-    ;;              :height "25px"}]]
-    [:div (str path)]
     [dnd/view {:value-path (vec (concat [:editor] (conj path :components)))
-               :component  component-hierarchy}]]))     
+               :component-data component-data
+               :component      component-hierarchy}]]))     
  
   
  
