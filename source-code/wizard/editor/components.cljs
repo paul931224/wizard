@@ -77,7 +77,8 @@
      content]))
 
 (defn grid [comp-router comp-state path]
-  (let [value            (second comp-state)
+  (let [the-key          (first comp-state)
+        value            (second comp-state)
         grid-rows        (:grid-rows     value)
         grid-columns     (:grid-columns  value)
         grid-components  (:components    value)
@@ -94,9 +95,9 @@
               :background grid-background}}
      ;(str path " - "  (vec (concat path [:components (first comp-state)])))
      (map (fn [component]
-            ^{:key (first component)} [comp-router component
-                                         (vec (concat path [:components (first component)]))])
-          grid-components)]))
+            ^{:key the-key} [comp-router component
+                             (vec (concat path [:components (first component)]))])
+          (sort-by (fn [a] (:position (second a))) grid-components))]))
 
 
 
@@ -104,11 +105,11 @@
   (let [type (:type (second comp-state))]
     [component-wrapper
      (case type
-       :block  [block  component-router comp-state path]
-       :plain  [plain  component-router comp-state path]
-       :navbar [navbar component-router comp-state path]
-       :grid   [grid   component-router comp-state path]
-       [plain component-router comp-state path])
+       "block"  [block  component-router comp-state path]
+       "plain"  [plain  component-router comp-state path]
+       "navbar" [navbar component-router comp-state path]
+       "grid"   [grid   component-router comp-state path]
+       [block component-router comp-state path])
      path]))
 
 

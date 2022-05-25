@@ -50,7 +50,7 @@
   :padding "5px"
   :border-radius "10px"})
 
-(defn sortable-item [props]
+(defn sortable-item [props path]
   (let [{:keys [attributes listeners setNodeRef transform transition]} 
         (to-clj-map (useSortable (clj->js {:id (:id props)})))]
     [:div (merge {:id    (str (:id props))
@@ -58,14 +58,22 @@
                   :style (sortable-style transform transition)}
                  attributes
                  listeners)
-     [(:component props) (:item props)]]))
+     [:div (str (:content (:item props)))]
+     (let [item            (:item props)
+           id              (:id item)
+           components      (:components item)
+           component       (:component props)
+           component-data  (:component-data props)
+           new-path    (vec (concat path [:components id]))]
+      (if components
+          [component component-data new-path]))]))
 
 (defn get-item-with-id [items id]
  (first (filter 
           (fn [item] (= (:id item) id))
           items)))
 
-(defn sortable-example [prop-items value-path component]
+(defn sortable-example [prop-items value-path component component-data]
   (let [[activeId, setActiveId]  (react/useState nil)
         [items, setItems] (react/useState (clj->js prop-items))
         sensors (useSensors
@@ -96,32 +104,20 @@
                             [:f> sortable-item {:id   (:id clj-item)
                                                 :key  (:id clj-item)
                                                 :item clj-item 
-                                                :component component}])) 
+                                                :component component 
+                                                :component-data component-data
+                                                :path value-path}])) 
                                                 
                 items)]]))
        ;[drag-overlay [:f> drag-overlay-item {:id (if activeId activeId nil)}]]]))
 
 
-
-
-
-
-(def when-in-may {"id3" {:type :grid
-                         :position 1}
-                  "id2" {:type :grid
-                         :position 0}
-                  "id4" {:type :grid 
-                         :position 2}
-                  "id5" {:type :grid
-                         :position 3}}) 
-
-(ordered-vector->id-map 
- (id-map->ordered-vector 
-   when-in-may))
-               
-
-(defn view [{:keys [value-path component]}]
+(defn view [{:keys [value-path component component-data]}]
   (let [items (subscribe [:db/get value-path])] 
-    [:div (str @items)
-     (if @items 
-      ^{:key (str @items)}[:f> sortable-example (id-map->ordered-vector @items) value-path component])]))
+    (if @items 
+      ^{:key (str @items)}
+      [:f> sortable-example 
+       (id-map->ordered-vector @items)
+       value-path
+       component
+       component-data])))

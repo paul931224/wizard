@@ -34,7 +34,7 @@
        grid-elements (range (* 
                              (count grid-rows)
                              (count grid-cols)))] 
-  [component-block {:type :grid
+  [component-block {:type "grid"
                     :name "Grid"
                     :grid-columns grid-cols
                     :grid-rows    grid-rows
@@ -47,12 +47,17 @@
 (defn elements []
  [:div
   [:h3 "Absolute"]
-  [component-block {:type :plain
+  [component-block {:type "block"
+                    :name "Block"
+                    :width 30
+                    :height 10
+                    :content "Block text"}]
+  [component-block {:type "plain"
                     :name "Plain"
                     :width 30
                     :height 10
                     :content "Plain text"}]
-  [component-block {:type :navbar
+  [component-block {:type "navbar"
                     :name "Navbar"
                     :height 3}]
   [:h3 "Relative"]
@@ -65,7 +70,7 @@
   (str label)])
 
 (defn dnd-component [props]
-  [:div "oi " (str props)])
+  [:div (str (:type props) " - " (:position props) " - " (:content props))])
 
 (defn component-hierarchy [component-data path]
  (let [components (:components component-data)
@@ -73,27 +78,19 @@
        this-type (:type component-data)
        path-depth (count path)]
    [:div {:style {:margin-left (str (* path-depth 10) "px")}}
-    [:div {:style {:margin-top "10px"
-                   :background :white 
-                   :padding "10px 5px"
-                   :color "#222"
-                   :display :flex 
-                   :justify-content :space-between}}
-          [component-label (str this-type)]
-          [:img {:src "/images/arrow-down-icon.png" 
-                 :width "25px"
-                 :height "25px"}]]
-    ;[:div (str (count @(subscribe [:db/get [:editor :components]])))]
-    [dnd/view {:value-path [:editor :components]
-               :component dnd-component}]]))
-    ;; (map-indexed
-    ;;  (fn [index component]
-    ;;     (let [component-key    (first component)
-    ;;           component-value  (second component)]
-    ;;       ^{:key index}[component-hierarchy 
-    ;;                       component-value 
-    ;;                       (vec (concat path [:components component-key]))]))            
-    ;;  components)]))     
+    ;; [:div {:style {:margin-top "10px"}
+    ;;             :background :white 
+    ;;               :padding "10px 5px"
+    ;;               :color "#222"
+    ;;             :display :flex 
+    ;;               :justify-content :space-between}
+    ;;       [component-label (str this-type)]
+    ;;    [:img {:src "/images/arrow-down-icon.png" 
+    ;;              :width "25px"
+    ;;              :height "25px"}]]
+    [:div (str path)]
+    [dnd/view {:value-path (vec (concat [:editor] (conj path :components)))
+               :component  component-hierarchy}]]))     
  
   
  
@@ -102,9 +99,8 @@
  (let [editor (subscribe [:db/get [:editor]])]
   [:div 
     [component-hierarchy @editor []]
-    [elements]
-    [dnd/view {:value-path [:example] 
-               :component  dnd-component}]]))    
+    [elements]]))
+    
    
 (defn view []
  [:div 

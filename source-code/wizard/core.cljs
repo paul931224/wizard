@@ -171,13 +171,12 @@
                            (dispatch [:db/init]))                 
      :reagent-render 
      (fn []
-        [:div 
-         [wrapper
+        [wrapper
           [:div {:style {:flex-grow 1}}
            (if @guild-selected 
              [hero-title] 
              [editor/view])
-           [modal]]]])})))
+           [modal]]])})))
          
     
     
