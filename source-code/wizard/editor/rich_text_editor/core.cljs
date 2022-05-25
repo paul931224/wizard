@@ -45,4 +45,4 @@
                                 (reset! local-editor-content (or original ""))))
       :reagent-render
       (fn [{:keys [value-path]}]
-        [jodit value-path local-editor-content])})))
+        ^{:key value-path}[jodit value-path local-editor-content])})))
