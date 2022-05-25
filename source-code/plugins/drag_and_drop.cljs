@@ -2,6 +2,7 @@
  (:require [reagent.core :as r]
            [re-frame.core :refer [dispatch subscribe]]
            ["react" :as react]
+           [reagent-hickory.sweet :refer [html->hiccup]]
            ["@dnd-kit/core" :refer [DndContext
                                     closestCenter
                                     KeyboardSensor
@@ -58,7 +59,7 @@
                   :style (sortable-style transform transition)}
                  attributes
                  listeners)
-     [:div (str (:content (:item props)))]
+     [:div (html->hiccup  (:content (:item props)))]
      (let [item            (:item props)
            id              (:id item)
            components      (:components item)

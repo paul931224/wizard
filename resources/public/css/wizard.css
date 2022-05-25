@@ -55,6 +55,16 @@ button {
    border: 1px solid #dddddeDD;
 }
 
+.component-wrapper{
+     border:1px solid transparent;
+     transition: 0.2s ease;
+}
+
+.component-wrapper:hover{
+     border: 1px solid rgba(255, 0, 0, 0.386);
+     transition: 0.2 ease;
+}
+
 .editor-particle:hover{
      animation: rainbow-bg 5s linear;
      animation-iteration-count: infinite;

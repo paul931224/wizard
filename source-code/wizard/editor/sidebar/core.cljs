@@ -1,6 +1,6 @@
 (ns wizard.editor.sidebar.core
   (:require  [re-frame.core :refer [dispatch subscribe]]
-             [plugins.drag-and-drop :as dnd]))
+             [plugins.drag-and-drop :as dnd] ))
 
 
 
