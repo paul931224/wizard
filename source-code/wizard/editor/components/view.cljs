@@ -28,14 +28,10 @@
 
 (defn view []
   (let [components (subscribe [:db/get [:editor :components]])]
-    [:div {:style {:position :absolute
-                   :pointer-events :none
-                   :width "100%"
-                   :height "100%"}}
-     [:<>
+    [:div {:style {:width "100%"}}
       (map
        (fn [comp-state] ^{:key (first comp-state)}
          [component-router
           comp-state
           [:editor :components (first comp-state)]])
-       @components)]]))
+       @components)]))

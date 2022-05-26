@@ -41,10 +41,8 @@
   [:div (str @editor)]))  
 
 (defn page-wrapper [content]
- [:div 
-  ;[editor-status]
-  [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
-   content]])
+ [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
+   content])
  
 
 (defn editor-wrapper [content]
@@ -76,12 +74,9 @@
  
 (defn view [] 
  [page-wrapper 
-    [editor-wrapper 
-      [:<> 
-        [toolbars/view]
-        ;[selected-particle] 
-        [components/view]]]])
-        ;[editor-grid]
+  [:<> 
+     [toolbars/view]
+     [components/view]]])
         
                
         

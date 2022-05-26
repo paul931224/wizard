@@ -6,8 +6,9 @@
   (let [pos (subscribe [:db/get [:editor :selected-particle]])]
      [:div.wizard-component
       {:on-click (fn [e]
-                    (dispatch [:editor/add! (merge component-data @pos)])
-                    (dispatch [:animation/close-sidebar!]))
+                    (.log js/console "hello")
+                    (dispatch [:editor/add! (merge component-data @pos)]))
+                    ;(dispatch [:animation/close-sidebar!]))
        :style {:color "#333"
                 :cursor :pointer
                :padding "5px"
@@ -20,8 +21,8 @@
   (reduce merge
            (map-indexed
             (fn [index a] (assoc {} (str (random-uuid)) {:type :block
-                                                              :position index
-                                                              :content "Grid Block"}))
+                                                         :position index
+                                                         :content "Grid Block"}))
             elements)))
 
 
@@ -30,7 +31,7 @@
         grid-rows [2 3 4]
         grid-elements (range (*
                                (count grid-rows)
-                              (count grid-cols)))]
+                               (count grid-cols)))]
      [component-block {:type "grid"
                        :name "Grid"
                        :grid-columns grid-cols

@@ -26,18 +26,22 @@
        {:keys [attributes listeners setNodeRef  transform]} 
        (to-clj-map (useDraggable (clj->js {:id id})))
        moved-style (subscribe [:db/get [:editor :toolbars id]])]
-      [:div (merge 
+      [:div (merge
              {:ref (js->clj setNodeRef)
-              :style 
-                 (merge 
-                   {:cursor :pointer 
-                    :color "#DDD"}
-                   draggable-window-style
-                   @moved-style)}
-             listeners 
-             attributes)       
-       label 
-       (:component props)]))
+              :style (merge
+                      {:cursor :pointer
+                       :color "#DDD"
+                       :max-height "90vh"
+                       :overflow :scroll}
+                      draggable-window-style
+                      @moved-style)}            
+             attributes)
+       [:div (merge 
+              {:ref (js->clj setNodeRef)}
+              listeners)
+             label]       
+       [:div 
+        (:component props)]]))
 
 
 (defn components-window []
