@@ -59,7 +59,11 @@
                   :style (sortable-style transform transition)}
                  attributes
                  listeners)
-     [:div (html->hiccup  (:content (:item props)))]
+     [:div 
+       {:on-mouse-enter #(dispatch [:db/set [:editor :hovered-component] (str (:id props))])
+        :on-mouse-leave #(dispatch [:db/set [:editor :hovered-component] nil])
+        :style {:cursor :pointer}}
+       (html->hiccup  (:content (:item props)))]
      (let [item            (:item props)
            id              (:id item)
            components      (:components item)
