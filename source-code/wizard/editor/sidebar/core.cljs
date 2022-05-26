@@ -1,8 +1,8 @@
 (ns wizard.editor.sidebar.core
-  (:require  [re-frame.core :refer [dispatch subscribe]]
-             [plugins.drag-and-drop :as dnd] ))
-
-
+  (:require  
+   [reagent.core :refer [atom]]
+   [re-frame.core :refer [dispatch subscribe]]
+   [plugins.drag-and-drop :as dnd]))
 
 
 (defn component-block [{:keys [name] :as component-data}]
@@ -63,15 +63,6 @@
   [:h3 "Relative"]
   [grid-block]])
 
-
-(defn component-label [label]
- [:span {:style {:background "#333" :color "#ddd" 
-                 :padding "2px"}}
-  (str label)])
-
-(defn dnd-component [props]
-  [:div (str (:type props) " - " (:position props) " - " (:content props))])
-
 (defn component-hierarchy [component-data path]
  (let [components (:components component-data)
        this-name (:name component-data)
@@ -82,14 +73,31 @@
                :component-data component-data
                :component      component-hierarchy}]]))     
  
-  
+(def sidebar-atom (atom :components))
  
+ 
+(defn sidebar-menu-item [menu-key url]
+ [:div {:on-click #(reset! sidebar-atom menu-key)
+        :style {:flex-grow 1
+                :display :flex
+                :cursor :pointer
+                :justify-content :center}}                
+  [:img {:src url
+         :width "40px" :height "40px"}]])
+
+(defn sidebar-menu []
+  [:div {:style {:display :flex}}    
+   [sidebar-menu-item :components "/images/components-icon.png"]
+   [sidebar-menu-item :order      "/images/order-icon.png"]])
 
 (defn sidebar []
  (let [editor (subscribe [:db/get [:editor]])]
-  [:div 
-    [component-hierarchy @editor []]
-    [elements]]))
+  (fn [] 
+   [:div 
+     [sidebar-menu]
+     (case @sidebar-atom 
+      :order      [component-hierarchy @editor []]
+      :components [elements])])))
     
    
 (defn view []

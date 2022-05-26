@@ -1,6 +1,6 @@
 (ns wizard.editor.core
  (:require  [re-frame.core :refer [dispatch subscribe]]
-            [wizard.editor.components :as components]
+            [wizard.editor.components.view :as components]
             [wizard.editor.sidebar.core :as sidebar]
             [wizard.editor.events]
             [wizard.editor.config :refer [row-height col-width]]
@@ -97,7 +97,7 @@
     [editor-wrapper 
       [:<> 
         [rte-modal]
-        [selected-particle] 
+        ;[selected-particle] 
         [components/view]
         [editor-grid]
         [sidebar/view]]]])
