@@ -12,6 +12,28 @@
                                    :stagger "0.2"}))))) 
                                    
 
+(defn open-config-modal! []
+  (let [config-modal          (.getElementById js/document "config-modal")
+        timeline           (gsap/TimelineMax.)]
+    (-> timeline
+       (.set config-modal (clj->js {:visibility :visible
+                                    :pointer-events :auto}))
+       (.to config-modal 0.4
+            (clj->js {:ease  "power3.inOut"
+                      :opacity 1
+                      :bottom "0"})))))
+
+(defn close-config-modal! []
+  (let [config-modal   (.getElementById js/document "config-modal")
+        timeline       (gsap/TimelineMax.)]
+    (-> timeline
+       (.to config-modal 0.7
+            (clj->js {:ease  "power3.inOut"
+                      :opacity 0
+                      :bottom "-100%"
+                      :onComplete #(.set timeline config-modal (clj->js {:visibility     :hidden
+                                                                         :pointer-events :none}))})))))
+
 (defn open-rte-modal! []
   (let [rte-modal          (.getElementById js/document "rte-modal")
         timeline           (gsap/TimelineMax.)]  
@@ -119,6 +141,18 @@
  (fn [db [_]]
    {:dispatch [:db/set [:modal] nil]
     :side-effect (close-rte-modal!)}))
+
+(reg-event-fx
+ :animation/open-config-modal!
+ (fn [db [_]]
+   {:dispatch [:db/set [:modal] true]
+    :side-effect (open-config-modal!)}))
+
+(reg-event-fx
+ :animation/close-config-modal!
+ (fn [db [_]]
+   {:dispatch [:db/set [:modal] nil]
+    :side-effect (close-config-modal!)}))
 
 
 (reg-event-fx

@@ -2,6 +2,7 @@
  (:require  [re-frame.core :refer [dispatch subscribe]]
             [wizard.editor.components.view :as components]
             [wizard.editor.sidebar.core :as sidebar]
+            [wizard.editor.toolbars.view :as toolbars]
             [wizard.editor.events]
             [wizard.editor.config :refer [row-height col-width]]
             [wizard.editor.rich-text-editor.core :as rtf]))
@@ -92,11 +93,30 @@
        (if @value-path 
         [rtf/view {:value-path @value-path}])]]]))
 
+(defn config-modal []
+ (let [value-path (subscribe [:db/get [:editor :selected-component-path]])]
+  [:div#config-modal {:style {:position :fixed 
+                              :z-index 2000
+                              :bottom "-100%"
+                              :left 0
+                              :width "100%"}}
+    [:div 
+     {:style {:display :flex :justify-content :right
+              :height "100vh" 
+              :flex-direction :column}}
+     [:div {:style {:flex-grow 1 :width "100vw"}
+            :on-click #(dispatch [:rich-text-editor/close!])}]
+     [:div {:style {:background :white}}
+       (if @value-path 
+        [rtf/view {:value-path @value-path}])]]]))
+
 (defn view [] 
  [page-wrapper 
     [editor-wrapper 
       [:<> 
         [rte-modal]
+        [config-modal]
+        [toolbars/view]
         ;[selected-particle] 
         [components/view]
         [editor-grid]
