@@ -1,4 +1,4 @@
-(ns wizard.editor.rich-text-editor.events
+(ns wizard.editor.toolbars.rich-text-editor.events
   (:require
    [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-sub]]))
 

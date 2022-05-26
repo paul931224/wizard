@@ -1,11 +1,11 @@
-(ns wizard.editor.rich-text-editor.core
+(ns wizard.editor.toolbars.rich-text-editor.core
   (:require
    [reagent.core :refer [create-class atom] :as reagent]
-   [wizard.editor.rich-text-editor.events]
+   [wizard.editor.toolbars.rich-text-editor.events]
    [jodit-react :default JoditEditor]
    [re-frame.core :refer [dispatch subscribe]]))
 
-   
+    
 ;; -- Editor ------------------------------------------------------------------
 ;; ----------------------------------------------------------------------------
 (defn remove-most-whitespace [content]
@@ -46,3 +46,5 @@
       :reagent-render
       (fn [{:keys [value-path]}]
         ^{:key value-path}[jodit value-path local-editor-content])})))
+
+

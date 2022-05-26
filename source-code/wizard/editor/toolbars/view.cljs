@@ -2,6 +2,9 @@
  (:require 
   [reagent.core :as r]
   [re-frame.core :refer [dispatch subscribe]]
+  [wizard.editor.toolbars.rich-text-editor.core :as rte]
+  [wizard.editor.toolbars.components.core :as components]
+  [wizard.editor.toolbars.order.core :as order]
   ["react" :as react]
   ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
   ["@dnd-kit/utilities" :refer [CSS]]
@@ -19,6 +22,7 @@
 
 (defn draggable [props]
  (let [id (:id props)
+       label (:label props)
        {:keys [attributes listeners setNodeRef  transform]} 
        (to-clj-map (useDraggable (clj->js {:id id})))
        moved-style (subscribe [:db/get [:editor :toolbars id]])]
@@ -26,26 +30,45 @@
              {:ref (js->clj setNodeRef)
               :style 
                  (merge 
-                   {:cursor :pointer
-                    
-                    :transform (.toString (.-Transform CSS) (clj->js transform))}
+                   {:cursor :pointer 
+                    :color "#DDD"}
                    draggable-window-style
                    @moved-style)}
              listeners 
              attributes)       
-       "Drag handle: "]))
+       label 
+       (:component props)]))
 
+
+(defn components-window []
+ [:div [components/view]])
+
+(defn order-window []
+ [:div [order/view]])
+
+(defn rte-window []
+ (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
+      (if @value-path
+         [rte/view {:value-path @value-path}])))
 
 (defn view []
- (let [handle-drag-end (fn [event]
-                         (let [{:keys [active over]} (to-clj-map event)
-                               id      (:id active)
-                               new-pos (-> active :rect :current :translated)
-                               top-and-left (select-keys new-pos [:top :left])]
-                           (dispatch [:db/set [:editor :toolbars id] top-and-left])))]
+ (let [handle-drag-move (fn [event]
+                          (let [{:keys [active over]} (to-clj-map event)
+                                id      (:id active)
+                                new-pos (-> active :rect :current :translated)
+                                top-and-left (select-keys new-pos [:top :left])]
+                            (dispatch [:db/set [:editor :toolbars id] top-and-left])))]
                                                                                      
   [:div 
-   [dnd-context {:onDragEnd     handle-drag-end
+   [dnd-context {:onDragMove    handle-drag-move
                  :modifiers     [restrictToWindowEdges]}
-                [:f> draggable {:id "draggable-1"}]]]))
+                [:f> draggable {:id "order-window"       
+                                :component [order-window]
+                                :label "Order"}]
+                [:f> draggable {:id "rte-window"  
+                                :component [rte-window]         
+                                :label "Rich Text Editor"}]
+                [:f> draggable {:id "components-window"  
+                                :component [components-window]    
+                                :label "Components"}]]]))
    
