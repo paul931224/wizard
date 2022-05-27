@@ -5,6 +5,7 @@
   [wizard.editor.toolbars.rich-text-editor.core :as rte]
   [wizard.editor.toolbars.components.core :as components]
   [wizard.editor.toolbars.order.core :as order]
+  [wizard.editor.toolbars.config.core :as config]
   ["react" :as react]
   ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
   ["@dnd-kit/utilities" :refer [CSS]]
@@ -34,6 +35,9 @@
 
 (defn order-window []
   [:div [order/view]])
+
+(defn config-window []
+  [:div [config/view]])
 
 (defn rte-window []
   (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
@@ -125,5 +129,7 @@
                :label "Rich Text Editor"}]
      [toolbar {:id "components-window"  
                :component [components-window]    
-               :label "Components"}]]])
-   
+               :label "Components"}]
+     [toolbar {:id "config-window"  
+               :component [config-window]    
+               :label "Config"}]]])
