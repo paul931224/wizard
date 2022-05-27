@@ -7,14 +7,9 @@
      [:div.wizard-component
       {:on-click (fn [e]
                     (.log js/console "hello")
-                    (dispatch [:editor/add! (merge component-data @pos)]))
-                    ;(dispatch [:animation/close-sidebar!]))
-       :style {:color "#333"
-                :cursor :pointer
-               :padding "5px"
-               :border-radius "5px"
-               :background "white"}}
-      [:h3 name]]))
+                    (dispatch [:editor/add! (merge component-data @pos)]))}
+     
+      name]))
 
 
 (defn generate-blocks [elements]
@@ -39,21 +34,16 @@
                        :components (generate-blocks grid-elements)
                        :height 20
                        :grid-padding 20
-                       :grid-background "#EEE"
-                       :content "Plain text"}]))
+                       :grid-background "#EEE"}]))
+                       
 
 (defn view []
-  [:div
+  [:div {:style {:padding "0px 5px"}}
    [component-block {:type "block"
                      :name "Block"
                      :width 30
                      :height 10
                      :content "Block text"}]
-   [component-block {:type "plain"
-                     :name "Plain"
-                     :width 30
-                     :height 10
-                     :content "Plain text"}]
    [component-block {:type "navbar"
                      :name "Navbar"
                      :height 3}]   

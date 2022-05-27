@@ -41,12 +41,21 @@ button {
 
 
 .wizard-component {
-     transform: scale(0.95);
-     transition: 0.2s ease-out;
+     background: #666;
+     color: #FFF;
+     cursor: pointer;
+     padding: 5px;
+     border-radius: 5px;
+     margin-bottom: 5px;
+     font-weight: bold;
+    
+     transform: scale(0.98);
+     transition: 0.2s ease-out transition;
+
 }
 
 .wizard-component:hover {
-     transition: 0.3s ease-in;
+     transition: 0.2s ease-in transition;
      transform: scale(1);
 }
 
@@ -90,7 +99,7 @@ button {
      color:          #DDD;
      display:        flex;
      flex-direction: column;
-     min-width:      200px;    
+     min-width:      250px;    
      position:       fixed;
      transition: 0.2s ease box-shadow;
      transform: scale(0.95);

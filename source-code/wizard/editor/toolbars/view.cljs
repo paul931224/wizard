@@ -91,10 +91,14 @@
 (defn handle-drag-start [event] 
    (let [{:keys [active over]} (to-clj-map event)
          id      (:id active)] 
-       (dispatch [:db/set [:editor :toolbar  :dragged] id])
-       (dispatch [:db/set [:editor :toolbar  :active] id])))                           
+       (dispatch [:db/set [:editor :toolbar  :dragged] id])))
+                                  
 
-(defn handle-drag-end [event] (dispatch [:db/set [:editor :toolbar  :dragged] nil]))
+(defn handle-drag-end [event] 
+  (let [{:keys [active over]} (to-clj-map event)
+         id      (:id active)] 
+    (dispatch [:db/set [:editor :toolbar  :dragged] nil])
+    (dispatch [:db/set [:editor :toolbar  :active] id])))
 
 (defn handle-drag-move [event]
   (let [{:keys [active over]} (to-clj-map event)
