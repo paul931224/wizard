@@ -81,12 +81,21 @@ button {
      padding:        5px 10px;     
      position:       fixed;
      transition: 0.2s ease box-shadow;
-     transform: scale(0.98);
+     transform: scale(0.95);
 }
 
 .toolbar.active{
      transition: 0.2s ease box-shadow;
+     transform: scale(0.98);
+     z-index: 1000;
+     box-shadow: 20px 18px 31px 3px rgba(0,0,0,0.3);
+}
+
+.toolbar.dragged{
+     transition: 0.2s ease box-shadow;
      transform: scale(1);
      z-index: 1000;
-     box-shadow: 20px 18px 31px 3px rgba(0,0,0,0.3);w: 5px 10px;
+     box-shadow: 20px 18px 31px 3px rgba(0,0,0,0.3);
 }
+
+

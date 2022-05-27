@@ -59,6 +59,7 @@
  (let [id                    (:id props)
        label                 (:label props)
        component             (:component props)
+       dragged-id            (subscribe [:db/get [:editor :toolbar  :dragged]])
        active-id             (subscribe [:db/get [:editor :toolbar  :active]])
        use-draggable         (to-clj-map (useDraggable (clj->js {:id id})))
        {:keys [attributes 
@@ -68,7 +69,8 @@
        moved-style           (subscribe [:db/get [:editor :toolbars id]])
        style                 (fn [] @moved-style)]
       [:div (merge {:class ["toolbar"
-                            (if (= @active-id id) "active" nil)]
+                            (if (= @dragged-id id) "dragged" nil)
+                            (if (= @active-id  id) "active" nil)]
                     :ref (js->clj setNodeRef)
                     :style (style)}            
                    attributes)
@@ -80,8 +82,9 @@
  (let [handle-drag-start  (fn [event] 
                               (let [{:keys [active over]} (to-clj-map event)
                                     id      (:id active)] 
+                                  (dispatch [:db/set [:editor :toolbar  :dragged] id])
                                   (dispatch [:db/set [:editor :toolbar  :active] id])))                           
-       handle-drag-end    (fn [event] (dispatch [:db/set [:editor :toolbar  :active] nil]))
+       handle-drag-end    (fn [event] (dispatch [:db/set [:editor :toolbar  :dragged] nil]))
        handle-drag-move   (fn [event]
                             (let [{:keys [active over]} (to-clj-map event)
                                   id      (:id active)
