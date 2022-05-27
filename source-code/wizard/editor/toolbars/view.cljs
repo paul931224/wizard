@@ -15,33 +15,39 @@
 (defn to-clj-map [hash-map]
   (js->clj hash-map :keywordize-keys true))
 
-(def draggable-window-style {:position :fixed
-                             :background "#333"
-                             :padding "5px 10px"
-                             :min-width "200px"})
+
+(defn draggable-body [component]
+ (let [style {:max-height "90vh" :overflow :scroll}] 
+  [:div {:style style} component]))
+
+(defn draggable-header [listeners label]
+ (let [style {:style {:cursor :pointer}}] 
+   [:div (merge listeners style) label])) 
+        
 
 (defn draggable [props]
- (let [id (:id props)
-       label (:label props)
-       {:keys [attributes listeners setNodeRef  transform]} 
-       (to-clj-map (useDraggable (clj->js {:id id})))
-       moved-style (subscribe [:db/get [:editor :toolbars id]])]
-      [:div (merge
-             {:ref (js->clj setNodeRef)
-              :style (merge
-                      {:cursor :pointer
-                       :color "#DDD"
-                       :max-height "90vh"
-                       :overflow :scroll}
-                      draggable-window-style
-                      @moved-style)}            
-             attributes)
-       [:div (merge 
-              {:ref (js->clj setNodeRef)}
-              listeners)
-             label]       
-       [:div 
-        (:component props)]]))
+ (let [id                    (:id props)
+       label                 (:label props)
+       component             (:component props)
+       use-draggable         (to-clj-map (useDraggable (clj->js {:id id})))
+       {:keys [attributes 
+               listeners
+               setNodeRef  
+               transform]}   use-draggable 
+       moved-style           (subscribe [:db/get [:editor :toolbars id]])
+       style                 (fn [] (merge {:background     "#333"
+                                            :color          "#DDD"
+                                            :display        :flex
+                                            :flex-direction :column
+                                            :min-width      "200px"
+                                            :padding        "5px 10px"
+                                            :position       :fixed}                              
+                                           @moved-style))]
+      [:div (merge {:ref (js->clj setNodeRef)
+                    :style (style)}            
+                   attributes)
+       [draggable-header listeners label]       
+       [draggable-body   component]]))
 
 
 (defn components-window []
