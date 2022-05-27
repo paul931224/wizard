@@ -72,53 +72,21 @@ button {
      transition: 0.2 ease;
 }
 
-.editor-particle:hover{
-     animation: rainbow-bg 5s linear;
-     animation-iteration-count: infinite;
-     border-color:  transparent;
+.toolbar{
+     background:     #333;
+     color:          #DDD;
+     display:        flex;
+     flex-direction: column;
+     min-width:      200px;
+     padding:        5px 10px;     
+     position:       fixed;
+     transition: 0.2s ease box-shadow;
+     transform: scale(0.98);
+}
+
+.toolbar.active{
+     transition: 0.2s ease box-shadow;
+     transform: scale(1);
      z-index: 1000;
-     background: rgb(0, 255, 221);
-     transition: 0.2s ease;
-     border-radius: 50%;
-     transform: scale(1.5);
-  }
-
-
-@keyframes rainbow-bg{
-     100%,0%{
-          background-color: #FFB5E8;
-     }
-     8%{
-          background-color:  #FF9CEE;
-     }
-     16%{
-          background-color: #B28DFF;
-     }
-     25%{
-          background-color: #A79AFF;
-     }
-     33%{
-          background-color: #FFBEBC;
-     }
-     41%{
-          background-color: #FFCBC1; 
-     }
-     50%{
-          background-color: #E7FFAC;
-     }
-     58%{
-          background-color: #FFF5BA;
-     }
-     66%{
-          background-color: #DCD3FF;
-     }
-     75%{
-          background-color: #D5AAFF;
-     }
-     83%{
-          background-color: #ACE7FF;
-     }
-     91%{
-          background-color: #C5A3FF;
-     }
+     box-shadow: 20px 18px 31px 3px rgba(0,0,0,0.3);w: 5px 10px;
 }

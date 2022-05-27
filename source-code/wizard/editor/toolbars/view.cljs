@@ -10,11 +10,41 @@
   ["@dnd-kit/utilities" :refer [CSS]]
   ["@dnd-kit/modifiers" :refer [restrictToWindowEdges]]))
 
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utils
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (def dnd-context (r/adapt-react-class DndContext))
 
 (defn to-clj-map [hash-map]
   (js->clj hash-map :keywordize-keys true))
 
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Window types
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn components-window []
+  [:div [components/view]])
+
+(defn order-window []
+  [:div [order/view]])
+
+(defn rte-window []
+  (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
+     (if @value-path
+      [rte/view {:value-path @value-path}])))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Draggable implementation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn draggable-body [component]
  (let [style {:max-height "90vh" :overflow :scroll}] 
@@ -29,48 +59,41 @@
  (let [id                    (:id props)
        label                 (:label props)
        component             (:component props)
+       active-id             (subscribe [:db/get [:editor :toolbar  :active]])
        use-draggable         (to-clj-map (useDraggable (clj->js {:id id})))
        {:keys [attributes 
                listeners
                setNodeRef  
                transform]}   use-draggable 
        moved-style           (subscribe [:db/get [:editor :toolbars id]])
-       style                 (fn [] (merge {:background     "#333"
-                                            :color          "#DDD"
-                                            :display        :flex
-                                            :flex-direction :column
-                                            :min-width      "200px"
-                                            :padding        "5px 10px"
-                                            :position       :fixed}                              
-                                           @moved-style))]
-      [:div (merge {:ref (js->clj setNodeRef)
+       style                 (fn [] @moved-style)]
+      [:div (merge {:class ["toolbar"
+                            (if (= @active-id id) "active" nil)]
+                    :ref (js->clj setNodeRef)
                     :style (style)}            
                    attributes)
        [draggable-header listeners label]       
        [draggable-body   component]]))
 
 
-(defn components-window []
- [:div [components/view]])
-
-(defn order-window []
- [:div [order/view]])
-
-(defn rte-window []
- (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
-      (if @value-path
-         [rte/view {:value-path @value-path}])))
-
 (defn view []
- (let [handle-drag-move (fn [event]
-                          (let [{:keys [active over]} (to-clj-map event)
-                                id      (:id active)
-                                new-pos (-> active :rect :current :translated)
-                                top-and-left (select-keys new-pos [:top :left])]
-                            (dispatch [:db/set [:editor :toolbars id] top-and-left])))]
-                                                                                     
+ (let [handle-drag-start  (fn [event] 
+                              (let [{:keys [active over]} (to-clj-map event)
+                                    id      (:id active)] 
+                                  (dispatch [:db/set [:editor :toolbar  :active] id])))                           
+       handle-drag-end    (fn [event] (dispatch [:db/set [:editor :toolbar  :active] nil]))
+       handle-drag-move   (fn [event]
+                            (let [{:keys [active over]} (to-clj-map event)
+                                  id      (:id active)
+                                  new-pos (-> active :rect :current :translated)
+                                  top-and-left (select-keys new-pos [:top :left])]
+                              (dispatch [:db/set [:editor :toolbars id] top-and-left])))]
+                        
+                                                                                         
   [:div 
-   [dnd-context {:onDragMove    handle-drag-move
+   [dnd-context {:onDragStart   handle-drag-start
+                 :onDragMove    handle-drag-move
+                 :onDragEnd     handle-drag-end
                  :modifiers     [restrictToWindowEdges]}
                 [:f> draggable {:id "order-window"       
                                 :component [order-window]
