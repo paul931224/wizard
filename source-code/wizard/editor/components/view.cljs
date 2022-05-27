@@ -5,12 +5,16 @@
   [wizard.editor.components.grid   :as grid]
   [re-frame.core :refer [dispatch subscribe]]))
 
-(defn component-wrapper [content id]
-  (let [hovered-component (subscribe [:db/get [:editor :hovered-component]])] 
+(defn component-wrapper [content id path type]
+  (let [hovered-component (subscribe [:db/get [:editor :hovered-component]])
+        content-path (vec (conj path :content))] 
    [:div.component-wrapper
-    {:class (if (= id @hovered-component)
+    {:on-click (fn [event] 
+                (if (= "block" type) 
+                 (dispatch [:db/set [:editor :selected :value-path] content-path])))
+     :class (if (= id @hovered-component)
              "component-hovered" nil)
-     :style {:cursor :pointer}}    
+     :style {:cursor :pointer}}            
     content]))
 
 (defn component-router [comp-state path]
@@ -22,7 +26,9 @@
        "navbar" [navbar/view component-router comp-state path]
        "grid"   [grid/view   component-router comp-state path]
        [block/view component-router comp-state path])
-     id]))
+     id
+     path
+     type]))
 
 
 

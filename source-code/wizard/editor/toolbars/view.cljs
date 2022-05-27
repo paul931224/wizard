@@ -40,9 +40,9 @@
   [:div [config/view]])
 
 (defn rte-window []
-  (let [value-path (subscribe [:db/get [:rich-text-editor :value-path]])]
+  (let [value-path (subscribe [:db/get [:editor :selected :value-path]])]
      (if @value-path
-      [rte/view {:value-path @value-path}])))
+        ^{:key @value-path}[rte/view {:value-path @value-path}])))
 
 
 
@@ -50,9 +50,11 @@
 ;; Draggable implementation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn draggable-body [component]
+(defn draggable-body [component id]
  (let [style {:max-height "90vh" :overflow :scroll}] 
-  [:div {:style style} component]))
+  [:div {:on-click #(dispatch [:db/set [:editor :toolbar :active] id])
+         :style style} 
+        component]))
 
 (defn draggable-header [listeners label]
  (let [style {:style {:font-weight :bold
@@ -84,7 +86,7 @@
                     :style (style)}            
                    attributes)
        [draggable-header listeners label]       
-       [draggable-body   component]]))
+       [draggable-body   component id]]))
 
 
 

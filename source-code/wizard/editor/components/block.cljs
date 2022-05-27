@@ -9,7 +9,6 @@
         comp-state                     (second key-and-comp)
         {:keys [content col row width height]}  comp-state
         content-path (vec (conj path :content))]
-    [:div {:on-click (fn [] (dispatch [:rich-text-editor/open! content-path]))
-           :style {:pointer-events "auto"}}
+    [:div {:style {:pointer-events "auto"}}
      [:div.component
       [:<> (html->hiccup (str "<div>" content "</div>"))]]]))

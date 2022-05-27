@@ -1,4 +1,6 @@
-(ns wizard.editor.toolbars.config.core)
+(ns wizard.editor.toolbars.config.core
+ (:require [re-frame.core :refer [dispatch subscribe]]))
 
 (defn view []
-  [:div "Selected"])
+  (let [selected-path (subscribe [:db/get [:editor :selected :value-path]])] 
+   [:div "Selected " @selected-path]))
