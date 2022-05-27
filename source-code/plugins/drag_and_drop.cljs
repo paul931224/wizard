@@ -36,42 +36,67 @@
 
 (defn ordered-vector->id-map [coll]
   (let [index-to-pos (fn [index item]
-                       {(:id item)   (-> item 
-                                         (dissoc :id)
-                                         (assoc  :position index))})]
+                       {(str (:id item))   
+                        (-> item 
+                            (dissoc :id)
+                            (assoc  :position index))})]
     (reduce merge (map-indexed index-to-pos coll))))
 
-(defn sortable-style [transform transition]
+(defn sortable-handle-style []
+ {
+  :flex-grow 1})
+
+(defn sortable-container-style [transform transition]
  {:transform (.toString (.-Transform CSS) (clj->js transform))
   :transition transition
-  :background "#333"
+  :display :flex
+  :margin-bottom "5px"
+  :border "1px solid #222"
+  :border-radius "5px"
+  :background "#666"
   :color "#DDD"
-  :margin "10px"
-  :border "1.5px solid yellow"
   :padding "5px"
-  :border-radius "10px"})
+  :cursor :pointer}) 
+  ;:width "100%"})
+  
+  
 
-(defn sortable-item [props path]
-  (let [{:keys [attributes listeners setNodeRef transform transition]} 
-        (to-clj-map (useSortable (clj->js {:id (:id props)})))]
-    [:div (merge {:id    (str (:id props))
-                  :ref   (js->clj setNodeRef)
-                  :style (sortable-style transform transition)}
-                 attributes
-                 listeners)
-     [:div 
-       {:on-mouse-enter #(dispatch [:db/set [:editor :hovered-component] (str (:id props))])
-        :on-mouse-leave #(dispatch [:db/set [:editor :hovered-component] nil])
-        :style {:cursor :pointer}}
-       (:type (:item props))] ;" "(html->hiccup  (:content (:item props)))]
-     (let [item            (:item props)
-           id              (:id item)
-           components      (:components item)
-           component       (:component props)
-           component-data  (:component-data props)
-           new-path    (vec (concat path [:components id]))]
-      (if components
-          [component component-data new-path]))]))
+(defn sortable-item [props]
+  (let [item            (:item props)
+        id              (:id item)
+        type            (:type item)
+        components      (:components item)
+        component       (:component props)
+        component-data  (:component-data props)
+        path            (:path props)
+        new-path        (vec (concat path [id])) 
+        {:keys [attributes listeners setNodeRef transform transition]} 
+        (to-clj-map (useSortable (clj->js {:id (str id)})))]
+    [:div {:style (sortable-container-style transform transition)}
+          [:div 
+            (merge {:style (sortable-handle-style)
+                    :on-mouse-enter #(dispatch [:db/set [:editor :hovered-component] id])
+                    :on-mouse-leave #(dispatch [:db/set [:editor :hovered-component] nil])
+                    :id    (str id)
+                    :ref   (js->clj setNodeRef)}
+                    
+              attributes)
+              
+                         
+            [:div (merge {:style {:font-weight :bold
+                                  :padding-bottom "10px"}}
+                         listeners)
+                  (str type)] ;" "(html->hiccup  (:content (:item props)))]            
+            (if components
+                 [component component-data new-path])]
+          [:div {:style {:border "1px solid white"
+                         :padding "5px"}
+                 :on-click (fn [e] 
+                            (.preventDefault e)
+                            (.stopPropagation e)
+                            (dispatch [:db/set [:editor :selected :value-path] new-path]))}
+              "S"]]))       
+          
 
 (defn get-item-with-id [items id]
  (first (filter 

@@ -1,6 +1,29 @@
 (ns wizard.editor.components.grid)
 
 
+(defn generate-default-blocks [elements]
+  (reduce merge
+           (map-indexed
+            (fn [index a] (assoc {} (str (random-uuid)) {:type :block
+                                                         :position index
+                                                         :content "Grid Block"}))
+            elements)))
+
+(defn default []
+  (let [grid-cols [2 3 4]
+        grid-rows [2 3 4]
+        grid-elements (range (*
+                               (count grid-rows)
+                               (count grid-cols)))]
+     {:type "grid"
+      :name "Grid"
+      :grid-columns grid-cols
+      :grid-rows    grid-rows
+      :components (generate-default-blocks grid-elements)
+      :height 20
+      :grid-padding 20
+      :grid-background "#EEE"}))
+
 (defn grid-fractions [numbers-vec]
   (str
    (clojure.string/join "fr " numbers-vec) "fr"))

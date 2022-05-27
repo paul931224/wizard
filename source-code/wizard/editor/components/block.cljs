@@ -3,6 +3,12 @@
   [re-frame.core :refer [dispatch subscribe]]
   [reagent-hickory.sweet :refer [html->hiccup]]))
 
+(defn default []
+  {:type "block"
+   :name "Block"
+   :width 30
+   :height 10
+   :content "Block text"})
 
 (defn view [comp-router key-and-comp path]
   (let [the-key                        (first key-and-comp)

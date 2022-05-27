@@ -9,8 +9,9 @@
   (let [hovered-component (subscribe [:db/get [:editor :hovered-component]])]
    [:div.component-wrapper
     {:on-click (fn [event] 
-                (if (= "block" type) 
-                 (dispatch [:db/set [:editor :selected :value-path] path])))
+                (.stopPropagation event)
+                (dispatch [:db/set [:editor :selected :value-path] path]))
+                 
      :class (if (= id @hovered-component)
              "component-hovered" nil)
      :style {:cursor :pointer}}            
@@ -28,7 +29,6 @@
      id
      path
      type]))
-
 
 
 (defn view []

@@ -44,34 +44,6 @@
  [:div {:style {:display :flex :justify-content :center :margin-top "60px"}}
    content])
  
-
-(defn editor-wrapper [content]
- [:<> 
-  [:div#editor {:style {:position :relative
-                        :max-width "1200px" :display :flex :flex-wrap :wrap}}
-              content]])
-  
-  
-
-(defn row-wrapper [content]
-  [:div {:style {:width "100%" :display :flex 
-                 :height (str row-height "px")}}
-    content])    
- 
-(defn editor-grid []
- (let [width-particles   (range 60)
-       height-particles  (range 240)]
-  [:div {:style {:width "100%" 
-                 :display :flex
-                 :flex-wrap :wrap}}
-   (map
-    (fn [row-index]
-      ^{:key row-index} [row-wrapper
-                         (map (fn [col-index] ^{:key (str row-index "-" col-index)}
-                                               [editor-particle col-index row-index])
-                              width-particles)])
-    height-particles)])) 
- 
 (defn view [] 
  [page-wrapper 
   [:<> 

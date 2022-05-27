@@ -7,9 +7,6 @@
  :db/init
  (fn [db [_]]
    (-> db 
-    (assoc :example {"id1" {:name "hello1" :type :block :position 0}
-                     "id2" {:name "hello2" :type :block :position 1}
-                     "id3" {:name "hello3" :type :block :position 2}})
     (assoc-in [:editor :type] :root)
     (assoc-in [:editor :name] "Root"))))
 
