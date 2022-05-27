@@ -78,33 +78,47 @@
        [draggable-body   component]]))
 
 
+
+(defn handle-drag-start [event] 
+   (let [{:keys [active over]} (to-clj-map event)
+         id      (:id active)] 
+       (dispatch [:db/set [:editor :toolbar  :dragged] id])
+       (dispatch [:db/set [:editor :toolbar  :active] id])))                           
+
+(defn handle-drag-end [event] (dispatch [:db/set [:editor :toolbar  :dragged] nil]))
+
+(defn handle-drag-move [event]
+  (let [{:keys [active over]} (to-clj-map event)
+        id      (:id active)
+        new-pos (-> active :rect :current :translated)
+        top-and-left (select-keys new-pos [:top :left])]
+    (dispatch [:db/set [:editor :toolbars id] top-and-left])))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Toolbar view
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn toolbar [config]
+ [:f> draggable config])
+
+(defn toolbars [content]
+ [dnd-context {:onDragStart   handle-drag-start
+               :onDragMove    handle-drag-move
+               :onDragEnd     handle-drag-end
+               :modifiers     [restrictToWindowEdges]}
+              content])             
+
 (defn view []
- (let [handle-drag-start  (fn [event] 
-                              (let [{:keys [active over]} (to-clj-map event)
-                                    id      (:id active)] 
-                                  (dispatch [:db/set [:editor :toolbar  :dragged] id])
-                                  (dispatch [:db/set [:editor :toolbar  :active] id])))                           
-       handle-drag-end    (fn [event] (dispatch [:db/set [:editor :toolbar  :dragged] nil]))
-       handle-drag-move   (fn [event]
-                            (let [{:keys [active over]} (to-clj-map event)
-                                  id      (:id active)
-                                  new-pos (-> active :rect :current :translated)
-                                  top-and-left (select-keys new-pos [:top :left])]
-                              (dispatch [:db/set [:editor :toolbars id] top-and-left])))]
-                        
-                                                                                         
-  [:div 
-   [dnd-context {:onDragStart   handle-drag-start
-                 :onDragMove    handle-drag-move
-                 :onDragEnd     handle-drag-end
-                 :modifiers     [restrictToWindowEdges]}
-                [:f> draggable {:id "order-window"       
-                                :component [order-window]
-                                :label "Order"}]
-                [:f> draggable {:id "rte-window"  
-                                :component [rte-window]         
-                                :label "Rich Text Editor"}]
-                [:f> draggable {:id "components-window"  
-                                :component [components-window]    
-                                :label "Components"}]]]))
+ [toolbars 
+   [:<> 
+     [toolbar {:id "order-window"       
+               :component [order-window]
+               :label "Order"}]
+     [toolbar {:id "rte-window"  
+               :component [rte-window]         
+               :label "Rich Text Editor"}]
+     [toolbar {:id "components-window"  
+               :component [components-window]    
+               :label "Components"}]]])
    

@@ -66,9 +66,7 @@ button {
 }
 
 .component-wrapper.component-hovered{
-     border: 3px solid rgb(29, 140, 160);
-     padding: 3px;
-     border-radius: 10px;
+     border: 1px solid rgba(255, 0, 0, 0.386);
      transition: 0.2 ease;
 }
 
