@@ -51,8 +51,11 @@
   [:div {:style style} component]))
 
 (defn draggable-header [listeners label]
- (let [style {:style {:cursor :pointer}}] 
-   [:div (merge listeners style) label])) 
+ (let [style {:style {:font-weight :bold
+                      :padding "10px"
+                      :border-bottom "1px solid white"
+                      :margin-bottom "10px"}}] 
+   [:div.toolbar-header (merge listeners style) label])) 
         
 
 (defn draggable [props]
@@ -67,10 +70,12 @@
                setNodeRef  
                transform]}   use-draggable 
        moved-style           (subscribe [:db/get [:editor :toolbars id]])
-       style                 (fn [] @moved-style)]
+       style                 (fn [] @moved-style)
+       dragged?               (fn [] (= @dragged-id id))
+       active?               (fn [] (= @active-id id))]
       [:div (merge {:class ["toolbar"
-                            (if (= @dragged-id id) "dragged" nil)
-                            (if (= @active-id  id) "active" nil)]
+                            (if (dragged?) "dragged" nil)
+                            (if (active?)  "active" nil)]
                     :ref (js->clj setNodeRef)
                     :style (style)}            
                    attributes)
