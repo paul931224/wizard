@@ -42,7 +42,7 @@
 (defn rte-window []
   (let [value-path (subscribe [:db/get [:editor :selected :value-path]])]
      (if @value-path
-        ^{:key @value-path}[rte/view {:value-path @value-path}])))
+        ^{:key @value-path}[rte/view {:value-path (vec (conj @value-path :content))}])))
 
 
 
