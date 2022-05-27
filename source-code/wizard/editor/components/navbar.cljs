@@ -1,11 +1,9 @@
-(ns wizard.editor.components.navbar 
- (:require 
-  [wizard.editor.config :refer [row-height col-width]]))
+(ns wizard.editor.components.navbar) 
 
 (defn default []
  {:type "navbar"
   :name "Navbar"
-  :height 3})
+  :height "100"})
 
 (defn view [comp-router key-and-comp path]
   (let [comp-state                     (second key-and-comp)
@@ -15,9 +13,9 @@
                    :background "rgba(0,0,0,0.3)"
                    :border-bottom-left-radius "10px"
                    :border-bottom-right-radius "10px"
-                   :height    (str (* height row-height) "px")
+                   :height    (str height "px")
                    :display :flex
                    :align-items :center}}
                   
-     [:h2 {:style {:padding-left (str (* 1 col-width) "px")}}
+     [:h2 {:style {:padding-left "10px"}}
       "Navbar"]]))
