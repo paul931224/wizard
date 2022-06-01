@@ -90,23 +90,27 @@
 ;; View
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn get-offset-index [number]
+ (let [grid-col-count (fn [] (inc (count (:cols @grid))))
+       grid-row-count (fn [] (inc (count (:rows @grid))))
+       double-col-count (fn [] (* 2 (grid-col-count)))
+       row-index (fn [] (dec (quot number (grid-col-count))))
+       index-without-first-row (fn [] (- number (grid-col-count)))] 
+    (cond
+       (< number        (grid-col-count))    "top row"
+       (= 0 (mod number (grid-col-count)))   "left col"
+       (<  number (double-col-count))         (index-without-first-row)
+       (>=  number (double-col-count))        (- (index-without-first-row) (row-index))
+       :else                             number)))
 
 (defn grid-div [number] 
-  (let [grid-col-count (fn [] (inc (count (:cols @grid))))
-        grid-row-count (fn [] (inc (count (:rows @grid))))] 
-    [:div {:style {:outline "1px solid #ddd"
+  [:div {:style {:outline "1px solid #ddd"
                    :min-width  "100px"
                    :min-height "100px"
                    :display :flex 
                    :justify-content :center 
                    :align-items :center}} 
-        (cond  
-         (< number        (grid-col-count))    "top row"
-         (= 0 (mod number (grid-col-count)))   "left col"
-         (< number (* 2 (grid-col-count)))     (- number (grid-col-count))
-         (> number (* 2 (grid-col-count)))     (- (- number (grid-col-count))
-                                                  (dec (quot number (grid-col-count))))
-         :else                                 number)]))
+        (get-offset-index number)])
          
 
 (defn grid-preview []
