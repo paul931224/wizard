@@ -28,14 +28,17 @@
  (let [{:keys [type]} component]
   [:div {:style {:padding :5px}}
    [type-header type]
-   [:div 
-    [text-input path :height]
-    [text-input path :width]
-    [text-input path :padding]
-    [color-input path :background-color]
-    [color-input path :color]
-    [box-model/view]
-    [grid-customizer/view]]]))
+   (case type
+    "grid"  [grid-customizer/view]
+    "block" [:div 
+             [text-input path :height]
+             [text-input path :width]
+             [text-input path :padding]
+             [color-input path :background-color]
+             [color-input path :color]
+             [box-model/view]]
+    [:div {:style {:padding "0px 5px"}} "No config for this type of component."])]))
+    
  
 
 (defn view []

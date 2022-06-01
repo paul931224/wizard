@@ -4,7 +4,7 @@
 (defn generate-default-blocks [elements]
   (reduce merge
            (map-indexed
-            (fn [index a] (assoc {} (str (random-uuid)) {:type :block
+            (fn [index a] (assoc {} (str (random-uuid)) {:type "block"
                                                          :position index
                                                          :content "Grid Block"}))
             elements)))

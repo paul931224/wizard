@@ -95,7 +95,10 @@
  ([content] 
   [:div {:style {:outline "1px solid #ddd"
                  :min-width  "100px"
-                 :min-height "100px"}} 
+                 :min-height "100px"
+                 :display :flex 
+                 :justify-content :center 
+                 :align-items :center}} 
    content]))
 
 (defn grid-preview []
@@ -108,7 +111,7 @@
                 :grid-auto-columns     "minmax(100px, auto)"}}
        
       (map-indexed 
-       (fn [index a] ^{:key index}[grid-div]) 
+       (fn [index a] ^{:key index}[grid-div index]) 
        (grid-divs-range))])
       
 
