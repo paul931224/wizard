@@ -100,7 +100,7 @@ button {
      display:        flex;
      flex-direction: column;
      min-width:      300px;
-     max-width:      500px;      
+     max-width:      auto;      
      position:       fixed;
      transition: 0.2s ease box-shadow;
      transform: scale(0.95);

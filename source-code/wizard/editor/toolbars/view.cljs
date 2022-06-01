@@ -52,7 +52,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn draggable-body [component id]
- (let [style {:max-height "90vh" :overflow :scroll}] 
+ (let [style {:max-height "90vh" :overflow :scroll}]
   [:div {:on-click #(dispatch [:db/set [:editor :toolbar :active] id])
          :style style} 
         component]))
