@@ -19,8 +19,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn grid-divs-range []
- (let [grid-col-count (count (:cols @grid))
-       grid-row-count (count (:rows @grid))]
+ (let [grid-col-count (inc (count (:cols @grid)))
+       grid-row-count (inc (count (:rows @grid)))]
   (range (* grid-col-count grid-row-count))))
 
 (defn map->grid-template [the-map]
@@ -32,11 +32,11 @@
  (count (vals the-map)))
 
 (defn rem-col []
-  (let [last-index (dec (get-map-length (:cols @grid)))]
+  (let [last-index (max 1 (dec (get-map-length (:cols @grid))))]
    (swap! grid assoc :cols (dissoc (:cols @grid) last-index))))
 
 (defn rem-row []
-  (let [last-index (dec (get-map-length (:rows @grid)))]
+  (let [last-index (max 1 (dec (get-map-length (:rows @grid))))]
    (swap! grid assoc :rows (dissoc (:rows @grid) last-index))))
 
 (defn add-col []
@@ -83,30 +83,34 @@
     "- row"])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; 
+;; Utils
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; View
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn grid-div
- ([] [grid-div ""])
- ([content] 
-  [:div {:style {:outline "1px solid #ddd"
-                 :min-width  "100px"
-                 :min-height "100px"
-                 :display :flex 
-                 :justify-content :center 
-                 :align-items :center}} 
-   content]))
+(defn grid-div [number] 
+  (let [grid-col-count (fn [] (inc (count (:cols @grid))))
+        grid-row-count (fn [] (inc (count (:rows @grid))))] 
+    [:div {:style {:outline "1px solid #ddd"
+                   :min-width  "100px"
+                   :min-height "100px"
+                   :display :flex 
+                   :justify-content :center 
+                   :align-items :center}} 
+        (cond  
+         (< number        (grid-col-count))    "top row"
+         (= 0 (mod number (grid-col-count)))   "left col"
+         :else                                 number)]))
+         
 
 (defn grid-preview []
- [:div {:style {:display :grid                
-                :width "100%"
+ [:div {:style {:display :grid
+                :padding "20px"                 
                 :gap "10px"
-                :grid-template-columns (map->grid-template (:cols @grid))
-                :grid-template-rows    (map->grid-template (:rows @grid))
+                :grid-template-columns (str "100px " (map->grid-template (:cols @grid)))
+                :grid-template-rows    (str "100px " (map->grid-template (:rows @grid)))
                 :grid-auto-rows        "minmax(100px, auto)"
                 :grid-auto-columns     "minmax(100px, auto)"}}
        
