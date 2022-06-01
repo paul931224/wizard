@@ -90,6 +90,7 @@
 ;; View
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 (defn grid-div [number] 
   (let [grid-col-count (fn [] (inc (count (:cols @grid))))
         grid-row-count (fn [] (inc (count (:rows @grid))))] 
@@ -102,6 +103,9 @@
         (cond  
          (< number        (grid-col-count))    "top row"
          (= 0 (mod number (grid-col-count)))   "left col"
+         (< number (* 2 (grid-col-count)))     (- number (grid-col-count))
+         (> number (* 2 (grid-col-count)))     (- (- number (grid-col-count))
+                                                  (dec (quot number (grid-col-count))))
          :else                                 number)]))
          
 
