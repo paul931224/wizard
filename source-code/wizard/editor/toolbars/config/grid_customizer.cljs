@@ -5,12 +5,10 @@
 ;; State
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def col-count (atom 1))
-(def row-count (atom 1))
-
 (def grid 
- {:rows {0 "1fr"} 
-  :cols {0 "1fr"}})
+ (atom 
+   {:rows {0 "1fr"}            
+    :cols {0 "1fr"}}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State
@@ -20,19 +18,34 @@
 ;; Utils
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn grid-divs-range []
+ (let [grid-col-count (count (:cols @grid))
+       grid-row-count (count (:rows @grid))]
+  (range (* grid-col-count grid-row-count))))
 
+(defn map->grid-template [the-map]
+ (clojure.string/join " " (vals the-map)))
+
+(map->grid-template (:rows grid)) 
+ 
+(defn get-map-length [the-map]
+ (count (vals the-map)))
 
 (defn rem-col []
-  (reset! col-count (max 0 (dec @col-count))))
+  (let [last-index (dec (get-map-length (:cols @grid)))]
+   (swap! grid assoc :cols (dissoc (:cols @grid) last-index))))
 
 (defn rem-row []
-  (reset! row-count (max 0 (dec @row-count))))
+  (let [last-index (dec (get-map-length (:rows @grid)))]
+   (swap! grid assoc :rows (dissoc (:rows @grid) last-index))))
 
 (defn add-col []
-  (reset! col-count (inc @col-count)))
+  (let [next-index (get-map-length (:cols @grid))]
+   (swap! grid assoc-in [:cols next-index] "1fr")))
 
 (defn add-row []
-  (reset! row-count (inc @row-count)))
+  (let [next-index (get-map-length (:rows @grid))]
+   (swap! grid assoc-in [:rows next-index] "1fr")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
@@ -81,25 +94,23 @@
  ([] [grid-div ""])
  ([content] 
   [:div {:style {:outline "1px solid #ddd"
-                 :min-width "100px"}} 
+                 :min-width  "100px"
+                 :min-height "100px"}} 
    content]))
 
 (defn grid-preview []
- [:div {:style {:display :grid
-                :height "300px"
+ [:div {:style {:display :grid                
                 :width "100%"
                 :gap "10px"
-                :grid-template-columns "2fr 1fr 1fr 1fr"
-                :grid-template-rows    "1fr minmax(100px, 2fr)"
+                :grid-template-columns (map->grid-template (:cols @grid))
+                :grid-template-rows    (map->grid-template (:rows @grid))
                 :grid-auto-rows        "minmax(100px, auto)"
                 :grid-auto-columns     "minmax(100px, auto)"}}
        
-      [grid-div]
-      [grid-div]
-      [grid-div]
-      [grid-div]
-      [grid-div]
-      [grid-div]])
+      (map-indexed 
+       (fn [index a] ^{:key index}[grid-div]) 
+       (grid-divs-range))])
+      
 
 (defn grid-buttons []
  [:div {:style {:display :grid 

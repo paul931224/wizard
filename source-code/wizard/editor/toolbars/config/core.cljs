@@ -18,11 +18,16 @@
    [:input {:value @(subscribe [:db/get new-path])
             :on-change (fn [e] (dispatch [:db/set new-path (-> e .-target .-value)]))}]]))
 
+(defn type-header [type]
+ [:div {:style {:font-weight :bold 
+                  :margin-bottom "10px"}} 
+      "Type: " type])
+ 
+
 (defn type-config [component path]
  (let [{:keys [type]} component]
   [:div {:style {:padding :5px}}
-   [:div {:style {:font-weight :bold 
-                  :margin-bottom "10px"}} type]
+   [type-header type]
    [:div 
     [text-input path :height]
     [text-input path :width]
