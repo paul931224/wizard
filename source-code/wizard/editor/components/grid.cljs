@@ -1,5 +1,13 @@
 (ns wizard.editor.components.grid)
 
+(defn grid-divs-range [block]
+  (let [grid-col-count (inc (count (:cols block)))
+        grid-row-count (inc (count (:rows block)))]
+     (range (* grid-col-count grid-row-count))))
+
+(defn map->grid-template [the-map]
+  (clojure.string/join " " (vals the-map)))
+
 
 (defn generate-default-blocks [elements]
   (reduce merge
@@ -10,15 +18,15 @@
             elements)))
 
 (defn default []
-  (let [grid-cols [2 3 4]
-        grid-rows [2 3 4]
+  (let [cols {0 "1fr" 1 "2fr"}
+        rows {0 "1fr" 1 "2fr" 2 "1fr"}
         grid-elements (range (*
-                               (count grid-rows)
-                               (count grid-cols)))]
+                               (count rows)
+                               (count cols)))]
      {:type "grid"
       :name "Grid"
-      :grid-columns grid-cols
-      :grid-rows    grid-rows
+      :cols       cols
+      :rows       rows
       :components (generate-default-blocks grid-elements)
       :height 20
       :grid-padding 20
@@ -31,15 +39,15 @@
 (defn view [comp-router comp-state path]
   (let [the-key          (first comp-state)
         value            (second comp-state)
-        grid-rows        (:grid-rows     value)
-        grid-columns     (:grid-columns  value)
+        rows        (:rows     value)
+        cols     (:cols     value)
         grid-components  (:components    value)
         grid-padding     (:grid-padding  value)
         grid-background  (:grid-background  value)]
     [:div.grid
      {:style {:display :grid
-              :grid-template-columns (grid-fractions grid-columns)
-              :grid-template-rows    (grid-fractions grid-rows)
+              :grid-template-columns (map->grid-template cols)
+              :grid-template-rows    (map->grid-template rows)
               :pointer-events "auto"
               :justify-items :center
               :gap "10px"

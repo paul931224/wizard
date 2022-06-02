@@ -1,5 +1,6 @@
 (ns wizard.editor.toolbars.config.grid-customizer
- (:require [reagent.core :refer [atom]]))
+ (:require [reagent.core :refer [atom]]
+           [wizard.editor.components.grid :as grid]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State
@@ -7,7 +8,8 @@
 
 (def grid 
  (atom 
-   {:rows {0 "1fr"}            
+   {:type "grid"
+    :rows {0 "1fr"}            
     :cols {0 "1fr"}}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -18,18 +20,10 @@
 ;; Utils
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn grid-divs-range []
- (let [grid-col-count (inc (count (:cols @grid)))
-       grid-row-count (inc (count (:rows @grid)))]
-  (range (* grid-col-count grid-row-count))))
 
-(defn map->grid-template [the-map]
- (clojure.string/join " " (vals the-map)))
-
-(map->grid-template (:rows grid)) 
  
 (defn get-map-length [the-map]
- (count (vals the-map)))
+ (count the-map))
 
 (defn rem-col []
   (let [last-index (max 1 (dec (get-map-length (:cols @grid))))]
@@ -188,18 +182,25 @@
  [:div {:style {:display :grid
                 :padding "20px"                 
                 :gap "10px"
-                :grid-template-columns (str "100px " (map->grid-template (:cols @grid)))
-                :grid-template-rows    (str "100px " (map->grid-template (:rows @grid)))
+                :grid-template-columns (str "100px " (grid/map->grid-template (:cols @grid)))
+                :grid-template-rows    (str "100px " (grid/map->grid-template (:rows @grid)))
                 :grid-auto-rows        "minmax(100px, auto)"
                 :grid-auto-columns     "minmax(100px, auto)"}}
       (map-indexed 
        (fn [index a] ^{:key index}[grid-div index]) 
-       (grid-divs-range))])
+       (grid/grid-divs-range @grid))])
   
+(defn add-grid []
+ [:div 
+  {:style {:padding "10px"
+           :cursor :pointer}}
+  "Add grid to page"])
+
 
 (defn view []
   [:div
-    [grid-preview]])
+    [grid-preview]
+    [add-grid]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; View
