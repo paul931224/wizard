@@ -53,10 +53,8 @@
 
 
 (def button-style
-  {:border "1px solid white"
-   :border-radius "10px"
-   :font-weight :bold
-   :padding "5px 10px"
+  {:font-weight :bold
+   :padding "0px 3px"
    :text-align :center
    :margin "5px"
    :cursor :pointer})
@@ -65,22 +63,22 @@
 (defn add-col-button []
   [:div {:style     button-style
          :on-click  add-col}
-    "+ col"])
+    "+"])
 
 (defn add-row-button []
   [:div {:style     button-style
          :on-click  add-row}
-    "+ row"])
+    "+"])
 
 (defn rem-col-button []
   [:div {:style     button-style
          :on-click  rem-col}
-    "- col"])
+    "-"])
 
 (defn rem-row-button []
   [:div {:style     button-style
          :on-click  rem-row}
-    "- row"])
+    "-"])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
@@ -90,6 +88,37 @@
 ;; View
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn grid-buttons []
+ [:div {:style {:position :relative
+                :top 0 
+                :width "100%"
+                :height "100%"}}
+  [:div {:style {:position :absolute
+                 :top 0 
+                 :width "100%"
+                 :height "100%"
+                 :display :grid
+                 :grid-template-rows "3fr 1fr"}}
+                  
+      [:div]
+      [:div {:style {:display :flex :z-index 1}}
+       [rem-row-button]
+       [add-row-button]]]
+       
+       
+  [:div {:style {:position :absolute
+                 :top 0 
+                 :width "100%"
+                 :height "100%"
+                 :display :grid 
+                 :grid-template-columns "3fr 1fr"}} 
+      [:div]
+      [:div 
+       [add-col-button]
+       [rem-col-button]]]]) 
+       
+       
+
 (defn get-offset-index [number]
  (let [grid-col-count (fn [] (inc (count (:cols @grid))))
        grid-row-count (fn [] (inc (count (:rows @grid))))
@@ -97,20 +126,33 @@
        row-index (fn [] (dec (quot number (grid-col-count))))
        index-without-first-row (fn [] (- number (grid-col-count)))] 
     (cond
-       (< number        (grid-col-count))    "top row"
-       (= 0 (mod number (grid-col-count)))   "left col"
+       (= number        0)                    :index-zero
+       (< number        (grid-col-count))     :top-row 
+       (= 0 (mod number (grid-col-count)))    :left-col
        (<  number (double-col-count))         (index-without-first-row)
        (>=  number (double-col-count))        (- (index-without-first-row) (row-index))
-       :else                             number)))
+       :else                                  number)))
+
+
+
 
 (defn grid-div [number] 
-  [:div {:style {:outline "1px solid #ddd"
+  (let [new-index (get-offset-index number)] 
+    [:div {:style {:outline "1px solid #ddd"
                    :min-width  "100px"
-                   :min-height "100px"
-                   :display :flex 
-                   :justify-content :center 
-                   :align-items :center}} 
-        (get-offset-index number)])
+                   :min-height "100px"}}
+                                   
+        (cond 
+         (= :index-zero new-index) [grid-buttons]
+         (= :top-row    new-index) [:div "top-row"]
+         (= :left-col   new-index) [:div "left-col"]
+         :else          [:div {:style {:height "100%"
+                                       :width "100%"
+                                       :display :flex 
+                                       :justify-content :center 
+                                       :align-items :center}}
+                            new-index])]))
+         
          
 
 (defn grid-preview []
@@ -125,22 +167,11 @@
       (map-indexed 
        (fn [index a] ^{:key index}[grid-div index]) 
        (grid-divs-range))])
-      
-
-(defn grid-buttons []
- [:div {:style {:display :grid 
-                :grid-template-columns "1fr 1fr"}}
-  [add-row-button]
-  [rem-row-button]
-
-  [add-col-button]
-  [rem-col-button]])
   
 
 (defn view []
   [:div
     "Grid customizer"
-    [grid-buttons]
     [grid-preview]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
