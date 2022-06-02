@@ -136,29 +136,34 @@
 
 (defn col-config [number]
  (let [col-index (fn [] (dec number))] 
-  [:div {:style {:padding-top "5px"
-                  :display :flex 
-                  :align-items :center
-                  :justify-content :center
-                  :height "100%"}}
-                
-    [:input {:style {:width "50px" :margin-right "10px"}
-             :placeholder 1}]
-    [:div "fr" " - " (col-index)]]))
+  (fn [number] 
+    [:div {:style {:padding-top "5px"
+                    :display :flex 
+                    :align-items :center
+                    :justify-content :center
+                    :height "100%"}}     
+      [:input {:value (get-in @grid [:cols (col-index)])
+               :on-change (fn [e] (swap! grid assoc-in [:cols (col-index)] (-> e .-target .-value)))
+               :style {:width "50px" :margin-right "10px"}
+               :placeholder 1}]])))
+     
 
 (defn row-config [number]
   (let [grid-col-count (fn [] (inc (count (:cols @grid))))
         row-index      (fn [] (dec (quot number (grid-col-count))))] 
-   [:div {:style {:padding-top "5px"
-                  :display :flex
-                  :flex-direction :column
-                  :align-items :center
-                  :justify-content :center
-                  :height "100%"}}
-     [:input {:style {:width "50px"
-                      :margin-bottom "5px"}
-              :placeholder 1}]
-     [:div "fr" " - " (row-index)]]))  
+   (fn [number] 
+    [:div {:style {:padding-top "5px"
+                   :display :flex
+                   :flex-direction :column
+                   :align-items :center
+                   :justify-content :center
+                   :height "100%"}}
+      [:input {:value (get-in @grid [:rows (row-index)])
+               :on-change (fn [e] (swap! grid assoc-in [:rows (row-index)] (-> e .-target .-value)))
+               :style {:width "50px"
+                       :margin-bottom "5px"}
+               :placeholder 1}]])))
+     
 
 (defn grid-div [number] 
   (let [new-index (get-offset-index number)] 
@@ -187,7 +192,6 @@
                 :grid-template-rows    (str "100px " (map->grid-template (:rows @grid)))
                 :grid-auto-rows        "minmax(100px, auto)"
                 :grid-auto-columns     "minmax(100px, auto)"}}
-       
       (map-indexed 
        (fn [index a] ^{:key index}[grid-div index]) 
        (grid-divs-range))])
@@ -195,7 +199,6 @@
 
 (defn view []
   [:div
-    "Grid customizer"
     [grid-preview]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
