@@ -134,26 +134,31 @@
        :else                                  number)))
 
 
-(defn col-config []
- [:div {:style {:padding-top "5px"
-                :display :flex 
-                :align-items :center
-                :justify-content :center
-                :height "100%"}}
-                
-  [:input {:style {:width "50px" :margin-right "10px"}}]
-  "fr"])
-
-(defn row-config []
+(defn col-config [number]
+ (let [col-index (fn [] (dec number))] 
   [:div {:style {:padding-top "5px"
-                 :display :flex
-                 :flex-direction :column
-                 :align-items :center
-                 :justify-content :center
-                 :height "100%"}}
-    [:input {:style {:width "50px"
-                     :margin-bottom "5px"}}]
-    [:div "fr"]])  
+                  :display :flex 
+                  :align-items :center
+                  :justify-content :center
+                  :height "100%"}}
+                
+    [:input {:style {:width "50px" :margin-right "10px"}
+             :placeholder 1}]
+    [:div "fr" " - " (col-index)]]))
+
+(defn row-config [number]
+  (let [grid-col-count (fn [] (inc (count (:cols @grid))))
+        row-index      (fn [] (dec (quot number (grid-col-count))))] 
+   [:div {:style {:padding-top "5px"
+                  :display :flex
+                  :flex-direction :column
+                  :align-items :center
+                  :justify-content :center
+                  :height "100%"}}
+     [:input {:style {:width "50px"
+                      :margin-bottom "5px"}
+              :placeholder 1}]
+     [:div "fr" " - " (row-index)]]))  
 
 (defn grid-div [number] 
   (let [new-index (get-offset-index number)] 
@@ -163,8 +168,8 @@
                                    
         (cond 
          (= :index-zero new-index) [grid-buttons]
-         (= :top-row    new-index) [col-config]
-         (= :left-col   new-index) [row-config]
+         (= :top-row    new-index) [col-config number]
+         (= :left-col   new-index) [row-config number]
          :else          [:div {:style {:height "100%"
                                        :width "100%"
                                        :display :flex 
