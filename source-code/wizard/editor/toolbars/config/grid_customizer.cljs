@@ -134,7 +134,26 @@
        :else                                  number)))
 
 
+(defn col-config []
+ [:div {:style {:padding-top "5px"
+                :display :flex 
+                :align-items :center
+                :justify-content :center
+                :height "100%"}}
+                
+  [:input {:style {:width "50px" :margin-right "10px"}}]
+  "fr"])
 
+(defn row-config []
+  [:div {:style {:padding-top "5px"
+                 :display :flex
+                 :flex-direction :column
+                 :align-items :center
+                 :justify-content :center
+                 :height "100%"}}
+    [:input {:style {:width "50px"
+                     :margin-bottom "5px"}}]
+    [:div "fr"]])  
 
 (defn grid-div [number] 
   (let [new-index (get-offset-index number)] 
@@ -144,8 +163,8 @@
                                    
         (cond 
          (= :index-zero new-index) [grid-buttons]
-         (= :top-row    new-index) [:div "top-row"]
-         (= :left-col   new-index) [:div "left-col"]
+         (= :top-row    new-index) [col-config]
+         (= :left-col   new-index) [row-config]
          :else          [:div {:style {:height "100%"
                                        :width "100%"
                                        :display :flex 
