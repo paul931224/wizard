@@ -1,7 +1,8 @@
 (ns wizard.editor.toolbars.config.grid-customizer
- (:require [reagent.core :refer [atom]]
+ (:require [reagent.core :as reagent :refer [atom]]
            [wizard.editor.components.grid :as grid]
            [re-frame.core :refer [dispatch subscribe]]))
+           
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State
@@ -158,23 +159,32 @@
                        :margin-bottom "5px"}
                :placeholder 1}]])))
      
+(defn grid-block [index]
+ (reagent/create-class
+     {:component-did-mount #(dispatch [:db/set [:toolbars :grid :components (str (random-uuid))] {:type     "block" 
+                                                                                                  :position index 
+                                                                                                  :content  (str index)}])
+                                                                                                  
+      :reagent-render (fn [index]
+                       [:div {:style {:height "100%"
+                                      :width "100%"
+                                      :display :flex 
+                                      :justify-content :center 
+                                      :align-items :center}}
+                          index])}))
+
 
 (defn grid-div [number] 
   (let [new-index (get-offset-index number)] 
-    [:div {:style {:outline "1px solid #ddd"
-                   :min-width  "100px"
-                   :min-height "100px"}}
+    [:div {:style {:outline "1px solid #ddd"}
+                 :min-width  "100px"
+                 :min-height "100px"}
                                    
-        (cond 
-         (= :index-zero new-index) [grid-buttons]
-         (= :top-row    new-index) [col-config number]
-         (= :left-col   new-index) [row-config number]
-         :else          [:div {:style {:height "100%"
-                                       :width "100%"
-                                       :display :flex 
-                                       :justify-content :center 
-                                       :align-items :center}}
-                            new-index])]))
+      (cond 
+       (= :index-zero new-index) [grid-buttons]
+       (= :top-row    new-index) [col-config number]
+       (= :left-col   new-index) [row-config number]
+       :else          [grid-block new-index])]))
          
 
 
@@ -195,14 +205,15 @@
   
 (defn add-grid []
  [:div 
-  {:style {:padding "10px"
+  {:on-click (fn [e] (dispatch [:editor/add! @(subscribe [:db/get [:toolbars :grid]])]))
+   :style {:padding "10px"
            :cursor :pointer}}
   "Add grid to page"])
 
 
 (defn view []
   [:div
-    (str @(subscribe [:db/get [:toolbars :grid]])) 
+    ;(str @(subscribe [:db/get [:toolbars :grid]])) 
     [grid-preview]
     [add-grid]])
 

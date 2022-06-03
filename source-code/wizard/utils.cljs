@@ -7,6 +7,7 @@
  :db/init
  (fn [db [_]]
    (-> db 
+    (assoc-in [:toolbars :grid :type] "grid")
     (assoc-in [:editor :type] :root)
     (assoc-in [:editor :name] "Root"))))
 

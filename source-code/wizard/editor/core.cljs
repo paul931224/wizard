@@ -47,7 +47,7 @@
 (defn view [] 
  [page-wrapper 
   [:<> 
-     ;(str @(subscribe [:db/get []]))
+     ;(str @(subscribe [:db/get [:toolbars :grid]]))
      [toolbars/view]
      [components/view]]])
         
