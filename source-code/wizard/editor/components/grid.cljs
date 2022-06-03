@@ -32,27 +32,20 @@
       :grid-padding 20
       :grid-background "#EEE"}))
 
-(defn grid-fractions [numbers-vec]
-  (str
-   (clojure.string/join "fr " numbers-vec) "fr"))
 
 (defn view [comp-router comp-state path]
   (let [the-key          (first comp-state)
         value            (second comp-state)
         rows        (:rows     value)
         cols     (:cols     value)
-        grid-components  (:components    value)
-        grid-padding     (:grid-padding  value)
-        grid-background  (:grid-background  value)]
+        grid-components  (:components    value)]
     [:div.grid
      {:style {:display :grid
               :grid-template-columns (map->grid-template cols)
               :grid-template-rows    (map->grid-template rows)
               :pointer-events "auto"
               :justify-items :center
-              :gap "10px"
-              :padding (str grid-padding "px")
-              :background grid-background}}
+              :gap "10px"}}
      ;(str path " - "  (vec (concat path [:components (first comp-state)])))
      (map (fn [component]
             ^{:key the-key} [comp-router component

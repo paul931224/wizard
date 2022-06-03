@@ -1,16 +1,12 @@
 (ns wizard.editor.toolbars.config.grid-customizer
  (:require [reagent.core :refer [atom]]
-           [wizard.editor.components.grid :as grid]))
+           [wizard.editor.components.grid :as grid]
+           [re-frame.core :refer [dispatch subscribe]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def grid 
- (atom 
-   {:type "grid"
-    :rows {0 "1fr"}            
-    :cols {0 "1fr"}}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; State
@@ -26,20 +22,24 @@
  (count the-map))
 
 (defn rem-col []
-  (let [last-index (max 1 (dec (get-map-length (:cols @grid))))]
-   (swap! grid assoc :cols (dissoc (:cols @grid) last-index))))
+  (let [cols        (subscribe [:db/get [:toolbars :grid :cols]])
+        last-index  (max 1 (dec (get-map-length @cols)))]
+   (dispatch [:db/set [:toolbars :grid :cols] (dissoc @cols last-index)])))     
 
 (defn rem-row []
-  (let [last-index (max 1 (dec (get-map-length (:rows @grid))))]
-   (swap! grid assoc :rows (dissoc (:rows @grid) last-index))))
+  (let [rows       (subscribe [:db/get [:toolbars :grid :rows]])
+        last-index (max 1 (dec (get-map-length @rows)))]
+   (dispatch [:db/set [:toolbars :grid :cols] (dissoc @rows last-index)])))
 
 (defn add-col []
-  (let [next-index (get-map-length (:cols @grid))]
-   (swap! grid assoc-in [:cols next-index] "1fr")))
+  (let [cols        (subscribe [:db/get [:toolbars :grid :cols]])
+        next-index  (get-map-length @cols)]
+   (dispatch [:db/set [:toolbars :grid :cols next-index] "1fr"])))
 
 (defn add-row []
-  (let [next-index (get-map-length (:rows @grid))]
-   (swap! grid assoc-in [:rows next-index] "1fr")))
+  (let [rows       (subscribe [:db/get [:toolbars :grid :rows]])
+        next-index (get-map-length @rows)]
+   (dispatch [:db/set [:toolbars :grid :rows next-index] "1fr"])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
@@ -114,8 +114,8 @@
        
 
 (defn get-offset-index [number]
- (let [grid-col-count (fn [] (inc (count (:cols @grid))))
-       grid-row-count (fn [] (inc (count (:rows @grid))))
+ (let [grid-col-count (fn [] (inc (count @(subscribe [:db/get [:toolbars :grid :cols]]))))
+       grid-row-count (fn [] (inc (count @(subscribe [:db/get [:toolbars :grid :cols]]))))
        double-col-count (fn [] (* 2 (grid-col-count)))
        row-index (fn [] (dec (quot number (grid-col-count))))
        index-without-first-row (fn [] (- number (grid-col-count)))] 
@@ -136,14 +136,14 @@
                     :align-items :center
                     :justify-content :center
                     :height "100%"}}     
-      [:input {:value (get-in @grid [:cols (col-index)])
-               :on-change (fn [e] (swap! grid assoc-in [:cols (col-index)] (-> e .-target .-value)))
+      [:input {:value           @(subscribe [:db/get [:toolbars :grid :cols (col-index)]])
+               :on-change (fn [e] (dispatch [:db/set [:toolbars :grid :cols (col-index)] (-> e .-target .-value)]))
                :style {:width "50px" :margin-right "10px"}
                :placeholder 1}]])))
      
 
 (defn row-config [number]
-  (let [grid-col-count (fn [] (inc (count (:cols @grid))))
+  (let [grid-col-count (fn [] (inc (count @(subscribe [:db/get [:toolbars :grid :cols]]))))
         row-index      (fn [] (dec (quot number (grid-col-count))))] 
    (fn [number] 
     [:div {:style {:padding-top "5px"
@@ -152,8 +152,8 @@
                    :align-items :center
                    :justify-content :center
                    :height "100%"}}
-      [:input {:value (get-in @grid [:rows (row-index)])
-               :on-change (fn [e] (swap! grid assoc-in [:rows (row-index)] (-> e .-target .-value)))
+      [:input {:value      @(subscribe [:db/get [:toolbars :grid :rows (row-index)]])
+               :on-change (fn [e] (dispatch [:db/set [:toolbars :grid :rows (row-index)] (-> e .-target .-value)]))
                :style {:width "50px"
                        :margin-bottom "5px"}
                :placeholder 1}]])))
@@ -176,19 +176,22 @@
                                        :align-items :center}}
                             new-index])]))
          
-         
+
 
 (defn grid-preview []
- [:div {:style {:display :grid
-                :padding "20px"                 
-                :gap "10px"
-                :grid-template-columns (str "100px " (grid/map->grid-template (:cols @grid)))
-                :grid-template-rows    (str "100px " (grid/map->grid-template (:rows @grid)))
-                :grid-auto-rows        "minmax(100px, auto)"
-                :grid-auto-columns     "minmax(100px, auto)"}}
-      (map-indexed 
-       (fn [index a] ^{:key index}[grid-div index]) 
-       (grid/grid-divs-range @grid))])
+ (let [grid (subscribe [:db/get [:toolbars :grid]])
+       cols (fn [] (:cols @grid))
+       rows (fn [] (:rows @grid))] 
+   [:div {:style {:display :grid
+                  :padding "20px"                 
+                  :gap "10px"
+                  :grid-template-columns (str "100px " (grid/map->grid-template (cols)))
+                  :grid-template-rows    (str "100px " (grid/map->grid-template (rows)))
+                  :grid-auto-rows        "minmax(100px, auto)"
+                  :grid-auto-columns     "minmax(100px, auto)"}}
+        (map-indexed 
+         (fn [index a] ^{:key index}[grid-div index]) 
+         (grid/grid-divs-range @grid))]))
   
 (defn add-grid []
  [:div 
@@ -199,6 +202,7 @@
 
 (defn view []
   [:div
+    (str @(subscribe [:db/get [:toolbars :grid]])) 
     [grid-preview]
     [add-grid]])
 
