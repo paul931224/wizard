@@ -14,7 +14,9 @@
                  
      :class (if (= id @hovered-component)
              "component-hovered" nil)
-     :style {:cursor :pointer}}            
+     :style {:cursor :pointer 
+             :width "100%"
+             :height "100%"}}            
     content]))
 
 (defn component-router [comp-state path]

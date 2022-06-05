@@ -20,8 +20,10 @@
     [:div {:style {:pointer-events "auto"
                    :color color 
                    :background-color background-color
-                   :padding (str padding "px")
-                   :height (str height "px")
-                   :width  (str width "px")}}
+                   :width  "100%"
+                   :height "100%"
+                   :display :flex 
+                   :justify-content :center 
+                   :align-items :center}}
      [:div.component
       [:<> (html->hiccup (str "<div>" content "</div>"))]]]))

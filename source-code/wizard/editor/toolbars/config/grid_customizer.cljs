@@ -1,6 +1,6 @@
 (ns wizard.editor.toolbars.config.grid-customizer
  (:require [reagent.core :as reagent :refer [atom]]
-           [wizard.editor.components.grid :as grid]
+           [wizard.editor.components.grid :as grid]          
            [re-frame.core :refer [dispatch subscribe]]))
            
 

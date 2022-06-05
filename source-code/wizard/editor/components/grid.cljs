@@ -38,6 +38,7 @@
         value            (second comp-state)
         rows        (:rows     value)
         cols     (:cols     value)
+        gap      (:gap value)
         grid-components  (:components    value)]
     [:div.grid
      {:style {:display :grid
@@ -45,7 +46,7 @@
               :grid-template-rows    (map->grid-template rows)
               :pointer-events "auto"
               :justify-items :center
-              :gap "10px"}}
+              :gap (str gap "px")}}
      ;(str path " - "  (vec (concat path [:components (first comp-state)])))
      (map (fn [component]
             ^{:key the-key} [comp-router component

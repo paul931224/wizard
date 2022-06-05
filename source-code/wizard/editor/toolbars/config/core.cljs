@@ -1,7 +1,7 @@
 (ns wizard.editor.toolbars.config.core
  (:require [re-frame.core :refer [dispatch subscribe]]
            [wizard.editor.toolbars.config.grid-customizer :as grid-customizer]
-           [wizard.editor.toolbars.config.box-model       :as box-model]))
+           [wizard.editor.toolbars.config.box-model       :as box-model]))           
 
 (defn color-input [path the-key]
   (let [new-path (vec (conj path the-key))]
@@ -45,7 +45,7 @@
   (let [selected-path      (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         selected-component (fn [] @(subscribe [:db/get ( selected-path)]))]       
    [type-config 
-     (selected-component) 
-     (selected-path)]))
+       (selected-component) 
+       (selected-path)]))
      
       ;[:div (str @selected-path)]]))
