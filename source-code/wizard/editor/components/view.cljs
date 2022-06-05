@@ -11,7 +11,7 @@
     {:on-click (fn [event] 
                 (.stopPropagation event)
                 (dispatch [:db/set [:editor :selected :value-path] path]))
-                 
+     :id id            
      :class (if (= id @hovered-component)
              "component-hovered" nil)
      :style {:cursor :pointer 
@@ -35,7 +35,7 @@
 
 (defn view []
   (let [components (subscribe [:db/get [:editor :components]])]
-    [:div {:style {:width "100%"}}
+    [:div {:style {:width "100%" :position :relative}}
       (map
        (fn [comp-state] ^{:key (first comp-state)}
          [component-router

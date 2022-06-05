@@ -70,12 +70,12 @@ button {
 }
 
 .component-wrapper:hover{
-     border: 1px solid rgba(255, 0, 0, 0.386);
+     background: rgba(108, 245, 39, 0.5);
      transition: 0.2 ease;
 }
 
 .component-wrapper.component-hovered{
-     border: 1px solid rgba(255, 0, 0, 0.386);
+     background: rgba(108, 245, 39, 0.2);
      transition: 0.2 ease;
 }
 

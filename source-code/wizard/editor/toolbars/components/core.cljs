@@ -6,13 +6,13 @@
   [re-frame.core :refer [dispatch subscribe]]))
   
 
-(defn component-block [{:keys [name] :as component-data}]
+(defn component-block [component-fn]
   [:div {:class ["wizard-component"]
-         :on-click (fn [e] (dispatch [:editor/add! component-data]))}
-     name])
+         :on-click (fn [e] (dispatch [:editor/add! (component-fn)]))}
+     (:name (component-fn))])
                        
 (defn view []
   [:div {:style {:padding "0px 5px"}}
-   [component-block  (block/default)]
-   [component-block  (navbar/default)]   
-   [component-block  (grid/default)]])
+   [component-block  (fn [] (block/default))]
+   [component-block  (fn [] (navbar/default))]   
+   [component-block  (fn [] (grid/default))]])
