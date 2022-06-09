@@ -166,19 +166,12 @@
                :placeholder 1}]])))
      
 (defn grid-block [index]
- (reagent/create-class
-     {:component-did-mount #(dispatch [:db/set (add-to-component-path [:components (str (random-uuid))]) 
-                                       {:type     "block" 
-                                        :position index 
-                                        :content  (str index)}])
-                                                                                                  
-      :reagent-render (fn [index]
-                       [:div {:style {:height "100%"
-                                      :width "100%"
-                                      :display :flex 
-                                      :justify-content :center 
-                                      :align-items :center}}
-                          index])}))
+ [:div {:style {:height "100%"
+                     :width "100%"
+                     :display :flex 
+                     :justify-content :center 
+                     :align-items :center}}
+    index])
 
 
 (defn grid-div [number] 
@@ -205,6 +198,7 @@
                   :grid-template-rows    (str "100px " (grid/map->grid-template (rows)))
                   :grid-auto-rows        "minmax(100px, auto)"
                   :grid-auto-columns     "minmax(100px, auto)"}}
+        ;(str (cols))
         (map-indexed 
          (fn [index a] ^{:key index}[grid-div index]) 
          (grid/grid-divs-range (get-grid-component)))]))

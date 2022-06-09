@@ -29,7 +29,7 @@
         id             (fn [] (last (path)))
         element        (fn [] (get-element-by-id (id)))
         rect-data      (fn [] (get-rect-data (element)))]                
-    @(subscribe [:db/get [:editor]])
+    (str @(subscribe [:db/get [:editor]]))
     [:div#overlay {:style {:z-index 1000}} 
      [:div {:on-click (fn [] (.log js/console (rect-data)))
             :style (merge 
