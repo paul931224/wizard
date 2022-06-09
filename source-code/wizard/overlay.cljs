@@ -26,6 +26,11 @@
    nil)))
 
 
+(defn unselect-component! []
+  (let [selected-path      (subscribe [:editor/get-selected-component-path])]
+     [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/unselect-component! @selected-path]))}
+      "!"]))
+
 (defn rem-component! []
  (let [selected-path      (subscribe [:editor/get-selected-component-path])]       
   [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/remove-selected-component! @selected-path]))}
@@ -45,6 +50,7 @@
                              :right 0
                              :height "auto"
                              :width  "80px"}}
+      [unselect-component!]
       [rem-component!]              
       [add-component! :editor/add-before-selected-component! "↑ +"]
       [add-component! :editor/add-after-selected-component!  "↓ +"]])

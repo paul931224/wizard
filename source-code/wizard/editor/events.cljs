@@ -46,6 +46,13 @@
  
 
 (reg-event-db
+ :editor/unselect-component!
+ (fn [db [_ path]]
+   (-> db
+         (assoc-in [:editor :selected :value-path] nil))))
+         
+
+(reg-event-db
  :editor/remove-selected-component!
  (fn [db [_ path]]
    (let [components-path   (vec (butlast path))
