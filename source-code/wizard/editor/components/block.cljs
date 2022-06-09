@@ -11,12 +11,11 @@
    :content "Block text"})
 
 (defn view [comp-router key-and-comp path]
-  (let [the-key                        (first key-and-comp)
-        comp-state                     (second key-and-comp)
+  (let [the-key                                    (first key-and-comp)
+        comp-state                                 (second key-and-comp)
         {:keys [content col row width height
-                color background-color padding]}
-        comp-state
-        content-path (vec (conj path :content))]
+                color background-color padding]}   comp-state]
+       
     [:div {:style {:pointer-events "auto"
                    :color color 
                    :background-color (if background-color background-color "white")
@@ -24,8 +23,6 @@
                    :height "100%"
                    :display :flex 
                    :justify-content :center 
-                   :align-items :center
-                   
-                   :margin "0 -1px -1px 0"}}
+                   :align-items :center}}                                     
      [:div.component {:style {:padding padding}}
       [:<> (html->hiccup (str "<div>" content "</div>"))]]]))
