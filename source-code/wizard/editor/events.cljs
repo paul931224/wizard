@@ -32,9 +32,9 @@
 
 
 
-(defn insert-into-vec [coll element position]
+(defn insert-into-vec [coll insert-coll position]
  (let [[before after] (split-at position coll)]
-   (vec (concat before [element] after))))
+   (vec (concat before insert-coll after))))
 
 (defn insert-component [direction components component position]
  (let [comp-vec (data-structures/id-map->ordered-vector components)
@@ -46,24 +46,39 @@
  
 
 (reg-event-db
- :editor/add-before-component!
+ :editor/remove-selected-component!
+ (fn [db [_ path]]
+   (let [components-path   (vec (butlast path))
+         components        (get-in db components-path)
+         new-components    (dissoc components (last path))
+         new-order         (insert-component :before
+                                             new-components
+                                             []
+                                             0)
+         new-selected      (vec (conj components-path (first (last new-components))))]                  
+     (-> db
+      (assoc-in [:editor :selected :value-path] new-selected)
+      (assoc-in components-path new-order)))))
+
+(reg-event-db
+ :editor/add-before-selected-component!
  (fn [db [_ path position new-component]]
    (let [components-path   (vec (butlast path))         
          components        (get-in db components-path)
          new-order         (insert-component :before 
                             components
-                            (assoc new-component :id (str (random-uuid))) 
+                            [(assoc new-component :id (str (random-uuid)))] 
                             position)] 
     (assoc-in db  components-path new-order))))
 
 (reg-event-db
- :editor/add-after-component!
+ :editor/add-after-selected-component!
  (fn [db [_ path position new-component]]
    (let [components-path   (vec (butlast path))
          components        (get-in db components-path)
          new-order         (insert-component :after 
                             components 
-                            (assoc new-component :id (str (random-uuid)))
+                            [(assoc new-component :id (str (random-uuid)))]
                             position)]
      (assoc-in db  components-path new-order))))
 
