@@ -17,30 +17,34 @@
 ;; Utils
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn get-grid-component [] 
+  @(subscribe [:editor/get-selected-component]))
 
- 
+(defn add-to-component-path [path-vec] 
+  (vec (concat @(subscribe [:editor/get-selected-component-path]) path-vec)))
+
 (defn get-map-length [the-map]
  (count the-map))
 
 (defn rem-col []
-  (let [cols        (subscribe [:db/get [:toolbars :grid :cols]])
+  (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
         last-index  (max 1 (dec (get-map-length @cols)))]
-   (dispatch [:db/set [:toolbars :grid :cols] (dissoc @cols last-index)])))     
+   (dispatch [:db/set (add-to-component-path [:cols]) (dissoc @cols last-index)])))     
 
 (defn rem-row []
-  (let [rows       (subscribe [:db/get [:toolbars :grid :rows]])
+  (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
         last-index (max 1 (dec (get-map-length @rows)))]
-   (dispatch [:db/set [:toolbars :grid :cols] (dissoc @rows last-index)])))
+   (dispatch [:db/set (add-to-component-path [:cols]) (dissoc @rows last-index)])))
 
 (defn add-col []
-  (let [cols        (subscribe [:db/get [:toolbars :grid :cols]])
+  (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
         next-index  (get-map-length @cols)]
-   (dispatch [:db/set [:toolbars :grid :cols next-index] "1fr"])))
+   (dispatch [:db/set (add-to-component-path [:cols next-index]) "1fr"])))
 
 (defn add-row []
-  (let [rows       (subscribe [:db/get [:toolbars :grid :rows]])
+  (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
         next-index (get-map-length @rows)]
-   (dispatch [:db/set [:toolbars :grid :rows next-index] "1fr"])))
+   (dispatch [:db/set (add-to-component-path [:rows next-index]) "1fr"])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utils
@@ -115,8 +119,8 @@
        
 
 (defn get-offset-index [number]
- (let [grid-col-count (fn [] (inc (count @(subscribe [:db/get [:toolbars :grid :cols]]))))
-       grid-row-count (fn [] (inc (count @(subscribe [:db/get [:toolbars :grid :cols]]))))
+ (let [grid-col-count (fn [] (inc (count @(subscribe [:db/get (add-to-component-path [:cols])]))))
+       grid-row-count (fn [] (inc (count @(subscribe [:db/get (add-to-component-path [:cols])]))))
        double-col-count (fn [] (* 2 (grid-col-count)))
        row-index (fn [] (dec (quot number (grid-col-count))))
        index-without-first-row (fn [] (- number (grid-col-count)))] 
@@ -137,14 +141,15 @@
                     :align-items :center
                     :justify-content :center
                     :height "100%"}}     
-      [:input {:value           @(subscribe [:db/get [:toolbars :grid :cols (col-index)]])
-               :on-change (fn [e] (dispatch [:db/set [:toolbars :grid :cols (col-index)] (-> e .-target .-value)]))
+      [:input {:value           @(subscribe [:db/get (add-to-component-path [:cols (col-index)])])
+               :on-change (fn [e] (dispatch [:db/set (add-to-component-path [:cols (col-index)]) 
+                                             (-> e .-target .-value)]))
                :style {:width "50px" :margin-right "10px"}
                :placeholder 1}]])))
      
 
 (defn row-config [number]
-  (let [grid-col-count (fn [] (inc (count @(subscribe [:db/get [:toolbars :grid :cols]]))))
+  (let [grid-col-count (fn [] (inc (count @(subscribe [:db/get (add-to-component-path [:cols])]))))
         row-index      (fn [] (dec (quot number (grid-col-count))))] 
    (fn [number] 
     [:div {:style {:padding-top "5px"
@@ -153,17 +158,19 @@
                    :align-items :center
                    :justify-content :center
                    :height "100%"}}
-      [:input {:value      @(subscribe [:db/get [:toolbars :grid :rows (row-index)]])
-               :on-change (fn [e] (dispatch [:db/set [:toolbars :grid :rows (row-index)] (-> e .-target .-value)]))
+      [:input {:value      @(subscribe [:db/get (add-to-component-path [:rows (row-index)])])
+               :on-change (fn [e] (dispatch [:db/set (add-to-component-path [:rows (row-index)]) 
+                                             (-> e .-target .-value)]))
                :style {:width "50px"
                        :margin-bottom "5px"}
                :placeholder 1}]])))
      
 (defn grid-block [index]
  (reagent/create-class
-     {:component-did-mount #(dispatch [:db/set [:toolbars :grid :components (str (random-uuid))] {:type     "block" 
-                                                                                                  :position index 
-                                                                                                  :content  (str index)}])
+     {:component-did-mount #(dispatch [:db/set (add-to-component-path [:components (str (random-uuid))]) 
+                                       {:type     "block" 
+                                        :position index 
+                                        :content  (str index)}])
                                                                                                   
       :reagent-render (fn [index]
                        [:div {:style {:height "100%"
@@ -189,9 +196,8 @@
 
 
 (defn grid-preview []
- (let [grid (subscribe [:db/get [:toolbars :grid]])
-       cols (fn [] (:cols @grid))
-       rows (fn [] (:rows @grid))] 
+ (let [cols (fn [] (:cols (get-grid-component)))
+       rows (fn [] (:rows (get-grid-component)))]
    [:div {:style {:display :grid
                   :padding "20px"                 
                   :gap "10px"
@@ -201,11 +207,11 @@
                   :grid-auto-columns     "minmax(100px, auto)"}}
         (map-indexed 
          (fn [index a] ^{:key index}[grid-div index]) 
-         (grid/grid-divs-range @grid))]))
+         (grid/grid-divs-range (get-grid-component)))]))
   
 (defn add-grid []
  [:div 
-  {:on-click (fn [e] (dispatch [:editor/add! @(subscribe [:db/get [:toolbars :grid]])]))
+  {:on-click (fn [e] (dispatch [:editor/add! @(subscribe [:db/get (add-to-component-path [])])]))
    :style {:padding "10px"
            :cursor :pointer}}
   "Add grid to page"])

@@ -10,7 +10,8 @@
    [:div.component-wrapper
     {:on-click (fn [event] 
                 (.stopPropagation event)
-                (dispatch [:db/set [:editor :selected :value-path] path]))
+                (dispatch [:editor/select-component! path]))
+                
      :id id            
      :class (if (= id @hovered-component)
              "component-hovered" nil)

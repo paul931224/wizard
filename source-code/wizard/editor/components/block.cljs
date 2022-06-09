@@ -25,5 +25,5 @@
                    :display :flex 
                    :justify-content :center 
                    :align-items :center}}
-     [:div.component
+     [:div.component {:style {:padding padding}}
       [:<> (html->hiccup (str "<div>" content "</div>"))]]]))
