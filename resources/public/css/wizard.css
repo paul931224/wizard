@@ -107,4 +107,12 @@ button {
      box-shadow: 20px 18px 31px 3px rgba(0,0,0,0.3);
 }
 
+.overlay-button{
+ transform: scale(0.98);
+}
+
+.overlay-button:hover{
+     transform: scale(1);
+}
+
 

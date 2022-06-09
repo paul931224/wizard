@@ -2,6 +2,7 @@
  (:require [reagent.core :as r]
            [re-frame.core :refer [dispatch subscribe]]
            ["react" :as react]
+           [wizard.data-structures :as data-structures]
            [reagent-hickory.sweet :refer [html->hiccup]]
            ["@dnd-kit/core" :refer [DndContext
                                     closestCenter
@@ -26,21 +27,7 @@
 (defn to-clj-map [hash-map]
   (js->clj hash-map :keywordize-keys true))
 
-(defn id-map->ordered-vector [coll]
-  (let [pos-to-index (fn [[item-id item-value]]
-                        [(:position item-value)
-                         (assoc item-value :id item-id)])]
-     (mapv second
-          (sort-by first
-                   (map pos-to-index coll)))))
 
-(defn ordered-vector->id-map [coll]
-  (let [index-to-pos (fn [index item]
-                       {(str (:id item))   
-                        (-> item 
-                            (dissoc :id)
-                            (assoc  :position index))})]
-    (reduce merge (map-indexed index-to-pos coll))))
 
 (defn sortable-handle-style []
  {
@@ -120,7 +107,7 @@
                                 newIndex     (.indexOf items over-item)
                                 new-order    (to-clj-map (arrayMove (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]                            
-                            (dispatch [:db/set value-path (ordered-vector->id-map new-order)])
+                            (dispatch [:db/set value-path (data-structures/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
                         (setActiveId nil))]
     [dnd-context {:sensors  sensors
@@ -147,7 +134,7 @@
     (if @items 
       ^{:key (str @items)}
       [:f> sortable-example 
-       (id-map->ordered-vector @items)
+       (data-structures/id-map->ordered-vector @items)
        value-path
        component
        component-data])))
