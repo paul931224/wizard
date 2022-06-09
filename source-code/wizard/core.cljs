@@ -174,6 +174,10 @@
        [editor/view])
      [modal]]]))
 
+(defn with-z-index [number content]
+ [:div {:style {:position :relative :z-index number}}
+  content])
+
 (defn view []
   (reagent/create-class
     {:component-did-mount (fn [e] 
@@ -181,10 +185,10 @@
                            (dispatch [:db/init]))                 
      :reagent-render 
      (fn []
-        [:div {:style {:position :relative}}
-         [overlay/view]         
-         [main-content]
-         [toolbars/view]])}))
+        [:<>
+         [with-z-index 2 [overlay/view]]         
+         [with-z-index 1 [main-content]]
+         [with-z-index 3 [toolbars/view]]])}))
          
          
          

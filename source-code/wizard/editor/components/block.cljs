@@ -19,11 +19,13 @@
         content-path (vec (conj path :content))]
     [:div {:style {:pointer-events "auto"
                    :color color 
-                   :background-color background-color
+                   :background-color (if background-color background-color "white")
                    :width  "100%"
                    :height "100%"
                    :display :flex 
                    :justify-content :center 
-                   :align-items :center}}
+                   :align-items :center
+                   
+                   :margin "0 -1px -1px 0"}}
      [:div.component {:style {:padding padding}}
       [:<> (html->hiccup (str "<div>" content "</div>"))]]]))

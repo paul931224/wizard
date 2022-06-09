@@ -46,7 +46,9 @@
               :grid-template-rows    (map->grid-template rows)
               :pointer-events "auto"
               :justify-items :center
-              :gap (str gap "px")}}
+              :background :black
+              :border "1px solid black"
+              :gap "1px"}}
      ;(str path " - "  (vec (concat path [:components (first comp-state)])))
      (map (fn [component]
             ^{:key the-key} [comp-router component

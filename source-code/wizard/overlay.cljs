@@ -40,10 +40,14 @@
          [:div#overlay {:style {:z-index 1000}} 
           [:div {:on-click (fn [] (.log js/console @rect-data))
                  :style (merge 
-                          {:position :absolute                     
-                           ;:pointer-events :none
-                           :background "rgba(108, 245, 39, 0.69)"}
-                          @rect-data)}]])})))
+                          {:position :absolute 
+                           :z-index 1  
+                           :pointer-events :none}
+                          @rect-data)}
+            [:div {:style {:background "rgba(108, 245, 39, 0.69)"
+                           :height "100%"
+                           
+                           :width "100%"}}]]])})))              
        
 (defn view []
    [overlay-refresher @(subscribe [:db/get [:editor]])])                  

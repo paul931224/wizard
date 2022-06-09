@@ -64,20 +64,6 @@ button {
    border: 1px solid #dddddeDD;
 }
 
-.component-wrapper{
-     border:1px solid transparent;
-     transition: 0.2s ease;
-}
-
-.component-wrapper:hover{
-     background: rgba(108, 245, 39, 0.5);
-     transition: 0.2 ease;
-}
-
-.component-wrapper.component-hovered{
-     background: rgba(108, 245, 39, 0.2);
-     transition: 0.2 ease;
-}
 
 .toolbar-header{
      background: #555;
