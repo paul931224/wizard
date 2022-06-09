@@ -29,13 +29,13 @@
         id             (fn [] (last (path)))
         element        (fn [] (get-element-by-id (id)))
         rect-data      (fn [] (get-rect-data (element)))]                
-    [:div {:on-click (fn [] (.log js/console (rect-data)))
-           :style (merge 
-                    {:position :absolute
-                     ;:pointer-events :none
-                     :background "rgba(108, 245, 39, 0.69)"}
-                    (rect-data))}]))   
+    [:div#overlay {:style {:z-index 1000}} 
+     [:div {:on-click (fn [] (.log js/console (rect-data)))
+            :style (merge 
+                     {:position :absolute                     
+                      ;:pointer-events :none
+                      :background "rgba(108, 245, 39, 0.69)"}
+                     (rect-data))}]]))   
 
-
-
-         
+                    
+                             

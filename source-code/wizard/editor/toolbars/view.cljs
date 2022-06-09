@@ -119,11 +119,13 @@
  [:f> draggable config])
 
 (defn toolbars [content]
- [dnd-context {:onDragStart   handle-drag-start
-               :onDragMove    handle-drag-move
-               :onDragEnd     handle-drag-end
-               :modifiers     [restrictToWindowEdges]}
-              content])             
+ [:div#toolbars {:style {:position :fixed 
+                         :top 0}} 
+  [dnd-context {:onDragStart   handle-drag-start
+                :onDragMove    handle-drag-move
+                :onDragEnd     handle-drag-end
+                :modifiers     [restrictToWindowEdges]}
+               content]])             
 
 (defn view []
  [toolbars 

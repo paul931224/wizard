@@ -95,10 +95,10 @@
              @sidebar-guilds))]])))
     
 
-(defn wrapper [content]
- [:div {:style {:background color-one
-                :min-height "100vh"
-                :display :flex}}
+(defn main-content-wrapper [content]
+ [:div#main-content {:style {:background color-one
+                             :min-height "100vh"
+                             :display :flex}}
    [sidebar]
    content])    
  
@@ -165,9 +165,17 @@
     [connect-wallet-button])]))
     
 
+(defn main-content []
+ (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
+   [main-content-wrapper
+    [:div {:style {:flex-grow 1}}
+     (if @guild-selected
+       [hero-title]
+       [editor/view])
+     [modal]]]))
+
 (defn view []
-  (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
-   (reagent/create-class
+  (reagent/create-class
     {:component-did-mount (fn [e] 
                            (dispatch [:web3/setup])
                            (dispatch [:db/init]))                 
@@ -175,13 +183,10 @@
      (fn []
         [:div {:style {:position :relative}}
          [overlay/view]         
-         [wrapper
-           [:div {:style {:flex-grow 1}}
-            (if @guild-selected 
-              [hero-title] 
-              [editor/view])
-            [modal]]]
-         [toolbars/view]])})))
+         [main-content]
+         [toolbars/view]])}))
+         
+         
          
          
     
