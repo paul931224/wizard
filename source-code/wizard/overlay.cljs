@@ -26,40 +26,23 @@
    nil)))
 
 
-(def menu-button-style 
- {:width "100%"
-  :height  "20px"
-  :background :white
-  :border-radius "5px"
-  :position :absolute 
-  :cursor :pointer
-  :box-shadow "5px 5px 15px -4px rgba(108, 245, 39, 0.69)"
-  :display :flex 
-  :padding "5px 0px"
-  :justify-content :center
-  :pointer-events :auto})
-
-(def menu-top-style
- (merge menu-button-style {:top "-20px"}))
-
-(def menu-bot-style 
- (merge menu-button-style {:bottom "-20px"}))
-
-(defn add-component! [style event]
+(defn add-component! [event content]
  (let [selected-component (subscribe [:editor/get-selected-component])
        selected-path      (subscribe [:editor/get-selected-component-path])
        position           (fn [] (:position @selected-component))] 
-  [:div.overlay-button {:on-click  (fn [e] (dispatch [event @selected-path (position) (block/default)]))
-                        :style     style} 
-    "+"]))
+  [:div.overlay-button {:on-click  (fn [e] (dispatch [event @selected-path (position) (block/default)]))}
+         
+    content]))
  
 
 (defn overlay-menu []
- [:div#overlay-menu {:style {:position :relative 
-                             :height "100%"
-                             :width  "100%"}}
-      [add-component! menu-top-style :editor/add-before-component!]
-      [add-component! menu-bot-style :editor/add-after-component!]])
+ [:div#overlay-menu {:style {:position :fixed
+                             :top 0 
+                             :right 0
+                             :height "auto"
+                             :width  "80px"}}
+      [add-component! :editor/add-before-component! "↑ +"]
+      [add-component! :editor/add-after-component!  "↓ +"]])
            
 
 (def overlay-style {:position :absolute
@@ -81,12 +64,14 @@
                                  (reset! rect-data (get-rect-data (element)))))     
       :reagent-render
        (fn [editor] 
-         [:div#overlay {:style (merge overlay-style @rect-data)}
-             [overlay-menu]])})))                    
+         [:div#overlay {:style (merge overlay-style @rect-data)}])})))
+                                 
                
        
 (defn view []
-   [overlay-refresher @(subscribe [:db/get [:editor]])])                  
+   [:<> 
+    [overlay-menu]
+    [overlay-refresher @(subscribe [:db/get [:editor]])]])                  
 
                     
                              

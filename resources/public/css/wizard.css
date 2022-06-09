@@ -108,10 +108,19 @@ button {
 }
 
 .overlay-button{
- transform: scale(0.98);
+ transform: scale(0.95);
+ font-size: 24px;
+ padding: 5px 10px;
+ border: 1px solid black;
+ border-radius: 5px;
+ cursor: pointer;
+ margin: 10px 0px;
+ margin-right: 5px;
+ transition: 0.2s ease-in;
 }
 
 .overlay-button:hover{
+     transition: 0.2s ease-out;
      transform: scale(1);
 }
 

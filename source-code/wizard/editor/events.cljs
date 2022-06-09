@@ -50,7 +50,10 @@
  (fn [db [_ path position new-component]]
    (let [components-path   (vec (butlast path))         
          components        (get-in db components-path)
-         new-order         (insert-component :before components new-component position)] 
+         new-order         (insert-component :before 
+                            components
+                            (assoc new-component :id (str (random-uuid))) 
+                            position)] 
     (assoc-in db  components-path new-order))))
 
 (reg-event-db
@@ -58,7 +61,10 @@
  (fn [db [_ path position new-component]]
    (let [components-path   (vec (butlast path))
          components        (get-in db components-path)
-         new-order         (insert-component :after components new-component position)]
+         new-order         (insert-component :after 
+                            components 
+                            (assoc new-component :id (str (random-uuid)))
+                            position)]
      (assoc-in db  components-path new-order))))
 
 (reg-sub
