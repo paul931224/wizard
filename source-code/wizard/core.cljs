@@ -8,7 +8,8 @@
     [reagent.core     :as reagent]
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
-    [wizard.editor.overlay           :as overlay]))
+    [wizard.editor.toolbars.view :as toolbars]
+    [wizard.overlay            :as overlay]))
     
 
 (def color-one "#EEE")
@@ -172,14 +173,16 @@
                            (dispatch [:db/init]))                 
      :reagent-render 
      (fn []
-        [:div  
-         [overlay/view]
+        [:div {:style {:position :relative}}
+         [overlay/view]         
          [wrapper
            [:div {:style {:flex-grow 1}}
             (if @guild-selected 
               [hero-title] 
               [editor/view])
-            [modal]]]])})))
+            [modal]]]
+         [toolbars/view]])})))
+         
          
     
     

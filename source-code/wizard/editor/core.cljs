@@ -14,8 +14,7 @@
 (defn view [] 
  [page-wrapper 
   [:<>
-      [breadcrumb/view]
-      [toolbars/view]
+      [breadcrumb/view]      
       [components/view]]])
         
                

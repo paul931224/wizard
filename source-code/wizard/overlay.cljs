@@ -1,9 +1,9 @@
-(ns wizard.editor.overlay
+(ns wizard.overlay 
   (:require [re-frame.core :refer [subscribe dispatch]]))
 
 
 (defn get-element-by-id [id]
- (try
+ (try 
   (js/document.getElementById id)
   (catch js/Error e nil)))
 
@@ -28,13 +28,14 @@
   (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         id             (fn [] (last (path)))
         element        (fn [] (get-element-by-id (id)))
-        rect-data      (fn [] (get-rect-data (element)))]
-        
-        
+        rect-data      (fn [] (get-rect-data (element)))]                
     [:div {:on-click (fn [] (.log js/console (rect-data)))
            :style (merge 
                     {:position :absolute
                      ;:pointer-events :none
                      :background "rgba(108, 245, 39, 0.69)"}
-                    (rect-data))}]))
-     
+                    (rect-data))}]))   
+
+
+
+         

@@ -128,12 +128,12 @@
 (defn view []
  [toolbars 
    [:<> 
-    ;;  [toolbar {:id "order-window"       
-    ;;            :component [order-window]
-    ;;            :label "Order"}]
-    ;;  [toolbar {:id "rte-window"  
-    ;;            :component [rte-window]         
-    ;;            :label "Rich Text Editor"}]
+     [toolbar {:id "order-window"       
+               :component [order-window]
+               :label "Order"}]
+     [toolbar {:id "rte-window"  
+               :component [rte-window]         
+               :label "Rich Text Editor"}]
      [toolbar {:id "components-window"  
                :component [components-window]    
                :label "Components"}]
