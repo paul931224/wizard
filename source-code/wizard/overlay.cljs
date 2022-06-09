@@ -1,5 +1,6 @@
 (ns wizard.overlay 
-  (:require [re-frame.core :refer [subscribe dispatch]]))
+  (:require [re-frame.core :refer [subscribe dispatch]]
+            [reagent.core :as reagent :refer [atom]]))
 
 
 (defn get-element-by-id [id]
@@ -24,19 +25,28 @@
    nil)))
 
 
-(defn view []
+(defn overlay-refresher [editor]
   (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         id             (fn [] (last (path)))
         element        (fn [] (get-element-by-id (id)))
-        rect-data      (fn [] (get-rect-data (element)))]                
-    (str @(subscribe [:db/get [:editor]]))
-    [:div#overlay {:style {:z-index 1000}} 
-     [:div {:on-click (fn [] (.log js/console (rect-data)))
-            :style (merge 
-                     {:position :absolute                     
-                      ;:pointer-events :none
-                      :background "rgba(108, 245, 39, 0.69)"}
-                     (rect-data))}]]))   
+        rect-data      (atom nil)]                
+    (reagent/create-class  
+     {:component-did-mount  (fn [e] (reset! rect-data (get-rect-data (element))))
+      :component-did-update (fn [this old]                ;; reagent provides you the entire "argv", not just the "props"
+                               (let [new (first (rest (reagent/argv this)))]
+                                 (reset! rect-data (get-rect-data (element)))))     
+      :reagent-render
+       (fn [editor] 
+         [:div#overlay {:style {:z-index 1000}} 
+          [:div {:on-click (fn [] (.log js/console @rect-data))
+                 :style (merge 
+                          {:position :absolute                     
+                           ;:pointer-events :none
+                           :background "rgba(108, 245, 39, 0.69)"}
+                          @rect-data)}]])})))
+       
+(defn view []
+   [overlay-refresher @(subscribe [:db/get [:editor]])])                  
 
                     
                              
