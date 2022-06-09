@@ -3,6 +3,7 @@
   [wizard.editor.components.navbar :as navbar]
   [wizard.editor.components.block  :as block]
   [wizard.editor.components.grid   :as grid]
+  [wizard.editor.components.placeholder   :as placeholder]
   [re-frame.core :refer [dispatch subscribe]]))
 
 (defn component-wrapper [content id path type]
@@ -25,9 +26,10 @@
         type (:type (second comp-state))]
     [component-wrapper
      (case type
-       "block"  [block/view  component-router comp-state path]
-       "navbar" [navbar/view component-router comp-state path]
-       "grid"   [grid/view   component-router comp-state path]
+       "block"        [block/view  component-router comp-state path]
+       "navbar"       [navbar/view component-router comp-state path]
+       "grid"         [grid/view   component-router comp-state path]
+       "placeholder"  [grid/view   component-router comp-state path]
        [block/view component-router comp-state path])
      id
      path
