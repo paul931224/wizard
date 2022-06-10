@@ -55,7 +55,7 @@
  :editor/unselect-component!
  (fn [db [_ path]]
    (-> db
-         (assoc-in [:editor :selected :value-path] nil))))
+         (assoc-in [:editor :selected :value-path] [:editor]))))
          
 
 (reg-event-db
