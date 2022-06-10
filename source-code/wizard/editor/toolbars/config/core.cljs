@@ -24,10 +24,20 @@
       "Type: " type])
  
 
+(defn change-type []
+ (let [selected-path (subscribe [:db/get [:editor :selected :value-path]])] 
+  [:select {:value     @(subscribe [:db/get (vec (conj @selected-path :type))])
+            :on-change (fn [e] (dispatch [:editor/change-type! @selected-path (-> e .-target .-value)]))}
+   [:option {:value "block"} "Block"]
+   [:option {:value "image"} "Image"]
+   [:option {:value "grid"}  "Grid"]
+   [:option {:value "block"} "Block"]]))
+
 (defn type-config [component path]
  (let [{:keys [type]} component]
   [:div {:style {:padding :5px}}
    [type-header type]
+   [change-type]
    (case type
     "grid"  [grid-customizer/view]
     "block" [:div 

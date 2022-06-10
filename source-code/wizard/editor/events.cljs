@@ -46,6 +46,12 @@
  
 
 (reg-event-db
+ :editor/change-type!
+ (fn [db [_ path value]]
+   (-> db
+       (assoc-in (vec (conj path :type)) value))))
+
+(reg-event-db
  :editor/unselect-component!
  (fn [db [_ path]]
    (-> db
