@@ -77,13 +77,15 @@
         id             (fn [] (last (path)))
         element        (fn [] (get-element-by-id (id)))
         rect-data      (atom nil)
-        scroll-top     (atom (.-scrollY js/window))]                
+        scroll-top     (atom (.-scrollY js/window))
+        editor         (subscribe [:db/get [:editor]])]                
     (reagent/create-class  
      {:component-did-mount  (fn [e] (reset! rect-data (get-rect-data (element))))
       :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
                                (let [old-rect @rect-data
                                      new-rect (get-rect-data (element))]                                                                      
                                  (if (or 
+                                      @editor
                                       (not= (str new-rect) (str old-rect))
                                       (not= @scroll-top    (.-scrollY js/window)))
                                   (let [rect-top     (:top new-rect)
