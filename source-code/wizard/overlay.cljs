@@ -16,9 +16,10 @@
 
 (defn get-rect-data [element]
  (let [bounding-rect (get-bounding-client-rect element)]
+  (if element (.log js/console "get scroll position : " (.-scrollY js/window)))
   (if bounding-rect 
    {:top            (.-top     bounding-rect)
-    :bottom         (.-bottom  bounding-rect)
+    ;:bottom         (.-bottom  bounding-rect)
     :width          (.-width   bounding-rect)
     :height         (.-height  bounding-rect)
     :left           (.-left    bounding-rect)
@@ -75,15 +76,26 @@
   (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         id             (fn [] (last (path)))
         element        (fn [] (get-element-by-id (id)))
-        rect-data      (atom nil)]                
+        rect-data      (atom nil)
+        scroll-top     (atom (.-scrollY js/window))]                
     (reagent/create-class  
      {:component-did-mount  (fn [e] (reset! rect-data (get-rect-data (element))))
-      :component-did-update (fn [this old]                ;; reagent provides you the entire "argv", not just the "props"
-                               (let [new (first (rest (reagent/argv this)))]
-                                 (reset! rect-data (get-rect-data (element)))))     
+      :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
+                               (let [old-rect @rect-data
+                                     new-rect (get-rect-data (element))]                                                                      
+                                 (if (or 
+                                      (not= (str new-rect) (str old-rect))
+                                      (not= @scroll-top    (.-scrollY js/window)))
+                                  (let [rect-top     (:top new-rect)
+                                        scroll-y     (.-scrollY js/window)
+                                        new-rect-top (+ rect-top scroll-y)
+                                        new-new-rect (assoc new-rect :top new-rect-top)] 
+                                    (do 
+                                     (reset! rect-data   new-new-rect)
+                                     (reset! scroll-top  (.-scrollY js/window)))))))
       :reagent-render
        (fn [editor] 
-         [:div#overlay {:style (merge overlay-style @rect-data)}])})))
+         [:div#overlay {:style (merge overlay-style @rect-data)}])})))          
                                  
                
        
