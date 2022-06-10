@@ -20,14 +20,15 @@
                      :cleanWhitespace true})
 
 (defn jodit [value-path editor-content]
-  [:> JoditEditor
-   {:config    jodit-settings
-    :value     @editor-content
-    :tabIndex  1
-    :onChange    (fn [new-html]
-                   (.log js/console (str (remove-most-whitespace new-html)))
-                   (dispatch
-                    [:db/set value-path (remove-most-whitespace new-html)]))}])
+  [:div {:style {:max-width "400px"}} 
+    [:> JoditEditor
+     {:config    jodit-settings
+      :value     @editor-content
+      :tabIndex  1
+      :onChange    (fn [new-html]
+                     (.log js/console (str (remove-most-whitespace new-html)))
+                     (dispatch
+                      [:db/set value-path (remove-most-whitespace new-html)]))}]])
 
 
 (defn view [{:keys [value-path]}]
