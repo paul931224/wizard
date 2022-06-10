@@ -1,9 +1,10 @@
 (ns wizard.editor.components.view
  (:require 
-  [wizard.editor.components.navbar :as navbar]
-  [wizard.editor.components.block  :as block]
-  [wizard.editor.components.grid   :as grid]
+  [wizard.editor.components.navbar        :as navbar]
+  [wizard.editor.components.block         :as block]
+  [wizard.editor.components.grid          :as grid]
   [wizard.editor.components.placeholder   :as placeholder]
+  [wizard.editor.components.image         :as image]
   [re-frame.core :refer [dispatch subscribe]]))
 
 (defn component-wrapper [content id path type]
@@ -30,6 +31,7 @@
        "navbar"       [navbar/view component-router comp-state path]
        "grid"         [grid/view   component-router comp-state path]
        "placeholder"  [grid/view   component-router comp-state path]
+       "image"        [image/view  component-router comp-state path]
        [block/view component-router comp-state path])
      id
      path

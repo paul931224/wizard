@@ -1,7 +1,8 @@
 (ns wizard.editor.toolbars.config.core
  (:require [re-frame.core :refer [dispatch subscribe]]
            [wizard.editor.toolbars.config.grid-customizer :as grid-customizer]
-           [wizard.editor.toolbars.config.box-model       :as box-model]))           
+           [wizard.editor.toolbars.config.box-model       :as box-model]
+           [wizard.editor.toolbars.config.image           :as image]))           
 
 (defn color-input [path the-key]
   (let [new-path (vec (conj path the-key))]
@@ -19,14 +20,7 @@
             :on-change (fn [e] (dispatch [:db/set new-path (-> e .-target .-value)]))}]]))
 
 
-(defn source-input [path the-key]
- (let [new-path (vec (conj path the-key))]
-   [:div
-     [:div (str the-key)]
-    [:input {:value @(subscribe [:db/get new-path])
-             :on-change (fn [e] (dispatch [:db/set new-path (-> e .-target .-value)]))}]]))
 
-             
 (defn type-header [type]
  [:div {:style {:font-weight :bold 
                   :margin-bottom "10px"}} 
@@ -42,10 +36,6 @@
    [:option {:value "grid"}  "Grid"]
    [:option {:value "block"} "Block"]]))
 
-
-(defn image-customizer [path]
-  [:div
-   [source-input path :background]])
 
 (defn block-customizer [path]
   [:div
@@ -64,7 +54,7 @@
    (case type
     "grid"  [grid-customizer/view]
     "block" [block-customizer path]
-    "image" [image-customizer path]
+    "image" [image/view path]
     [:div {:style {:padding "0px 5px"}} "No config for this type of component."])]))
     
  

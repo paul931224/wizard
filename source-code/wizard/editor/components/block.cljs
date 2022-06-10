@@ -8,7 +8,7 @@
    :name "Block"
    :width 100
    :height 100
-   :content "Block text"})
+   :content "Placeholder element"})
 
 (defn view [comp-router key-and-comp path]
   (let [the-key                                    (first key-and-comp)
