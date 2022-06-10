@@ -131,17 +131,19 @@
  (let [selected-element-type (:type @(subscribe [:editor/get-selected-component]))]
   [toolbars 
      [:<> 
-       [toolbar {:id "order-window"       
-                 :component [order-window]
-                 :label "Order"}]
+       (if (not= :root selected-element-type) 
+           [toolbar {:id "order-window"       
+                     :component [order-window]
+                     :label "Order"}])
        (if (= "block" selected-element-type)
            [toolbar {:id "rte-window"  
                      :component [rte-window]         
                      :label "Rich Text Editor"}])          
        (if (= :root selected-element-type) 
            [toolbar {:id "components-window"  
-                         :component [components-window]    
-                         :label "Components"}])
-       [toolbar {:id "config-window"  
-                 :component [config-window]    
-                 :label "Config"}]]]))
+                     :component [components-window]    
+                     :label "Components"}])
+       (if (not= :root selected-element-type) 
+           [toolbar {:id "config-window"  
+                     :component [config-window]    
+                     :label "Config"}])]]))
