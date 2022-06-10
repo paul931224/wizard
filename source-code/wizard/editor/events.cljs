@@ -73,6 +73,19 @@
       (assoc-in [:editor :selected :value-path] new-selected)
       (assoc-in components-path new-order)))))
 
+
+(reg-event-db
+ :editor/add-to-selected-component!
+ (fn [db [_ path new-component]]
+   (let [components-path   (conj path :components)
+         components        (get-in db components-path)
+         position          (count components)
+         new-order         (insert-component :before
+                                             components
+                                             [(assoc new-component :id (str (random-uuid)))]
+                                             position)]
+     (assoc-in db  components-path new-order))))
+
 (reg-event-db
  :editor/add-before-selected-component!
  (fn [db [_ path position new-component]]

@@ -36,12 +36,19 @@
   [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/remove-selected-component! @selected-path]))}
     "x"]))
  
-(defn add-component! [event content]
+
+(defn add-to-component! []
+ (let [selected-component (subscribe [:editor/get-selected-component])
+       selected-path      (subscribe [:editor/get-selected-component-path])]      
+  [:div.overlay-button 
+   {:on-click  (fn [e] (dispatch [:editor/add-to-selected-component! @selected-path (block/default)]))}
+   "→ +"]))
+
+(defn add-around-component! [event content]
  (let [selected-component (subscribe [:editor/get-selected-component])
        selected-path      (subscribe [:editor/get-selected-component-path])
        position           (fn [] (:position @selected-component))] 
   [:div.overlay-button {:on-click  (fn [e] (dispatch [event @selected-path (position) (block/default)]))}
-         
     content]))
 
 (defn overlay-menu []
@@ -51,9 +58,10 @@
                              :height "auto"
                              :width  "80px"}}
       [unselect-component!]
-      [rem-component!]              
-      [add-component! :editor/add-before-selected-component! "↑ +"]
-      [add-component! :editor/add-after-selected-component!  "↓ +"]])
+      [rem-component!]     
+      [add-to-component!]         
+      [add-around-component! :editor/add-before-selected-component! "↑ +"]
+      [add-around-component! :editor/add-after-selected-component!  "↓ +"]])
            
 
 (def overlay-style {:position :absolute
