@@ -39,8 +39,6 @@
 
 (defn block-customizer [path]
   [:div
-   [text-input path :height]
-   [text-input path :width]
    [text-input path :padding]
    [color-input path :background-color]
    [color-input path :color]
