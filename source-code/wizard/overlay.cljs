@@ -68,7 +68,8 @@
 (def overlay-style {:position :absolute
                     :z-index 1
                     :pointer-events :none
-                    :background "rgba(108, 245, 39, 0.69)"
+                    :border "4px solid rgba(108, 245, 39, 0.69)"
+                    :margin "-4px -4px 0px -4px"
                     :height "100%"
                     :width "100%"})
 
@@ -100,7 +101,6 @@
          [:div#overlay {:style (merge overlay-style @rect-data)}])})))          
                                  
                
-       
 (defn view []
    [:<> 
     [overlay-menu]
