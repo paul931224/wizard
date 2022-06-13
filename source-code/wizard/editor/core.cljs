@@ -16,10 +16,13 @@
      content]])
  
 (defn view [] 
- [page-wrapper 
-  [:<>
-      [breadcrumb/view]      
-      [components/view]]])
+ [:div
+  [:div (str @(subscribe [:db/get [:editor :components]]))]  
+  [:div 
+   [page-wrapper 
+    [:<>
+        [breadcrumb/view]      
+        [components/view]]]]])
         
                
         
