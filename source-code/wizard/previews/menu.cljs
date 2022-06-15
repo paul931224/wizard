@@ -1,5 +1,7 @@
 (ns wizard.previews.menu
- (:require [re-frame.core :refer [subscribe dispatch]]))
+ (:require 
+  [re-frame.core :refer [subscribe dispatch]]
+  [wizard.editor.components.block :as block]))
 
 (defn unselect-component! []
   (let [selected-path      (subscribe [:editor/get-selected-component-path])]

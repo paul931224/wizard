@@ -9,7 +9,7 @@
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
     [wizard.editor.toolbars.view :as toolbars]
-    [wizard.modes.overlay            :as overlay]))
+    [wizard.previews.overlay   :as overlay]))
     
 
 (def color-one "#EEE")
