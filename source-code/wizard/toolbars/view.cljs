@@ -1,11 +1,11 @@
-(ns wizard.editor.toolbars.view
+(ns wizard.toolbars.view
  (:require 
   [reagent.core :as r]
   [re-frame.core :refer [dispatch subscribe]]
-  [wizard.editor.toolbars.rich-text-editor.core :as rte]
-  [wizard.editor.toolbars.components.core :as components]
-  [wizard.editor.toolbars.order.core :as order]
-  [wizard.editor.toolbars.config.core :as config]
+  [wizard.toolbars.rich-text-editor.core :as rte]
+  [wizard.toolbars.components.core :as components]
+  [wizard.toolbars.order.core :as order]
+  [wizard.toolbars.config.core :as config]
   ["react" :as react]
   ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
   ["@dnd-kit/utilities" :refer [CSS]]

@@ -1,4 +1,4 @@
-(ns wizard.editor.toolbars.order.core
+(ns wizard.toolbars.order.core
  (:require [re-frame.core :refer [dispatch subscribe]]
            [plugins.drag-and-drop :as dnd]))
 

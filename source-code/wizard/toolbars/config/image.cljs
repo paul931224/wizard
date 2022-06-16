@@ -1,4 +1,4 @@
-(ns wizard.editor.toolbars.config.image
+(ns wizard.toolbars.config.image
  (:require [re-frame.core :refer [dispatch subscribe]]))
 
 

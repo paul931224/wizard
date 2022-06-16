@@ -8,11 +8,11 @@
     [reagent.core     :as reagent]
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
-    [wizard.editor.toolbars.view :as toolbars]
+    [wizard.toolbars.view        :as toolbars]
     [wizard.previews.selection   :as selection]
     [wizard.previews.order       :as order]
-    [wizard.previews.grid            :as grid]
-    [wizard.editor.breadcrumb        :as breadcrumb]))
+    [wizard.previews.grid        :as grid]
+    [wizard.editor.breadcrumb    :as breadcrumb]))
     
 
 (def color-one "#EEE")
@@ -178,7 +178,7 @@
      [modal]]]))
 
 (defn with-z-index [number content]
- [:div {:style {:position :relative :z-index number}}
+ [:div {:style {:z-index number}}
   content])
 
 (defn view []
@@ -188,7 +188,7 @@
                            (dispatch [:db/init]))                 
      :reagent-render 
      (fn []
-        [:<>
+        [:div {:style {:position :relative}}
          [with-z-index 2 [selection/view @(subscribe [:db/get [:editor]])]]   
          [with-z-index 2 [breadcrumb/view]]  
          [with-z-index 2 [grid/view]]      

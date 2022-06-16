@@ -1,8 +1,8 @@
-(ns wizard.editor.toolbars.config.core
+(ns wizard.toolbars.config.core
  (:require [re-frame.core :refer [dispatch subscribe]]
-           [wizard.editor.toolbars.config.grid-customizer :as grid-customizer]
-           [wizard.editor.toolbars.config.box-model       :as box-model]
-           [wizard.editor.toolbars.config.image           :as image]))           
+           [wizard.toolbars.config.grid-customizer :as grid-customizer]
+           [wizard.toolbars.config.box-model       :as box-model]
+           [wizard.toolbars.config.image           :as image]))           
 
 (defn color-input [path the-key]
   (let [new-path (vec (conj path the-key))]

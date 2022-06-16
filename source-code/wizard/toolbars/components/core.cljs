@@ -1,4 +1,4 @@
-(ns wizard.editor.toolbars.components.core
+(ns wizard.toolbars.components.core
  (:require 
   [wizard.editor.components.block :as  block]
   [wizard.editor.components.grid  :as  grid]

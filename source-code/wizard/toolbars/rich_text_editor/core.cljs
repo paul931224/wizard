@@ -1,4 +1,4 @@
-(ns wizard.editor.toolbars.rich-text-editor.core
+(ns wizard.toolbars.rich-text-editor.core
   (:require
    [reagent.core :refer [create-class atom] :as reagent]
    [jodit-react :default JoditEditor]
