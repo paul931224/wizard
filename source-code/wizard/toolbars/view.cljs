@@ -4,7 +4,6 @@
   [re-frame.core :refer [dispatch subscribe]]
   [wizard.toolbars.rich-text-editor.core :as rte]
   [wizard.toolbars.components.core :as components]
-  [wizard.toolbars.order.core :as order]
   [wizard.toolbars.config.core :as config]
   ["react" :as react]
   ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
@@ -33,8 +32,6 @@
 (defn components-window []
   [:div [components/view]])
 
-(defn order-window []
-  [:div [order/view]])
 
 (defn config-window []
   [:div [config/view]])
@@ -131,10 +128,6 @@
  (let [selected-element-type (:type @(subscribe [:editor/get-selected-component]))]
   [toolbars 
      [:<> 
-       (if (not= :root selected-element-type) 
-           [toolbar {:id "order-window"       
-                     :component [order-window]
-                     :label "Order"}])
        (if (= "block" selected-element-type)
            [toolbar {:id "rte-window"  
                      :component [rte-window]         
