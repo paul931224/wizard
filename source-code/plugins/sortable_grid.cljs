@@ -18,6 +18,7 @@
                                          sortableKeyboardCoordinates
                                          verticalListSortingStrategy
                                          rectSortingStrategy
+                                         rectSwappingStrategy
                                          useSortable]]
             ["@dnd-kit/utilities" :refer [CSS]]))
 
@@ -29,22 +30,17 @@
   (js->clj hash-map :keywordize-keys true))
 
 
-
-(defn sortable-handle-style []
-  {:flex-grow 1})
-
 (defn sortable-container-style [transform transition]
   {:transform (.toString (.-Transform CSS) (clj->js transform))
    :transition transition
    :display :flex
-   :margin-bottom "5px"
-   :border "1px solid #222"
-   :border-radius "5px"
-   :background "#666"
-   :color "#DDD"
-   :padding "5px"
-   :cursor :pointer})
-  ;:width "100%"})
+   :justify-content :center 
+   :align-items :center
+   :cursor :pointer
+   :position :relative
+   :width "100%"})
+   
+
 
 
 
@@ -52,28 +48,23 @@
   (let [item            (:item props)
         id              (:id item)
         type            (:type item)
-        components      (:components item)
-        component       (:component props)
         component-data  (:component-data props)
         path            (:path props)
+        position        (:position props)
         new-path        (vec (concat path [id]))
         {:keys [attributes listeners setNodeRef transform transition]}
         (to-clj-map (useSortable (clj->js {:id (str id)})))]
-    [:div {:style (sortable-container-style transform transition)}
-     [:div
-      (merge {:style (sortable-handle-style)            
-              :id    (str id)
-              :ref   (js->clj setNodeRef)}
-
-        attributes)
-
-
-      [:div (merge {:style {:font-weight :bold
-                            :padding-bottom "10px"}}
-                   listeners)
-        (str id) ;" "(html->hiccup  (:content (:item props)))]            
-        (if components
-          [component component-data new-path])]]]))
+    [:div (merge {:id    (str id)
+                  :ref   (js->clj setNodeRef)
+                  :style (sortable-container-style transform transition)}
+                 attributes
+                 listeners)
+     [:div {:style {:background "#666"
+                    :color "#DDD" 
+                    :height "100%"
+                    :width "100%"}} 
+      (str position "-" (apply str (take 5 id)))]]))
+       
         
 
 
@@ -108,13 +99,14 @@
                   :onDragStart  (fn [e]
                                   (setActiveId (get (js->clj (aget e "active")) "id")))}
         [sortable-context {:items    items
-                           :strategy verticalListSortingStrategy}
+                           :strategy rectSwappingStrategy}
          [grid/grid-wrapper
-          (map (fn [item] (let [clj-item (to-clj-map item)]
-                           [:f> sortable-item {:id   (:id clj-item)
-                                               :key  (:id clj-item)
-                                               :item clj-item
-                                               :path value-path}]))
+          (map-indexed (fn [index item] (let [clj-item (to-clj-map item)]
+                                         [:f> sortable-item {:position index
+                                                             :id   (:id clj-item)
+                                                             :key  (:id clj-item)
+                                                             :item clj-item
+                                                             :path value-path}]))
                                          
 
                items)

@@ -48,7 +48,7 @@
                :grid-template-rows    (map->grid-template rows)
                :pointer-events "auto"
                :justify-items :center
-               :background :black
+               ;:background :black
                :border "1px solid black"
                :gap "1px"}}     
       content])))  
