@@ -108,6 +108,14 @@
                             position)]
      (assoc-in db  components-path new-order))))
 
+(reg-event-db
+ :editor/set-overlay!
+ (fn [db [_ overlay]]
+   (let [old-overlay (-> db :editor :overlay)]
+     (if (= overlay old-overlay)
+        (assoc-in db [:editor :overlay] nil)
+        (assoc-in db [:editor :overlay] overlay)))))
+
 (reg-sub
  :editor/get-selected-component
  (fn [db [_]]
@@ -118,5 +126,9 @@
  :editor/get-selected-component-path
  (fn [db [_]]
    (-> db :editor :selected :value-path))) 
+
+   
+
+
     
      

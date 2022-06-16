@@ -12,6 +12,7 @@
     [wizard.previews.selection   :as selection]
     [wizard.previews.order       :as order]
     [wizard.previews.grid        :as grid]
+    [wizard.previews.menu        :as menu]
     [wizard.editor.breadcrumb    :as breadcrumb]))
     
 
@@ -167,19 +168,36 @@
      ;[all-guilds]]
     [connect-wallet-button])]))
     
+(defn page-wrapper [content]
+  [:div {:style {:display :flex
+                 :justify-content :center
+                 :margin-top "60px"}}
+   [:div {:style {:max-width "1200px"
+                  :position :relative                  
+                  :width "100%"}}
+    content]])
 
-(defn main-content []
- (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
-   [main-content-wrapper
-    [:div {:style {:flex-grow 1}}
-     (if @guild-selected
-       [hero-title]
-       [editor/view])
-     [modal]]]))
 
 (defn with-z-index [number content]
  [:div {:style {:z-index number}}
   content])
+
+(defn page-wrapper-with-z-index [number content]
+  [:div {:style {:z-index number}}
+   [page-wrapper content]])
+
+
+(defn the-editor []
+  [:div {:style {:position :relative}}
+        [with-z-index 2 [breadcrumb/view]]
+        [with-z-index 2 [menu/view]]
+        [with-z-index 1 [page-wrapper  
+                            [:<> 
+                             [with-z-index 1 [editor/view]]
+                             [grid/view]
+                             [order/view]]]]
+                             
+        [with-z-index 3 [toolbars/view]]])
 
 (defn view []
   (reagent/create-class
@@ -187,14 +205,17 @@
                            (dispatch [:web3/setup])
                            (dispatch [:db/init]))                 
      :reagent-render 
-     (fn []
-        [:div {:style {:position :relative}}
-         [with-z-index 2 [selection/view @(subscribe [:db/get [:editor]])]]   
-         [with-z-index 2 [breadcrumb/view]]  
-         [with-z-index 2 [grid/view]]      
-         [with-z-index 1 [main-content]]
-         [with-z-index 3 [order/view]]
-         [with-z-index 3 [toolbars/view]]])}))
+     (fn [] 
+       (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
+         [main-content-wrapper
+          [:<> 
+            [selection/view @(subscribe [:db/get [:editor]])]
+            [:div {:style {:flex-grow 1}}
+             (if @guild-selected
+               [hero-title]
+               [the-editor])
+             (identity [modal])]]]))}))
+       
          
          
          

@@ -11,7 +11,14 @@
                 :component      component-hierarchy}]]))
 
 (defn view []
- (let [editor (subscribe [:db/get [:editor]])]
+ (let [editor  (subscribe [:db/get [:editor]])
+       overlay (subscribe [:db/get [:editor :overlay]])]
   (fn [] 
-   [:div {:style {:position :absolute :top 0}}
-    [component-hierarchy @editor [:editor]]])))
+   (if (= :order @overlay) 
+    [:div {:style {:position :absolute 
+                   :height "100%"
+                   :width "100%"
+                   :top 0
+                   :background "red"}} ;:display :none}}
+     [component-hierarchy @editor [:editor]]]))))
+    

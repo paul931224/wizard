@@ -28,6 +28,7 @@
 
 
 (def overlay-style {:position :absolute
+                    :left 0
                     :z-index 1
                     :pointer-events :none
                     :border "4px solid rgba(108, 245, 39, 0.69)"
