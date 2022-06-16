@@ -42,16 +42,16 @@
         rows             (:rows     value)
         cols             (:cols     value)]                
     [:div.grid
-     {:id    (str "grid-" the-key)
-      :style {:display :grid
-              :grid-template-columns (map->grid-template cols)
-              :grid-template-rows    (map->grid-template rows)
-              :pointer-events "auto"
-              :justify-items :center
-              :background :black
-              :border "1px solid black"
-              :gap "1px"}}
-     content])))  
+      {:id    (str "grid-" the-key)
+       :style {:display :grid
+               :grid-template-columns (map->grid-template cols)
+               :grid-template-rows    (map->grid-template rows)
+               :pointer-events "auto"
+               :justify-items :center
+               :background :black
+               :border "1px solid black"
+               :gap "1px"}}     
+      content])))  
 
 (defn view [comp-router comp-state path]
   (let [the-key          (first comp-state)
