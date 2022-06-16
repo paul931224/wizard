@@ -1,6 +1,7 @@
 (ns wizard.previews.order
   (:require [re-frame.core :refer [dispatch subscribe]]
-           [plugins.drag-and-drop :as dnd]))
+            [plugins.drag-and-drop :as dnd]
+            [plugins.sortable-grid :as sortable-grid]))
 
 (defn component-hierarchy [component-data path]
   (let [path-depth (dec (count path))]
@@ -12,13 +13,14 @@
 
 (defn view []
  (let [editor  (subscribe [:db/get [:editor]])
-       overlay (subscribe [:db/get [:editor :overlay]])]
+       overlay (subscribe [:db/get [:editor :overlay]])
+       selected-path (subscribe [:db/get [:editor :selected :value-path]])]
   (fn [] 
    (if (= :order @overlay) 
     [:div {:style {:position :absolute 
                    :height "100%"
                    :width "100%"
-                   :top 0
-                   :background "red"}} ;:display :none}}
-     [component-hierarchy @editor [:editor]]]))))
+                   :top 0}} ;:display :none}}
+     [sortable-grid/view {:value-path @selected-path}]]))))
+               
     

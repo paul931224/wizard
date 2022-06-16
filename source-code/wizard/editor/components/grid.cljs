@@ -41,7 +41,8 @@
         gap      (:gap value)
         grid-components  (:components    value)]
     [:div.grid
-     {:style {:display :grid
+     {:id    (str "grid-" the-key)
+      :style {:display :grid
               :grid-template-columns (map->grid-template cols)
               :grid-template-rows    (map->grid-template rows)
               :pointer-events "auto"

@@ -30,7 +30,7 @@
        "block"        [block/view  component-router comp-state path]
        "navbar"       [navbar/view component-router comp-state path]
        "grid"         [grid/view   component-router comp-state path]
-       "placeholder"  [grid/view   component-router comp-state path]
+       ;"placeholder"  [grid/view   component-router comp-state path]
        "image"        [image/view  component-router comp-state path]
        [block/view component-router comp-state path])
      id

@@ -12,4 +12,4 @@
                 :width "100%"
                 :top 0
                 :background "rgba(255,0,0,0.3)"}}
-       "grid"]))))
+       "Grid customizer"]))))
