@@ -33,13 +33,14 @@
       :grid-background "#EEE"}))
 
 
-(defn view [comp-router comp-state path]
-  (let [the-key          (first comp-state)
+(defn grid-wrapper 
+ ([comp-state]
+  [grid-wrapper nil comp-state])
+ ([content comp-state]
+  (let [the-key          (first  comp-state)
         value            (second comp-state)
-        rows        (:rows     value)
-        cols     (:cols     value)
-        gap      (:gap value)
-        grid-components  (:components    value)]
+        rows             (:rows     value)
+        cols             (:cols     value)]                
     [:div.grid
      {:id    (str "grid-" the-key)
       :style {:display :grid
@@ -50,8 +51,15 @@
               :background :black
               :border "1px solid black"
               :gap "1px"}}
-     ;(str path " - "  (vec (concat path [:components (first comp-state)])))
+     content])))  
+
+(defn view [comp-router comp-state path]
+  (let [the-key          (first comp-state)
+        value            (second comp-state)
+        grid-components  (:components    value)]
+   [grid-wrapper
      (map (fn [component]
             ^{:key the-key} [comp-router component
                              (vec (concat path [:components (first component)]))])
-          (sort-by (fn [a] (:position (second a))) grid-components))]))
+          (sort-by (fn [a] (:position (second a))) grid-components))
+     comp-state]))

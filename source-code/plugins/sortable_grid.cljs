@@ -123,10 +123,10 @@
   (let [components-value-path (vec (conj value-path :components))
         this   (subscribe [:db/get value-path])
         items  (subscribe [:db/get components-value-path])]
-    (if @items
+    (if (and @items (= (:type @this) "grid"))
       ^{:key (str @items)}
       [:f> sortable-example
-       (data-structures/id-map->ordered-vector @items)
-       value-path
-       components-value-path])))
+        (data-structures/id-map->ordered-vector @items)
+        value-path
+        components-value-path])))
        
