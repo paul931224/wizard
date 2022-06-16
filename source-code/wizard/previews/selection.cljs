@@ -15,8 +15,7 @@
     (catch js/Error e nil)))
 
 (defn get-rect-data [element]
-  (let [bounding-rect (get-bounding-client-rect element)]
-     (if element (.log js/console "get scroll position : " (.-scrollY js/window)))
+  (let [bounding-rect (get-bounding-client-rect element)]     
      (if bounding-rect
       {:top            (.-top     bounding-rect)
        ;:bottom         (.-bottom  bounding-rect)
@@ -49,7 +48,7 @@
                               (let [old-rect @rect-data
                                     new-rect (get-rect-data (element))]
                                 (if (or
-                                     @editor
+                                     ;@editor
                                      (not= (str new-rect) (str old-rect))
                                      (not= @scroll-top    (.-scrollY js/window)))
                                  (let [rect-top     (:top new-rect)

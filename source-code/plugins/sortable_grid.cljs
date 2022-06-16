@@ -4,6 +4,7 @@
             ["react" :as react]
             [wizard.data-structures :as data-structures]
             [reagent-hickory.sweet :refer [html->hiccup]]
+            [wizard.editor.components.grid :as grid]
             ["@dnd-kit/core" :refer [DndContext
                                      closestCenter
                                      KeyboardSensor
@@ -106,16 +107,20 @@
                   :onDragEnd     handleDragEnd
                   :onDragStart  (fn [e]
                                   (setActiveId (get (js->clj (aget e "active")) "id")))}
-     [sortable-context {:items    items
-                        :strategy verticalListSortingStrategy}
-      (map (fn [item] (let [clj-item (to-clj-map item)]
-                       [:f> sortable-item {:id   (:id clj-item)
-                                           :key  (:id clj-item)
-                                           :item clj-item
-                                           :path value-path}]))
+       [sortable-context {:items    items
+                          :strategy verticalListSortingStrategy}
+        [grid/grid-wrapper
+         (map (fn [item] (let [clj-item (to-clj-map item)]
+                          [:f> sortable-item {:id   (:id clj-item)
+                                              :key  (:id clj-item)
+                                              :item clj-item
+                                              :path value-path}]))
                                          
 
-        items)]]))
+              items)
+         (vector 
+                (last value-path) 
+                (str @(subscribe [:db/get value-path])))]]]))
     ;[drag-overlay [:f> drag-overlay-item {:id (if activeId activeId nil)}]]]))
 
 
