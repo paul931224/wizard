@@ -9,7 +9,10 @@
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
     [wizard.editor.toolbars.view :as toolbars]
-    [wizard.previews.overlay   :as overlay]))
+    [wizard.previews.selection   :as selection]
+    [wizard.previews.order       :as order]
+    [wizard.previews.grid            :as grid]
+    [wizard.editor.breadcrumb        :as breadcrumb]))
     
 
 (def color-one "#EEE")
@@ -186,8 +189,11 @@
      :reagent-render 
      (fn []
         [:<>
-         [with-z-index 2 [overlay/view]]         
+         [with-z-index 2 [selection/view @(subscribe [:db/get [:editor]])]]   
+         [with-z-index 2 [breadcrumb/view]]  
+         [with-z-index 2 [grid/view]]      
          [with-z-index 1 [main-content]]
+         [with-z-index 3 [order/view]]
          [with-z-index 3 [toolbars/view]]])}))
          
          

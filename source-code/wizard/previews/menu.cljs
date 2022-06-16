@@ -3,6 +3,11 @@
   [re-frame.core :refer [subscribe dispatch]]
   [wizard.editor.components.block :as block]))
 
+
+(defn set-overlay-type! [type type-name]
+ [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/set-overlay! type]))}
+  type-name])
+
 (defn unselect-component! []
   (let [selected-path      (subscribe [:editor/get-selected-component-path])]
     [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/unselect-component! @selected-path]))}
@@ -10,8 +15,8 @@
 
 (defn rem-component! []
   (let [selected-path      (subscribe [:editor/get-selected-component-path])]
-     [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/remove-selected-component! @selected-path]))}]
-     "x"))
+     [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/remove-selected-component! @selected-path]))}
+      "x"]))
 
 
 (defn add-to-component! []
@@ -25,8 +30,8 @@
   (let [selected-component (subscribe [:editor/get-selected-component])
         selected-path      (subscribe [:editor/get-selected-component-path])
         position           (fn [] (:position @selected-component))]
-     [:div.overlay-button {:on-click  (fn [e] (dispatch [event @selected-path (position) (block/default)]))}]
-     content))
+     [:div.overlay-button {:on-click  (fn [e] (dispatch [event @selected-path (position) (block/default)]))}
+      content]))
 
 (defn view []
   [:div#overlay-menu {:style {:position :fixed
@@ -34,6 +39,8 @@
                                :right 0
                               :height "auto"
                               :width  "80px"}}
+    [set-overlay-type! :grid  "G"]                        
+    [set-overlay-type! :order "O"]  
     [unselect-component!]
     [rem-component!]
     [add-to-component!]

@@ -4,7 +4,10 @@
             [wizard.editor.toolbars.view :as toolbars]
             [wizard.editor.events]
             [wizard.editor.config :refer [row-height col-width]]
-            [wizard.editor.breadcrumb :as breadcrumb]))
+            [wizard.editor.breadcrumb  :as breadcrumb]
+            [wizard.previews.order     :as order]
+            [wizard.previews.selection :as selection]
+            [wizard.previews.menu      :as menu]))
 
 
 (defn page-wrapper [content]
@@ -16,13 +19,12 @@
      content]])
  
 (defn view [] 
- [:div
-  [:div (str @(subscribe [:db/get [:editor :components]]))]  
-  [:div 
+ [:div 
+   ;[breadcrumb/view]              
    [page-wrapper 
-    [:<>
-        [breadcrumb/view]      
-        [components/view]]]]])
+     [components/view]]])
+     
+      
         
                
         
