@@ -14,6 +14,7 @@
                                      useSensor
                                      useSensors]]
             ["@dnd-kit/sortable" :refer [arrayMove
+                                         arraySwap
                                          SortableContext
                                          sortableKeyboardCoordinates
                                          verticalListSortingStrategy
@@ -62,8 +63,10 @@
      [:div {:style {:background "#666"
                     :color "#DDD" 
                     :height "100%"
-                    :width "100%"}} 
-      (str position "-" (apply str (take 5 id)))]]))
+                    :width "100%"
+                    :position :relative}} 
+      (str position "-" (apply str (take 3 id)))]]))
+    
        
         
 
@@ -88,7 +91,7 @@
                                 over-item    (get-item-with-id items over-index)
                                 oldIndex     (.indexOf items active-item)
                                 newIndex     (.indexOf items over-item)
-                                new-order    (to-clj-map (arrayMove (clj->js items) oldIndex newIndex))
+                                new-order    (to-clj-map (arraySwap (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]
                             (dispatch [:db/set components-value-path (data-structures/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
