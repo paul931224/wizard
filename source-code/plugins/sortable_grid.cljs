@@ -60,12 +60,18 @@
                   :style (sortable-container-style transform transition)}
                  attributes
                  listeners)
-     [:div {:style {:background "#666"
+     [:div {:style {:background "rgba(0,0,255,0.3)"
+                    :display :flex 
+                    :justify-content :center 
+                    :align-items :center
                     :color "#DDD" 
                     :height "100%"
                     :width "100%"
                     :position :relative}} 
-      (str position "-" (apply str (take 3 id)))]]))
+      [:div {:style {:background "#333" 
+                     :padding "0px 2px"
+                     :border-radius "50%"}}                      
+       (str (inc position))]]]))
     
        
         
@@ -110,8 +116,6 @@
                                                              :key  (:id clj-item)
                                                              :item clj-item
                                                              :path value-path}]))
-                                         
-
                items)
           (vector 
                  (last value-path) 

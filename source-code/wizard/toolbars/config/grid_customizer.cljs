@@ -198,7 +198,6 @@
                   :grid-template-rows    (str "100px " (grid/map->grid-template (rows)))
                   :grid-auto-rows        "minmax(100px, auto)"
                   :grid-auto-columns     "minmax(100px, auto)"}}
-        ;(str (cols))
         (map-indexed 
          (fn [index a] ^{:key index}[grid-div index]) 
          (grid/grid-divs-range (get-grid-component)))]))

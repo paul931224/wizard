@@ -5,8 +5,11 @@
 
 
 (defn set-overlay-type! [type type-name]
- [:div.overlay-button {:on-click  (fn [e] (dispatch [:editor/set-overlay! type]))}
-  type-name])
+ (let [active-type (subscribe [:db/get [:editor :overlay]])]
+   [:div.overlay-button 
+    {:style {:background (if (= type @active-type) "rgba(0,150,20,0.3)")}
+     :on-click  (fn [e] (dispatch [:editor/set-overlay! type]))}
+    type-name]))
 
 (defn unselect-component! []
   (let [selected-path      (subscribe [:editor/get-selected-component-path])]
