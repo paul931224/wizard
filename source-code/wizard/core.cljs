@@ -193,9 +193,8 @@
         [with-z-index 2 [menu/view]]
         [with-z-index 1 [page-wrapper  
                             [:<> 
-                             [with-z-index 1 [editor/view]]
-                             [grid/view  @(subscribe [:db/get [:editor]])]
-                             [order/view @(subscribe [:db/get [:editor]])]]]]
+                             [with-z-index 1 [editor/view]]]]]
+                             
                              
         [with-z-index 3 [toolbars/view]]])
 
@@ -210,6 +209,8 @@
          [main-content-wrapper
           [:<> 
             [selection/view @(subscribe [:db/get [:editor]])]
+            [grid/view      @(subscribe [:db/get [:editor]])]
+            [order/view     @(subscribe [:db/get [:editor]])]
             [:div {:style {:flex-grow 1}}
              (if @guild-selected
                [hero-title]
