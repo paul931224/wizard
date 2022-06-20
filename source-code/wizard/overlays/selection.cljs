@@ -14,7 +14,6 @@
                     :height "100%"
                     :width "100%"})
 
-(defn view [editor]
+(defn view []
  [overlay-wrapper/view
-  editor 
   [:div#selection-overlay {:style overlay-style}]])

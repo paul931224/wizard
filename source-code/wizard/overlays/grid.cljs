@@ -7,7 +7,6 @@
   (fn [editor] 
    (if (= :grid @overlay)
     [overlay-wrapper/view 
-     editor
      [:div#grid-overlay
         {:style {:position :absolute
                  :height "100%"

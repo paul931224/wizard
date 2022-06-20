@@ -1,14 +1,15 @@
 (ns wizard.overlays.wrapper
  (:require [re-frame.core :refer [subscribe dispatch]]
-           [reagent.core :as reagent]
+           [reagent.core :as reagent :refer [atom]]
            [wizard.dom-utils :as dom-utils]))
 
-(defn view [editor content]
+(defn view [content]
    (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
          id             (fn [] (last (path)))
          element        (fn [] (dom-utils/get-element-by-id (id)))
          rect-data      (atom nil)
-         scroll-top     (atom (.-scrollY js/window))]        
+         scroll-top     (atom (.-scrollY js/window))
+         editor         (subscribe [:db/get [:editor]])]    
      (reagent/create-class
       {:component-did-mount  (fn [e] (reset! rect-data (dom-utils/get-rect-data (element))))
        :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
@@ -26,7 +27,7 @@
                                        (reset! rect-data   new-new-rect)
                                        (reset! scroll-top  (.-scrollY js/window)))))))
        :reagent-render
-       (fn [editor content]
-         editor
+       (fn [content]
+         @editor
          [:div.overlay-wrapper {:style (merge {:position :absolute} @rect-data)}
           content])})))

@@ -10,7 +10,6 @@
   (fn [editor] 
    (if (= :order @overlay) 
     [overlay-wrapper/view 
-     editor
      [:div#order-overlay {:style {:position :absolute 
                                   :height "100%"
                                   :width "100%"
