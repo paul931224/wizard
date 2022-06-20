@@ -1,29 +1,11 @@
 (ns wizard.previews.selection
  (:require 
   [re-frame.core :refer [subscribe dispatch]]
-  [reagent.core :as reagent :refer [atom]]))
+  [reagent.core :as reagent :refer [atom]]
+  [wizard.dom-utils :as dom-utils]))
 
 
-(defn get-element-by-id [id]
-  (try
-     (js/document.getElementById id)
-     (catch js/Error e nil)))
 
-(defn get-bounding-client-rect [element]
-  (try
-    (.getBoundingClientRect element)
-    (catch js/Error e nil)))
-
-(defn get-rect-data [element]
-  (let [bounding-rect (get-bounding-client-rect element)]     
-     (if bounding-rect
-      {:top            (.-top     bounding-rect)
-       ;:bottom         (.-bottom  bounding-rect)
-       :width          (.-width   bounding-rect)
-       :height         (.-height  bounding-rect)
-       :left           (.-left    bounding-rect)
-       :right          (.-right   bounding-rect)}
-      nil)))
 
 
 (def overlay-style {:position :absolute
@@ -38,15 +20,15 @@
 (defn view [editor]
   (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         id             (fn [] (last (path)))
-        element        (fn [] (get-element-by-id (id)))
+        element        (fn [] (dom-utils/get-element-by-id (id)))
         rect-data      (atom nil)
         scroll-top     (atom (.-scrollY js/window))
         editor         (subscribe [:db/get [:editor]])]
     (reagent/create-class
-     {:component-did-mount  (fn [e] (reset! rect-data (get-rect-data (element))))
+     {:component-did-mount  (fn [e] (reset! rect-data (dom-utils/get-rect-data (element))))
       :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
                               (let [old-rect @rect-data
-                                    new-rect (get-rect-data (element))]
+                                    new-rect (dom-utils/get-rect-data (element))]
                                 (if (or
                                      ;@editor
                                      (not= (str new-rect) (str old-rect))
