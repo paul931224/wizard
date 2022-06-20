@@ -1,11 +1,8 @@
-(ns wizard.previews.selection
+(ns wizard.overlays.selection
  (:require 
   [re-frame.core :refer [subscribe dispatch]]
   [reagent.core :as reagent :refer [atom]]
   [wizard.dom-utils :as dom-utils]))
-
-
-
 
 
 (def overlay-style {:position :absolute
@@ -17,7 +14,7 @@
                     :height "100%"
                     :width "100%"})
 
-(defn view [editor]
+(defn overlay-wrapper [editor content]
   (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         id             (fn [] (last (path)))
         element        (fn [] (dom-utils/get-element-by-id (id)))
@@ -42,4 +39,10 @@
                                      (reset! scroll-top  (.-scrollY js/window)))))))
       :reagent-render
        (fn [editor]
-         [:div#overlay {:style (merge overlay-style @rect-data)}])})))
+         [:div.overlay-wrapper {:style (merge {:position :absolute} @rect-data)}
+          content])})))
+
+(defn view [editor]
+ [overlay-wrapper
+  editor 
+  [:div {:style overlay-style}]])

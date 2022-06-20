@@ -9,10 +9,10 @@
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
     [wizard.toolbars.view        :as toolbars]
-    [wizard.previews.selection   :as selection]
-    [wizard.previews.order       :as order]
-    [wizard.previews.grid        :as grid]
-    [wizard.previews.menu        :as menu]
+    [wizard.overlays.selection   :as selection]
+    [wizard.overlays.order       :as order]
+    [wizard.overlays.grid        :as grid]
+    [wizard.overlays.menu        :as menu]
     [wizard.editor.breadcrumb    :as breadcrumb]))
     
 

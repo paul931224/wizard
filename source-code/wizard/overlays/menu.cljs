@@ -1,4 +1,4 @@
-(ns wizard.previews.menu
+(ns wizard.overlays.menu
  (:require 
   [re-frame.core :refer [subscribe dispatch]]
   [wizard.editor.components.block :as block]))

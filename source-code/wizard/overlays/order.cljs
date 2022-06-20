@@ -1,4 +1,4 @@
-(ns wizard.previews.order
+(ns wizard.overlays.order
   (:require [re-frame.core :refer [dispatch subscribe]]
             [plugins.drag-and-drop :as dnd]
             [plugins.sortable-grid :as sortable-grid]))

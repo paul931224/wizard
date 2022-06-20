@@ -1,4 +1,4 @@
-(ns wizard.previews.grid
+(ns wizard.overlays.grid
    (:require [re-frame.core :refer [subscribe dispatch]]))
 
 (defn view []
