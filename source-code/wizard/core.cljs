@@ -194,8 +194,8 @@
         [with-z-index 1 [page-wrapper  
                             [:<> 
                              [with-z-index 1 [editor/view]]
-                             [grid/view]
-                             [order/view]]]]
+                             [grid/view  @(subscribe [:db/get [:editor]])]
+                             [order/view @(subscribe [:db/get [:editor]])]]]]
                              
         [with-z-index 3 [toolbars/view]]])
 
