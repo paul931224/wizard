@@ -12,7 +12,8 @@
 
 (defn row-indicator []
   [:div
-   {:style {:position :absolute
+   {:style {:cursor :pointer 
+            :position :absolute
             :bottom "0px"
             :right  "-10px"
             :background :blue
@@ -21,19 +22,47 @@
 
 (defn col-indicator []
  [:div
-  {:style {:position :absolute
+  {:style {:cursor :pointer
+           :position :absolute
            :top "-10px"
            :right 0
            :background :red
            :height "10px"
            :width  "5px"}}])
 
+(defn add-col-indicator []
+  [:div
+   {:style {:cursor :pointer
+            :position :absolute
+            :top "-50px"
+            :right 0
+            :background :lightgreen
+            :color :black
+            :padding :5px
+            :border-radius :5px}}                    
+   "+"])
+
+(defn add-row-indicator []
+  [:div
+   {:style {:cursor :pointer
+            :position :absolute
+            :bottom "0px"
+            :right  "-50px"
+            :background :lightgreen
+            :color :black
+            :padding :5px
+            :border-radius :5px}}         
+   "+"])                     
+
+
 (defn index-to-abc [index]
  (clojure.string/lower-case (str (char (+ 65 index)))))
 
 (defn grid-item [index grid-data]
  (let [col-count (count (:cols grid-data))
-       row-count (count (:rows grid-data))] 
+       row-count (count (:rows grid-data))
+       add-col-index (dec col-count)
+       add-row-index (dec (* col-count row-count))] 
   [:div {:style {:background "rgba(0,0,0,0.3)"
                  :display :flex
                  :justify-content :center
@@ -49,7 +78,11 @@
    (if (col-indicator? col-count index)
     [col-indicator])
    (if (row-indicator? col-count index)
-     [row-indicator])]))
+     [row-indicator])
+   (if (= add-col-index index)
+    [add-col-indicator])
+   (if (= add-row-index index)
+    [add-row-indicator])]))
 
   
 
