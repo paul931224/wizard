@@ -28,6 +28,9 @@
            :height "10px"
            :width  "5px"}}])
 
+(defn index-to-abc [index]
+ (clojure.string/lower-case (str (char (+ 65 index)))))
+
 (defn grid-item [index grid-data]
  (let [col-count (count (:cols grid-data))
        row-count (count (:rows grid-data))] 
@@ -42,7 +45,7 @@
    [:div {:style {:background "#333"
                   :padding "0px 2px"
                   :border-radius "50%"}}
-    (str index " - " row-count " - " col-count)]
+    (str (index-to-abc index))]
    (if (col-indicator? col-count index)
     [col-indicator])
    (if (row-indicator? col-count index)
@@ -54,8 +57,10 @@
  (let [overlay (subscribe [:db/get [:editor :overlay]])
        value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
        components-value-path (fn [] (vec (conj (value-path) :components)))
-       grid-data             (fn [] @(subscribe [:db/get (value-path)]))
-       items                 (fn [] @(subscribe [:db/get (components-value-path)]))]
+       grid-data             (fn [] @(subscribe [:db/get (value-path)]))       
+       col-count (fn [] (count (:cols (grid-data))))
+       row-count (fn [] (count (:rows (grid-data))))
+       items     (fn [] (range (* (col-count) (row-count))))]
   (if (= :grid @overlay)
    [overlay-wrapper/view 
     [:div#grid-overlay
