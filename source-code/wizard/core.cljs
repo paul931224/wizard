@@ -10,6 +10,7 @@
     [plugins.drag-and-drop :as dnd]
     [wizard.toolbars.view        :as toolbars]
     [wizard.overlays.selection   :as selection]
+    [wizard.overlays.area        :as area]
     [wizard.overlays.order       :as order]
     [wizard.overlays.grid        :as grid]
     [wizard.overlays.menu        :as menu]
@@ -209,6 +210,7 @@
          [main-content-wrapper
           [:<> 
             [selection/view @(subscribe [:db/get [:editor]])]
+            [area/view      @(subscribe [:db/get [:editor]])]
             [grid/view      @(subscribe [:db/get [:editor]])]
             [order/view     @(subscribe [:db/get [:editor]])]
             [:div {:style {:flex-grow 1}}

@@ -42,6 +42,7 @@
                                :right 0
                               :height "auto"
                               :width  "80px"}}
+    [set-overlay-type! :area  "A"]
     [set-overlay-type! :grid  "G"]                        
     [set-overlay-type! :order "O"]  
     [unselect-component!]
