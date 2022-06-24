@@ -39,7 +39,7 @@
         rgba-code (clojure.string/join ", " [r g b a])]
     (str "rgba(" rgba-code ")")))
 
-(defn grid-item [letter grid-data]
+(defn grid-item [item grid-data]
   [:div {:style {:background (randomize-rgb)
                     :display :flex
                     :justify-content :center
@@ -47,11 +47,12 @@
                     :color "#DDD"
                     :height "100%"
                     :width "100%"
-                    :position :relative}}
+                    :position :relative
+                    :grid-area (utils/number-to-letter (:position (second item)))}}
       [:div {:style {:background "#333"
                        :padding "0px 2px"
                        :border-radius "50%"}}
-       (str letter)]
+       (str (utils/number-to-letter (:position (second item))))]
       [expand-horizontal-indicator]
       [expand-vertical-indicator]])
    
@@ -78,7 +79,7 @@
                      :z-index 2}}                     
            [grid/grid-wrapper
             (map-indexed (fn [index item] [grid-item item (grid-data)])
-                      (abc-matrix))
+                      (components))
             (vector
              (last (value-path))
              @(subscribe [:db/get (value-path)]))]]])))

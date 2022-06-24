@@ -67,11 +67,11 @@
                  :color "#DDD"
                  :height "100%"
                  :width "100%"
-                 :position :relative}}
+                 :position :relative}}                
    [:div {:style {:background "#333"
                   :padding "0px 2px"
                   :border-radius "50%"}}
-    (str (utils/number-to-letter index))]
+    index]
    (if (col-indicator? col-count index)
     [col-indicator])
    (if (row-indicator? col-count index)
@@ -91,7 +91,8 @@
        components            (fn [] @(subscribe [:db/get (components-value-path)]))     
        col-count (fn [] (count (:cols (grid-data))))
        row-count (fn [] (count (:rows (grid-data))))
-       items     (fn [] (components))]
+       items     (fn [] (range (* (col-count) (row-count))))]
+                                
   (if (= :grid @overlay)
    [overlay-wrapper/view 
     [:div#grid-overlay
@@ -99,8 +100,7 @@
                 :width "100%"   
                 :position :absolute
                 :left 0
-                :z-index 2                      
-                :background "rgba(0,255,0,0.3)"}}
+                :z-index 2}}                                      
        [grid/grid-wrapper
             (map-indexed (fn [index item] [grid-item index (grid-data)])
                          (items))
