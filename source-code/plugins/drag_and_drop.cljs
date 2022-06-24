@@ -18,16 +18,11 @@
                                         verticalListSortingStrategy
                                         rectSortingStrategy
                                         useSortable]]
-           ["@dnd-kit/utilities" :refer [CSS]]))
+           ["@dnd-kit/utilities" :refer [CSS]]))           
 
 (def dnd-context (r/adapt-react-class DndContext))
 (def sortable-context (r/adapt-react-class SortableContext))
 (def drag-overlay   (r/adapt-react-class DragOverlay))
-
-(defn to-clj-map [hash-map]
-  (js->clj hash-map :keywordize-keys true))
-
-
 
 (defn sortable-handle-style []
  {
@@ -58,7 +53,7 @@
         path            (:path props)
         new-path        (vec (concat path [id])) 
         {:keys [attributes listeners setNodeRef transform transition]} 
-        (to-clj-map (useSortable (clj->js {:id (str id)})))]
+        (utils/to-clj-map (useSortable (clj->js {:id (str id)})))]
     [:div {:style (sortable-container-style transform transition)}
           [:div 
             (merge {:style (sortable-handle-style)
@@ -95,17 +90,17 @@
         [items, setItems] (react/useState (clj->js prop-items))
         sensors (useSensors
                  (useSensor PointerSensor)
-                 (useSensor KeyboardSensor, (to-clj-map {:coordinateGetter sortableKeyboardCoordinates})))
+                 (useSensor KeyboardSensor, (utils/to-clj-map {:coordinateGetter sortableKeyboardCoordinates})))
         handleDragEnd (fn [event]
-                        (let [{:keys [active over]} (to-clj-map event)]
-                          (let [items        (to-clj-map items)
+                        (let [{:keys [active over]} (utils/to-clj-map event)]
+                          (let [items        (utils/to-clj-map items)
                                 active-index (:id active)
                                 over-index   (:id over)
                                 active-item  (get-item-with-id items active-index)
                                 over-item    (get-item-with-id items over-index)
                                 oldIndex     (.indexOf items active-item)
                                 newIndex     (.indexOf items over-item)
-                                new-order    (to-clj-map (arrayMove (clj->js items) oldIndex newIndex))
+                                new-order    (utils/to-clj-map (arrayMove (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]                            
                             (dispatch [:db/set value-path (utils/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
@@ -117,7 +112,7 @@
                                  (setActiveId (get (js->clj (aget e "active")) "id")))}
           [sortable-context {:items    items
                              :strategy verticalListSortingStrategy}
-           (map (fn [item] (let [clj-item (to-clj-map item)] 
+           (map (fn [item] (let [clj-item (utils/to-clj-map item)] 
                             [:f> sortable-item {:id   (:id clj-item)
                                                 :key  (:id clj-item)
                                                 :item clj-item 

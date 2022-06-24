@@ -1,7 +1,8 @@
 (ns wizard.editor.block 
  (:require 
   [re-frame.core :refer [dispatch subscribe]]
-  [reagent-hickory.sweet :refer [html->hiccup]]))
+  [reagent-hickory.sweet :refer [html->hiccup]]
+  [wizard.utils :as utils]))
 
 (defn default []
   {:type "block"
@@ -15,11 +16,11 @@
         comp-state                                 (second key-and-comp)
         {:keys [content col row width height
                 color background-color padding 
-                grid-area]}   comp-state]
+                position]}   comp-state]
        
     [:div {:style {:pointer-events "auto"
                    :color color
-                   :grid-area grid-area 
+                   :grid-area (utils/number-to-letter position) 
                    :background-color (if background-color background-color "white")
                    :width  "100%"
                    :height "100%"

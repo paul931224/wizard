@@ -1,5 +1,9 @@
 (ns wizard.utils)
 
+
+(defn to-clj-map [hash-map]
+  (js->clj hash-map :keywordize-keys true))
+
 (defn id-map->ordered-vector [coll]
   (let [pos-to-index (fn [[item-id item-value]]
                        [(:position item-value)

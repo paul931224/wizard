@@ -21,15 +21,12 @@
                                          rectSortingStrategy
                                          rectSwappingStrategy
                                          useSortable]]
-            ["@dnd-kit/utilities" :refer [CSS]]))
+            ["@dnd-kit/utilities" :refer [CSS]]
+            [wizard.utils :as utils]))
 
 (def dnd-context (r/adapt-react-class DndContext))
 (def sortable-context (r/adapt-react-class SortableContext))
 (def drag-overlay   (r/adapt-react-class DragOverlay))
-
-(defn to-clj-map [hash-map]
-  (js->clj hash-map :keywordize-keys true))
-
 
 (defn sortable-container-style [transform transition]
   {:transform (.toString (.-Transform CSS) (clj->js transform))
@@ -51,16 +48,15 @@
         type            (:type item)
         component-data  (:component-data props)
         path            (:path props)
-        position        (:position props)
-        grid-area       (:grid-area item)
+        position        (:position props)        
         new-path        (vec (concat path [id]))
         {:keys [attributes listeners setNodeRef transform transition]}
-        (to-clj-map (useSortable (clj->js {:id (str id)})))]
+        (utils/to-clj-map (useSortable (clj->js {:id (str id)})))]
     [:div (merge {:id    (str id)
                   :ref   (js->clj setNodeRef)
                   :style (assoc 
                            (sortable-container-style transform transition)
-                           :grid-area grid-area)}
+                           :grid-area (utils/number-to-letter position))}
                  attributes
                  listeners)
      [:div {:style {:background "rgba(0,0,255,0.3)"
@@ -90,19 +86,19 @@
         [items, setItems] (react/useState (clj->js prop-items))
         sensors (useSensors
                  (useSensor PointerSensor)
-                 (useSensor KeyboardSensor, (to-clj-map {:coordinateGetter sortableKeyboardCoordinates})))
+                 (useSensor KeyboardSensor, (utils/to-clj-map {:coordinateGetter sortableKeyboardCoordinates})))
         handleDragEnd (fn [event]
-                        (let [{:keys [active over]} (to-clj-map event)]
-                          (let [items        (to-clj-map items)
+                        (let [{:keys [active over]} (utils/to-clj-map event)]
+                          (let [items        (utils/to-clj-map items)
                                 active-index (:id active)
                                 over-index   (:id over)
                                 active-item  (get-item-with-id items active-index)
                                 over-item    (get-item-with-id items over-index)
                                 oldIndex     (.indexOf items active-item)
                                 newIndex     (.indexOf items over-item)
-                                new-order    (to-clj-map (arraySwap (clj->js items) oldIndex newIndex))
+                                new-order    (utils/to-clj-map (arraySwap (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]
-                            (.log js/console new-order-js)
+                            (.log js/console (str new-order))
                             (dispatch [:db/set components-value-path (utils/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
                         (setActiveId nil))]
@@ -111,19 +107,19 @@
                   :onDragEnd     handleDragEnd
                   :onDragStart  (fn [e]
                                   (setActiveId (get (js->clj (aget e "active")) "id")))}
-        [sortable-context {:items    items
-                           :strategy rectSwappingStrategy}
-         [grid/grid-wrapper
-          (map-indexed (fn [index item] (let [clj-item (to-clj-map item)]
-                                         [:f> sortable-item {:position index
-                                                             :id   (:id clj-item)
-                                                             :key  (:id clj-item)
-                                                             :item clj-item
-                                                             :path value-path}]))
-               items)
-          (vector 
-                 (last value-path) 
-                 @(subscribe [:db/get value-path]))]]]))
+         [sortable-context {:items    items
+                            :strategy rectSwappingStrategy}
+         
+          [grid/grid-wrapper
+           (map-indexed (fn [index item] [:f> sortable-item {:position index
+                                                               :id   (:id item)
+                                                               :key  (str (:position item) (:id item))
+                                                               :item item
+                                                               :path value-path}])
+                        (sort-by :position (utils/to-clj-map items)))
+           (vector 
+                  (last value-path) 
+                  @(subscribe [:db/get value-path]))]]]))
     ;[drag-overlay [:f> drag-overlay-item {:id (if activeId activeId nil)}]]]))
 
 

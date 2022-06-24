@@ -15,8 +15,7 @@
            (map-indexed
             (fn [index a] (assoc {} (str (random-uuid)) {:type "block"
                                                          :position index
-                                                         :content "Grid Block"
-                                                         :grid-area (utils/number-to-letter index)}))
+                                                         :content "Grid Block"}))                                                       
             elements)))
 
 (defn default []
@@ -48,8 +47,8 @@
                :grid-template-rows    (map->grid-template rows)
                :pointer-events "auto"
                :justify-items :center
-               :grid-template-areas "\"a a\" 
-                                     \"b b\"
+               :grid-template-areas "\"a b\" 
+                                     \"a b\"
                                      \"c c\""
                ;:background :black
                :border "1px solid black"
@@ -61,8 +60,8 @@
         value            (second comp-state)
         grid-components  (:components    value)]
    [grid-wrapper
-     (map (fn [component]
-            ^{:key the-key} [comp-router component
-                             (vec (concat path [:components (first component)]))])
-          (sort-by (fn [a] (:position (second a))) grid-components))
-     comp-state]))
+      (map (fn [component]
+             ^{:key the-key} [comp-router component
+                              (vec (concat path [:components (first component)]))])
+           (sort-by (fn [a] (:position (second a))) grid-components))
+      comp-state]))

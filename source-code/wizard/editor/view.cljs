@@ -6,9 +6,10 @@
   [wizard.editor.placeholder   :as placeholder]
   [wizard.editor.image         :as image]
   [re-frame.core :refer [dispatch subscribe]]
-  [wizard.editor.events]))
+  [wizard.editor.events]
+  [wizard.utils :as utils]))
 
-(defn component-wrapper [content id path type grid-area]
+(defn component-wrapper [content id path type position]
   (let [hovered-component (subscribe [:db/get [:editor :hovered-component]])]
    [:div.component-wrapper
     {:on-click (fn [event] 
@@ -20,14 +21,14 @@
              "component-hovered" nil)
      :style {:cursor :pointer 
              :width "100%"
-             :grid-area grid-area
+             :grid-area (utils/number-to-letter position)
              :height "100%"}}            
     content]))
 
 (defn component-router [comp-state path]
   (let [id   (first comp-state)
         type (:type (second comp-state))
-        grid-area (:grid-area (second comp-state))]
+        position (:position (second comp-state))]
     [component-wrapper
      (case type
        "block"        [block/view  component-router comp-state path]
@@ -39,7 +40,7 @@
      id
      path
      type
-     grid-area]))
+     position]))
 
 
 (defn view []
