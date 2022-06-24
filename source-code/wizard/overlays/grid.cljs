@@ -87,10 +87,11 @@
  (let [overlay (subscribe [:db/get [:editor :overlay]])
        value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
        components-value-path (fn [] (vec (conj (value-path) :components)))
-       grid-data             (fn [] @(subscribe [:db/get (value-path)]))       
+       grid-data             (fn [] @(subscribe [:db/get (value-path)]))  
+       components            (fn [] @(subscribe [:db/get (components-value-path)]))     
        col-count (fn [] (count (:cols (grid-data))))
        row-count (fn [] (count (:rows (grid-data))))
-       items     (fn [] (range (* (col-count) (row-count))))]
+       items     (fn [] (components))]
   (if (= :grid @overlay)
    [overlay-wrapper/view 
     [:div#grid-overlay

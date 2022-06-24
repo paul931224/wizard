@@ -52,12 +52,15 @@
         component-data  (:component-data props)
         path            (:path props)
         position        (:position props)
+        grid-area       (:grid-area item)
         new-path        (vec (concat path [id]))
         {:keys [attributes listeners setNodeRef transform transition]}
         (to-clj-map (useSortable (clj->js {:id (str id)})))]
     [:div (merge {:id    (str id)
                   :ref   (js->clj setNodeRef)
-                  :style (sortable-container-style transform transition)}
+                  :style (assoc 
+                           (sortable-container-style transform transition)
+                           :grid-area grid-area)}
                  attributes
                  listeners)
      [:div {:style {:background "rgba(0,0,255,0.3)"
@@ -71,7 +74,7 @@
       [:div {:style {:background "#333" 
                      :padding "0px 2px"
                      :border-radius "50%"}}                      
-       (str (inc position))]]]))
+       (inc position)]]]))
     
        
         
@@ -99,6 +102,7 @@
                                 newIndex     (.indexOf items over-item)
                                 new-order    (to-clj-map (arraySwap (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]
+                            (.log js/console new-order-js)
                             (dispatch [:db/set components-value-path (utils/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
                         (setActiveId nil))]

@@ -48,9 +48,9 @@
                :grid-template-rows    (map->grid-template rows)
                :pointer-events "auto"
                :justify-items :center
-               :grid-template-areas "\"a b\" 
-                                     \"a b\"
-                                     \"c b\""
+               :grid-template-areas "\"a a\" 
+                                     \"b b\"
+                                     \"c c\""
                ;:background :black
                :border "1px solid black"
                :gap "1px"}}     
