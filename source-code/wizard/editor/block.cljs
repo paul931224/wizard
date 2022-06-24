@@ -1,4 +1,4 @@
-(ns wizard.editor.components.block 
+(ns wizard.editor.block 
  (:require 
   [re-frame.core :refer [dispatch subscribe]]
   [reagent-hickory.sweet :refer [html->hiccup]]))
@@ -14,10 +14,12 @@
   (let [the-key                                    (first key-and-comp)
         comp-state                                 (second key-and-comp)
         {:keys [content col row width height
-                color background-color padding]}   comp-state]
+                color background-color padding 
+                grid-area]}   comp-state]
        
     [:div {:style {:pointer-events "auto"
-                   :color color 
+                   :color color
+                   :grid-area grid-area 
                    :background-color (if background-color background-color "white")
                    :width  "100%"
                    :height "100%"

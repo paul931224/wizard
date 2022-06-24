@@ -1,4 +1,4 @@
-(ns wizard.editor.components.navbar) 
+(ns wizard.editor.navbar) 
 
 (defn default []
  {:type "navbar"

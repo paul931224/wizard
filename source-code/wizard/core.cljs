@@ -2,9 +2,9 @@
   (:require 
     [wizard.animations]
     [wizard.guild-xyz]
-    [wizard.utils]
+    [wizard.re-frame-utils]
     [wizard.web3]
-    [wizard.editor.core :as editor]
+    [wizard.editor.view :as editor]
     [reagent.core     :as reagent]
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
@@ -14,7 +14,7 @@
     [wizard.overlays.order       :as order]
     [wizard.overlays.grid        :as grid]
     [wizard.overlays.menu        :as menu]
-    [wizard.editor.breadcrumb    :as breadcrumb]))
+    [wizard.breadcrumb.view      :as breadcrumb]))
     
 
 (def color-one "#EEE")

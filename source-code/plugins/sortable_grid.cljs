@@ -2,9 +2,9 @@
   (:require [reagent.core :as r]
             [re-frame.core :refer [dispatch subscribe]]
             ["react" :as react]
-            [wizard.data-structures :as data-structures]
+            [wizard.utils :as utils]
             [reagent-hickory.sweet :refer [html->hiccup]]
-            [wizard.editor.components.grid :as grid]
+            [wizard.editor.grid :as grid]
             ["@dnd-kit/core" :refer [DndContext
                                      closestCenter
                                      KeyboardSensor
@@ -99,7 +99,7 @@
                                 newIndex     (.indexOf items over-item)
                                 new-order    (to-clj-map (arraySwap (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]
-                            (dispatch [:db/set components-value-path (data-structures/ordered-vector->id-map new-order)])
+                            (dispatch [:db/set components-value-path (utils/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
                         (setActiveId nil))]
     [dnd-context {:sensors  sensors
@@ -130,7 +130,7 @@
     (if (and @items (= (:type @this) "grid"))
       ^{:key (str @items)}
       [:f> sortable-example
-        (data-structures/id-map->ordered-vector @items)
+        (utils/id-map->ordered-vector @items)
         value-path
         components-value-path])))
        

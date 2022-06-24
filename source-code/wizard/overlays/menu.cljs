@@ -1,7 +1,7 @@
 (ns wizard.overlays.menu
  (:require 
   [re-frame.core :refer [subscribe dispatch]]
-  [wizard.editor.components.block :as block]))
+  [wizard.editor.block :as block]))
 
 
 (defn set-overlay-type! [type type-name]

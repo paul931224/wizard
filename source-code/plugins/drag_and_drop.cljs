@@ -2,7 +2,7 @@
  (:require [reagent.core :as r]
            [re-frame.core :refer [dispatch subscribe]]
            ["react" :as react]
-           [wizard.data-structures :as data-structures]
+           [wizard.utils :as utils]
            [reagent-hickory.sweet :refer [html->hiccup]]
            ["@dnd-kit/core" :refer [DndContext
                                     closestCenter
@@ -107,7 +107,7 @@
                                 newIndex     (.indexOf items over-item)
                                 new-order    (to-clj-map (arrayMove (clj->js items) oldIndex newIndex))
                                 new-order-js (clj->js new-order)]                            
-                            (dispatch [:db/set value-path (data-structures/ordered-vector->id-map new-order)])
+                            (dispatch [:db/set value-path (utils/ordered-vector->id-map new-order)])
                             (setItems new-order-js)))
                         (setActiveId nil))]
     [dnd-context {:sensors  sensors
@@ -134,7 +134,7 @@
     (if @items 
       ^{:key (str @items)}
       [:f> sortable-example 
-       (data-structures/id-map->ordered-vector @items)
+       (utils/id-map->ordered-vector @items)
        value-path
        component
        component-data])))

@@ -1,4 +1,4 @@
-(ns wizard.editor.components.placeholder
+(ns wizard.editor.placeholder
  (:require
     [re-frame.core :refer [dispatch subscribe]]
     [reagent-hickory.sweet :refer [html->hiccup]]))

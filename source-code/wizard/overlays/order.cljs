@@ -4,6 +4,10 @@
             [plugins.sortable-grid :as sortable-grid]
             [wizard.overlays.wrapper :as overlay-wrapper]))
 
+
+
+
+
 (defn view []
  (let [overlay (subscribe [:db/get [:editor :overlay]])
        selected-path (subscribe [:db/get [:editor :selected :value-path]])]

@@ -1,4 +1,4 @@
-(ns wizard.editor.components.image
+(ns wizard.editor.image
  (:require
   [re-frame.core :refer [dispatch subscribe]]))
 

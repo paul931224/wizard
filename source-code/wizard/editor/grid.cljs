@@ -1,4 +1,4 @@
-(ns wizard.editor.components.grid)
+(ns wizard.editor.grid)
 
 (defn grid-divs-range [block]
   (let [grid-col-count (inc (count (:cols block)))
@@ -14,15 +14,14 @@
            (map-indexed
             (fn [index a] (assoc {} (str (random-uuid)) {:type "block"
                                                          :position index
-                                                         :content "Grid Block"}))
+                                                         :content "Grid Block"
+                                                         :grid-area index}))
             elements)))
 
 (defn default []
-  (let [cols {0 "1fr" 1 "2fr"}
-        rows {0 "1fr" 1 "2fr" 2 "1fr"}
-        grid-elements (range (*
-                               (count rows)
-                               (count cols)))]
+  (let [cols {0 "20%" 1 "80%"}
+        rows {0 "auto" 1 "auto" 2 "auto"}
+        grid-elements (range 3)]
      {:type "grid"
       :name "Grid"
       :cols       cols
@@ -48,6 +47,9 @@
                :grid-template-rows    (map->grid-template rows)
                :pointer-events "auto"
                :justify-items :center
+               :grid-template-areas "'a b'
+                                     'c b'
+                                     'c c'"
                ;:background :black
                :border "1px solid black"
                :gap "1px"}}     

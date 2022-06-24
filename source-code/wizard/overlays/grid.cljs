@@ -1,7 +1,8 @@
 (ns wizard.overlays.grid
    (:require [re-frame.core :refer [subscribe dispatch]]
              [wizard.overlays.wrapper :as overlay-wrapper]
-             [wizard.editor.components.grid :as grid]))
+             [wizard.editor.grid :as grid]
+             [wizard.utils :as utils]))
 
 
 (defn row-indicator? [col-count index]
@@ -54,10 +55,6 @@
             :border-radius :5px}}         
    "+"])                     
 
-
-(defn index-to-abc [index]
- (clojure.string/lower-case (str (char (+ 65 index)))))
-
 (defn grid-item [index grid-data]
  (let [col-count (count (:cols grid-data))
        row-count (count (:rows grid-data))
@@ -74,7 +71,7 @@
    [:div {:style {:background "#333"
                   :padding "0px 2px"
                   :border-radius "50%"}}
-    (str (index-to-abc index))]
+    (str (utils/number-to-letter index))]
    (if (col-indicator? col-count index)
     [col-indicator])
    (if (row-indicator? col-count index)

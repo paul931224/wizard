@@ -1,8 +1,8 @@
 (ns wizard.toolbars.components.core
  (:require 
-  [wizard.editor.components.block :as  block]
-  [wizard.editor.components.grid  :as  grid]
-  [wizard.editor.components.navbar :as navbar]
+  [wizard.editor.block :as  block]
+  [wizard.editor.grid  :as  grid]
+  [wizard.editor.navbar :as navbar]
   [re-frame.core :refer [dispatch subscribe]]))
   
 

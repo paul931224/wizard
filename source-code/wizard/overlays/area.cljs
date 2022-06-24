@@ -1,16 +1,11 @@
 (ns wizard.overlays.area
   (:require [re-frame.core :refer [subscribe dispatch]]
             [wizard.overlays.wrapper :as overlay-wrapper]
-            [wizard.editor.components.grid :as grid]))
+            [wizard.editor.grid :as grid]
+            [wizard.utils :as utils]))
 
 
-(defn row-indicator? [col-count index]
-  (= 0 (rem (inc index) col-count)))
-
-(defn col-indicator? [col-count index]
-  (< index col-count))
-
-(defn row-indicator []
+(defn expand-horizontal-indicator []
   [:div
    {:style {:cursor :pointer
             :position :absolute
@@ -20,7 +15,7 @@
             :height "5px"
             :width  "10px"}}])
 
-(defn col-indicator []
+(defn expand-vertical-indicator []
   [:div
    {:style {:cursor :pointer
             :position :absolute
@@ -30,59 +25,36 @@
             :height "10px"
             :width  "5px"}}])
 
-(defn add-col-indicator []
-  [:div
-   {:style {:cursor :pointer
-            :position :absolute
-            :top "-50px"
-            :right 0
-            :background :lightgreen
-            :color :black
-            :padding :5px
-            :border-radius :5px}}
-   "+"])
 
-(defn add-row-indicator []
-  [:div
-   {:style {:cursor :pointer
-            :position :absolute
-            :bottom "0px"
-            :right  "-50px"
-            :background :lightgreen
-            :color :black
-            :padding :5px
-            :border-radius :5px}}
-   "+"])
+(defn generate-abc-matrix [how-many]
+ (let [numbers (range how-many)]
+  (vec (map utils/number-to-letter numbers))))
 
+(defn randomize-rgb []
+  (let [value-range (range 256)
+        r (rand-nth value-range)
+        g (rand-nth value-range)
+        b (rand-nth value-range)
+        a "0.5" 
+        rgba-code (clojure.string/join ", " [r g b a])]
+    (str "rgba(" rgba-code ")")))
 
-(defn index-to-abc [index]
-  (clojure.string/lower-case (str (char (+ 65 index)))))
-
-(defn grid-item [index grid-data]
-  (let [col-count (count (:cols grid-data))
-        row-count (count (:rows grid-data))
-        add-col-index (dec col-count)
-        add-row-index (dec (* col-count row-count))]
-     [:div {:style {:background "rgba(0,0,0,0.3)"}
-                   :display :flex
-                   :justify-content :center
-                   :align-items :center
-                   :color "#DDD"
-                   :height "100%"
-                   :width "100%"
-                   :position :relative}
+(defn grid-item [letter grid-data]
+  [:div {:style {:background (randomize-rgb)
+                    :display :flex
+                    :justify-content :center
+                    :align-items :center
+                    :color "#DDD"
+                    :height "100%"
+                    :width "100%"
+                    :position :relative}}
       [:div {:style {:background "#333"
                        :padding "0px 2px"
                        :border-radius "50%"}}
-       (str (index-to-abc index))]
-      (if (col-indicator? col-count index)
-       [col-indicator])
-      (if (row-indicator? col-count index)
-          [row-indicator])
-      (if (= add-col-index index)
-       [add-col-indicator])
-      (if (= add-row-index index)
-       [add-row-indicator])]))
+       (str letter)]
+      [expand-horizontal-indicator]
+      [expand-vertical-indicator]])
+   
 
 
 
@@ -91,9 +63,10 @@
         value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         components-value-path (fn [] (vec (conj (value-path) :components)))
         grid-data             (fn [] @(subscribe [:db/get (value-path)]))
-         col-count (fn [] (count (:cols (grid-data))))
-        row-count (fn [] (count (:rows (grid-data))))
-        items     (fn [] (range (* (col-count) (row-count))))]
+        col-count    (fn [] (count (:cols (grid-data))))
+        row-count    (fn [] (count (:rows (grid-data))))
+        items-count  (fn [] (* (col-count) (row-count)))
+        abc-matrix   (fn [] (generate-abc-matrix (items-count)))]
      (if (= :area @overlay)
       [overlay-wrapper/view
           [:div#area-overlay
@@ -101,11 +74,10 @@
                      :width "100%"
                      :position :absolute
                      :left 0
-                     :z-index 2
-                     :background "rgba(255,0,0,0.3)"}}
+                     :z-index 2}}                     
            [grid/grid-wrapper
-            (map-indexed (fn [index item] [grid-item index (grid-data)])
-                      (items))
+            (map-indexed (fn [index item] [grid-item item (grid-data)])
+                      (abc-matrix))
             (vector
              (last (value-path))
              @(subscribe [:db/get (value-path)]))]]])))

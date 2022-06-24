@@ -1,11 +1,12 @@
-(ns wizard.editor.components.view
+(ns wizard.editor.view
  (:require 
-  [wizard.editor.components.navbar        :as navbar]
-  [wizard.editor.components.block         :as block]
-  [wizard.editor.components.grid          :as grid]
-  [wizard.editor.components.placeholder   :as placeholder]
-  [wizard.editor.components.image         :as image]
-  [re-frame.core :refer [dispatch subscribe]]))
+  [wizard.editor.navbar        :as navbar]
+  [wizard.editor.block         :as block]
+  [wizard.editor.grid          :as grid]
+  [wizard.editor.placeholder   :as placeholder]
+  [wizard.editor.image         :as image]
+  [re-frame.core :refer [dispatch subscribe]]
+  [wizard.editor.events]))
 
 (defn component-wrapper [content id path type]
   (let [hovered-component (subscribe [:db/get [:editor :hovered-component]])]
@@ -46,4 +47,17 @@
          [component-router
           comp-state
           [:editor :components (first comp-state)]])
-       @components)]))
+       @components)
+      [:div {:style {:display :grid    
+                     :grid-template-columns "1fr 2fr"
+                     :grid-template-rows    "1fr 1fr 1fr"                 
+                     :grid-template-areas "\"a b\" 
+                                           \"a b\"
+                                           \"c b\""}}
+                     
+            [:div {:style {:grid-area "a"}} ;:background :red}}
+              "one"]
+            [:div {:style {:grid-area "b"}} ;:background :blue}} 
+             "two"]
+            [:div {:style {:grid-area "c"}} ;:background :green}} 
+             "three"]]]))

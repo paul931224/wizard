@@ -1,7 +1,7 @@
 (ns wizard.editor.events
   (:require
    [re-frame.core :refer [dispatch reg-event-db reg-event-fx reg-sub]]
-   [wizard.data-structures :as data-structures]))
+   [wizard.utils :as utils]))
 
 
 (reg-event-db
@@ -37,12 +37,12 @@
    (vec (concat before insert-coll after))))
 
 (defn insert-component [direction components component position]
- (let [comp-vec (data-structures/id-map->ordered-vector components)
+ (let [comp-vec (utils/id-map->ordered-vector components)
        new-vec  (case direction 
                  :before (insert-into-vec comp-vec component position)
                  :after  (insert-into-vec comp-vec component (inc position))
                  components)]
-      (data-structures/ordered-vector->id-map new-vec)))                
+      (utils/ordered-vector->id-map new-vec)))                
  
 
 (reg-event-db
