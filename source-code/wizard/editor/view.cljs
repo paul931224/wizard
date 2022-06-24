@@ -8,7 +8,7 @@
   [re-frame.core :refer [dispatch subscribe]]
   [wizard.editor.events]))
 
-(defn component-wrapper [content id path type]
+(defn component-wrapper [content id path type grid-area]
   (let [hovered-component (subscribe [:db/get [:editor :hovered-component]])]
    [:div.component-wrapper
     {:on-click (fn [event] 
@@ -20,12 +20,14 @@
              "component-hovered" nil)
      :style {:cursor :pointer 
              :width "100%"
+             :grid-area grid-area
              :height "100%"}}            
     content]))
 
 (defn component-router [comp-state path]
   (let [id   (first comp-state)
-        type (:type (second comp-state))]
+        type (:type (second comp-state))
+        grid-area (:grid-area (second comp-state))]
     [component-wrapper
      (case type
        "block"        [block/view  component-router comp-state path]
@@ -36,7 +38,8 @@
        [block/view component-router comp-state path])
      id
      path
-     type]))
+     type
+     grid-area]))
 
 
 (defn view []
@@ -47,17 +50,4 @@
          [component-router
           comp-state
           [:editor :components (first comp-state)]])
-       @components)
-      [:div {:style {:display :grid    
-                     :grid-template-columns "1fr 2fr"
-                     :grid-template-rows    "1fr 1fr 1fr"                 
-                     :grid-template-areas "\"a b\" 
-                                           \"a b\"
-                                           \"c b\""}}
-                     
-            [:div {:style {:grid-area "a"}} ;:background :red}}
-              "one"]
-            [:div {:style {:grid-area "b"}} ;:background :blue}} 
-             "two"]
-            [:div {:style {:grid-area "c"}} ;:background :green}} 
-             "three"]]]))
+       @components)]))     

@@ -1,4 +1,5 @@
-(ns wizard.editor.grid)
+(ns wizard.editor.grid
+ (:require [wizard.utils :as utils]))
 
 (defn grid-divs-range [block]
   (let [grid-col-count (inc (count (:cols block)))
@@ -15,7 +16,7 @@
             (fn [index a] (assoc {} (str (random-uuid)) {:type "block"
                                                          :position index
                                                          :content "Grid Block"
-                                                         :grid-area index}))
+                                                         :grid-area (utils/number-to-letter index)}))
             elements)))
 
 (defn default []
@@ -47,9 +48,9 @@
                :grid-template-rows    (map->grid-template rows)
                :pointer-events "auto"
                :justify-items :center
-               :grid-template-areas "'a b'
-                                     'c b'
-                                     'c c'"
+               :grid-template-areas "\"a b\" 
+                                     \"a b\"
+                                     \"c b\""
                ;:background :black
                :border "1px solid black"
                :gap "1px"}}     

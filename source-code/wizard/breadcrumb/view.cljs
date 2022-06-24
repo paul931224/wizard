@@ -9,7 +9,8 @@
                :padding "5px 10px"
                :border-radius "5px"
                :cursor :pointer}}
-      type]))
+      type])) 
+      
 
 
 (defn render-path [depth path]
@@ -20,18 +21,18 @@
         rest-count    (count rest-path)
         type          (fn [] (str (:type @here)))]
      [:span {:style {:font-weight :bold}}
-      [one-breadcrumb (type) you-are-here]]
-     (if (> rest-count 0)
-        [:span [:span " > "] [render-path  new-depth path]])))
+      [one-breadcrumb (type) you-are-here]
+      (if (> rest-count 0)
+         [:span [:span " > "] [render-path  new-depth path]])]))
       ;[:span (type)])]))
 
 
 (defn view []
   (let [path      (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))]
      (fn []
-         [:div {:style {:height "50px"}
-                  :display :flex
-                  :justify-content :center
-                  :align-items :center}
+         [:div {:style {:height "50px"
+                        :display :flex
+                        :justify-content :center
+                        :align-items :center}}
           (if (< 0 (count (path)))
             [render-path 0 (path)])])))
