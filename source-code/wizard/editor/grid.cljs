@@ -15,13 +15,13 @@
            (map-indexed
             (fn [index a] (assoc {} (str (random-uuid)) {:type "block"
                                                          :position index
-                                                         :content "Grid Block"}))                                                       
+                                                         :content (str index " - block")}))                                                       
             elements)))
 
 (defn default []
-  (let [cols {0 "20%" 1 "80%"}
-        rows {0 "auto" 1 "auto" 2 "auto"}
-        grid-elements (range 3)]
+  (let [cols {0 "30%" 1 "70%"}
+        rows {0 "100px" 1 "200px" 2 "100px" 3 "75px"}
+        grid-elements (range 5)]
      {:type "grid"
       :name "Grid"
       :cols       cols
@@ -49,9 +49,9 @@
                :justify-items :center
                :grid-template-areas "\"a b\" 
                                      \"a b\"
-                                     \"c c\""
-               ;:background :black
-               :border "1px solid black"
+                                     \"c c\"
+                                     \"d e\""
+               ;:background :black               
                :gap "1px"}}     
       content])))  
 

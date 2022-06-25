@@ -94,7 +94,7 @@
          new-order         (insert-component :before 
                             components
                             [(assoc new-component :id (str (random-uuid)))] 
-                            position)] 
+                            position)]                      
     (assoc-in db  components-path new-order))))
 
 (reg-event-db

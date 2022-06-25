@@ -100,6 +100,7 @@
                 :width "100%"   
                 :position :absolute
                 :left 0
+                :backdrop-filter "blur(3px)"
                 :z-index 2}}                                      
        [grid/grid-wrapper
             (map-indexed (fn [index item] [grid-item index (grid-data)])

@@ -18,7 +18,8 @@
                                   :left 0
                                   :z-index 2 
                                   :height "100%"
-                                  :width "100%"}}                                  
+                                  :width "100%"
+                                  :backdrop-filter "blur(1px)"}}                                  
       [sortable-grid/view {:value-path @selected-path}]]]))))
                
     

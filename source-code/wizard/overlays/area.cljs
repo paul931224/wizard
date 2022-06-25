@@ -74,6 +74,7 @@
           [:div#area-overlay
            {:style {:height "100%"
                      :width "100%"
+                     :backdrop-filter "blur(1px)"
                      :position :absolute
                      :left 0
                      :z-index 2}}                     
