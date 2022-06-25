@@ -26,11 +26,20 @@
       :name "Grid"
       :cols       cols
       :rows       rows
+      :areas      [["a" "b"]
+                   ["a" "b"]
+                   ["c" "c"]
+                   ["d" "e"]]
       :components (generate-default-blocks grid-elements)
       :height 20
       :grid-padding 20
       :grid-background "#EEE"}))
 
+(defn areas->grid-areas-template [areas]
+  (let [quote-around  (fn [area] (str "\"" area "\""))
+        vec-to-string (fn [the-vec] (quote-around (clojure.string/join " " the-vec)))
+        areas         (clojure.string/join " " (vec (map vec-to-string areas)))]
+     areas))
 
 (defn grid-wrapper 
  ([comp-state]
@@ -39,21 +48,22 @@
   (let [the-key          (first  comp-state)
         value            (second comp-state)
         rows             (:rows     value)
-        cols             (:cols     value)]                
+        cols             (:cols     value)
+        areas            (:areas    value)]                
     [:div.grid
-      {:id    (str "grid-" the-key)
-       :style {:display :grid
-               :grid-template-columns (map->grid-template cols)
-               :grid-template-rows    (map->grid-template rows)
-               :pointer-events "auto"
-               :justify-items :center
-               :grid-template-areas "\"a b\" 
-                                     \"a b\"
-                                     \"c c\"
-                                     \"d e\""
-               ;:background :black               
-               :gap "1px"}}     
-      content])))  
+       {:id    (str "grid-" the-key)
+        :style {:display :grid
+                :grid-template-columns (map->grid-template cols)
+                :grid-template-rows    (map->grid-template rows)
+                :pointer-events "auto"
+                :justify-items :center
+                :grid-template-areas (areas->grid-areas-template areas)
+                ;:background :black               
+                :gap "2px"}}     
+       content])))  
+
+
+
 
 (defn view [comp-router comp-state path]
   (let [the-key          (first comp-state)
