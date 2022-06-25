@@ -29,5 +29,6 @@
        :reagent-render
        (fn [content]
          @editor
-         [:div.overlay-wrapper {:style (merge {:position :absolute} @rect-data)}
+         [:div.overlay-wrapper {:style (merge {:pointer-events :none
+                                               :position :absolute} @rect-data)}
           content])})))

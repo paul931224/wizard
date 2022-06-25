@@ -111,10 +111,10 @@
 (reg-event-db
  :editor/set-overlay!
  (fn [db [_ overlay]]
-   (let [old-overlay (-> db :editor :overlay)]
+   (let [old-overlay (-> db :editor :overlay :type)]
      (if (= overlay old-overlay)
-        (assoc-in db [:editor :overlay] nil)
-        (assoc-in db [:editor :overlay] overlay)))))
+        (assoc-in db [:editor :overlay :type] nil)
+        (assoc-in db [:editor :overlay :type] overlay)))))
 
 (reg-sub
  :editor/get-selected-component

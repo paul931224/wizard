@@ -40,27 +40,34 @@
     (str "rgba(" rgba-code ")")))
 
 (defn grid-item [item grid-data]
-  [:div {:style {:background (randomize-rgb)
-                    :display :flex
-                    :justify-content :center
-                    :align-items :center
-                    :color "#DDD"
-                    :height "100%"
-                    :width "100%"
-                    :position :relative
-                    :grid-area (utils/number-to-letter (:position (second item)))}}
-      [:div {:style {:background "#333"
-                       :padding "0px 2px"
-                       :border-radius "50%"}}
-       (str (utils/number-to-letter (:position (second item))))]
-      [expand-horizontal-indicator]
-      [expand-vertical-indicator]])
+  (let [letter  (fn [] (utils/number-to-letter (:position (second item))))
+        active? (fn [] (= (letter) @(subscribe [:db/get [:overlay :active]])))] 
+   [:div {:on-click (fn [])
+          :style    {:background (randomize-rgb)
+                     :display :flex
+                     :justify-content :center
+                     :align-items :center
+                     :color "#DDD"
+                     :height "100%"
+                     :width "100%"
+                     :position :relative
+                     :grid-area (letter)}}
+       [:div {:style {:background "#333"
+                      :height "30px"
+                      :width "30px"
+                      :display :flex 
+                      :justify-content :center
+                      :align-items :center
+                      :border-radius "15px"}}
+        (str (letter))]
+       [expand-horizontal-indicator]
+       [expand-vertical-indicator]]))
    
 
 
 
 (defn view []
-  (let [overlay (subscribe [:db/get [:editor :overlay]])
+  (let [overlay (subscribe [:db/get [:editor :overlay :type]])
         value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         components-value-path (fn [] (vec (conj (value-path) :components)))
         grid-data             (fn [] @(subscribe [:db/get (value-path)]))
@@ -76,6 +83,7 @@
                      :width "100%"
                      :backdrop-filter "blur(1px)"
                      :position :absolute
+                     :pointer-events :auto
                      :left 0
                      :z-index 2}}                     
            [grid/grid-wrapper

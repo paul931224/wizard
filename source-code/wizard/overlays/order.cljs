@@ -9,7 +9,7 @@
 
 
 (defn view []
- (let [overlay (subscribe [:db/get [:editor :overlay]])
+ (let [overlay (subscribe [:db/get [:editor :overlay :type]])
        selected-path (subscribe [:db/get [:editor :selected :value-path]])]
   (fn [] 
    (if (= :order @overlay) 
@@ -19,6 +19,7 @@
                                   :z-index 2 
                                   :height "100%"
                                   :width "100%"
+                                  :pointer-events :auto
                                   :backdrop-filter "blur(1px)"}}                                  
       [sortable-grid/view {:value-path @selected-path}]]]))))
                

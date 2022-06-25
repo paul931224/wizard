@@ -134,8 +134,12 @@
                  :width "100%"
                  :position :relative}}                
    [:div {:style {:background "#333"
-                  :padding "0px 2px"
-                  :border-radius "50%"}}
+                  :height "30px"
+                  :width "30px"
+                  :display :flex 
+                  :justify-content :center
+                  :align-items :center
+                  :border-radius "15px"}}
     index]
    (if (col-indicator? col-count index)
     [col-indicator])
@@ -149,7 +153,7 @@
   
 
 (defn view []
- (let [overlay (subscribe [:db/get [:editor :overlay]])
+ (let [overlay (subscribe [:db/get [:editor :overlay :type]])
        value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
        components-value-path (fn [] (vec (conj (value-path) :components)))
        grid-data             (fn [] @(subscribe [:db/get (value-path)]))  
@@ -166,6 +170,7 @@
                 :position :absolute
                 :left 0
                 :backdrop-filter "blur(3px)"
+                :pointer-events :auto
                 :z-index 2}}                                      
        [grid/grid-wrapper
             (map-indexed (fn [index item] [grid-item index (grid-data)])
