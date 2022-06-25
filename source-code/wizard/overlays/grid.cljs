@@ -49,7 +49,7 @@
 (defn rem-row []
   (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
         last-index (max 1 (dec (get-map-length @rows)))]
-    (dispatch [:db/set (add-to-component-path [:cols]) (dissoc @rows last-index)])))
+    (dispatch [:db/set (add-to-component-path [:rows]) (dissoc @rows last-index)])))
 
 (defn add-col []
   (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
