@@ -41,8 +41,9 @@
 
 (defn grid-item [item grid-data]
   (let [letter  (fn [] (utils/number-to-letter (:position (second item))))
-        active? (fn [] (= (letter) @(subscribe [:db/get [:overlay :active]])))] 
-   [:div {:on-click (fn [])
+        active  (fn [] @(subscribe [:db/get [:overlay :active]])) 
+        active? (fn [] (= (letter) (active)))]
+   [:div {:on-click (fn [e] (dispatch [:db/set [:overlay :active] (letter)]))
           :style    {:background (randomize-rgb)
                      :display :flex
                      :justify-content :center
@@ -50,6 +51,7 @@
                      :color "#DDD"
                      :height "100%"
                      :width "100%"
+                     :border (if (active?) "1px solid black" nil)
                      :position :relative
                      :grid-area (letter)}}
        [:div {:style {:background "#333"
@@ -60,8 +62,10 @@
                       :align-items :center
                       :border-radius "15px"}}
         (str (letter))]
-       [expand-horizontal-indicator]
-       [expand-vertical-indicator]]))
+       (if (active?) 
+         [:<> 
+          [expand-horizontal-indicator]
+          [expand-vertical-indicator]])]))
    
 
 
