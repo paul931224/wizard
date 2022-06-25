@@ -209,15 +209,16 @@
        (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
          [main-content-wrapper
           [:<> 
-            [selection/view @(subscribe [:db/get [:editor]])]
-            [area/view      @(subscribe [:db/get [:editor]])]
-            [grid/view      @(subscribe [:db/get [:editor]])]
-            [order/view     @(subscribe [:db/get [:editor]])]
             [:div {:style {:flex-grow 1}}
              (if @guild-selected
                [hero-title]
                [the-editor])
-             (identity [modal])]]]))}))
+             (identity [modal])] 
+            [selection/view @(subscribe [:db/get [:editor]])]
+            [area/view      @(subscribe [:db/get [:editor]])]
+            [grid/view      @(subscribe [:db/get [:editor]])]
+            [order/view     @(subscribe [:db/get [:editor]])]]]))}))
+            
        
          
          

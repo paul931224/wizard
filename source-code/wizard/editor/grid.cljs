@@ -19,7 +19,7 @@
             elements)))
 
 (defn default []
-  (let [cols {0 "30%" 1 "70%"}
+  (let [cols {0 "2fr" 1 "1fr"}
         rows {0 "100px" 1 "200px" 2 "100px" 3 "75px"}
         grid-elements (range 5)]
      {:type "grid"

@@ -117,7 +117,8 @@
 
 (defn toolbars [content]
  [:div#toolbars {:style {:position :fixed 
-                         :top 0}} 
+                         :top 0
+                         :z-index 100}} 
   [dnd-context {:onDragStart   handle-drag-start
                 :onDragMove    handle-drag-move
                 :onDragEnd     handle-drag-end

@@ -50,7 +50,7 @@
    [type-header type]
    [change-type]
    (case type
-    "grid"  [grid-customizer/view]
+    ;"grid"  [grid-customizer/view]
     "block" [block-customizer path]
     "image" [image/view path]
     [:div {:style {:padding "0px 5px"}} "No config for this type of component."])]))

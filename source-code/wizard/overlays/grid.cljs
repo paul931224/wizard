@@ -31,29 +31,94 @@
            :height "10px"
            :width  "5px"}}])
 
+
+(defn get-grid-component []
+  @(subscribe [:editor/get-selected-component]))
+
+(defn add-to-component-path [path-vec]
+  (vec (concat @(subscribe [:editor/get-selected-component-path]) path-vec)))
+
+(defn get-map-length [the-map]
+  (count the-map))
+
+(defn rem-col []
+  (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
+        last-index  (max 1 (dec (get-map-length @cols)))]
+    (dispatch [:db/set (add-to-component-path [:cols]) (dissoc @cols last-index)])))
+
+(defn rem-row []
+  (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
+        last-index (max 1 (dec (get-map-length @rows)))]
+    (dispatch [:db/set (add-to-component-path [:cols]) (dissoc @rows last-index)])))
+
+(defn add-col []
+  (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
+        next-index  (get-map-length @cols)]
+    (dispatch [:db/set (add-to-component-path [:cols next-index]) "1fr"])))
+
+(defn add-row []
+  (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
+        next-index (get-map-length @rows)]
+    (dispatch [:db/set (add-to-component-path [:rows next-index]) "100px"])))
+
+
+(defn rem-col-indicator []
+  [:div
+   {:on-click  rem-col
+    :style {:cursor :pointer            
+            :background :lightgreen
+            :color :black
+            :padding :5px
+            :border-radius :5px}}
+   "-"])
+
 (defn add-col-indicator []
   [:div
-   {:style {:cursor :pointer
-            :position :absolute
-            :top "-50px"
-            :right 0
+   {:on-click  add-col
+    :style {:cursor :pointer            
             :background :lightgreen
             :color :black
             :padding :5px
             :border-radius :5px}}                    
    "+"])
 
+(defn modify-col []
+ [:div {:style {:display :flex 
+                :position :absolute
+                :top "-50px"
+                :right 0}}
+  [rem-col-indicator]
+  [:div {:style {:width "5px"}}]
+  [add-col-indicator]])   
+
+(defn rem-row-indicator []
+  [:div
+   {:on-click  rem-row
+    :style {:cursor :pointer
+            :background :lightgreen
+            :color :black
+            :padding :5px
+            :border-radius :5px}}
+   "-"])
+
 (defn add-row-indicator []
   [:div
-   {:style {:cursor :pointer
-            :position :absolute
-            :bottom "0px"
-            :right  "-50px"
+   {:on-click  add-row
+    :style {:cursor :pointer
             :background :lightgreen
             :color :black
             :padding :5px
             :border-radius :5px}}         
    "+"])                     
+
+(defn modify-row []
+  [:div {:style {:display :flex 
+                 :position :absolute
+                 :bottom "0px"
+                 :right  "-50px"}}
+   [rem-row-indicator]
+   [:div {:style {:width "5px"}}]
+   [add-row-indicator]])
 
 (defn grid-item [index grid-data]
  (let [col-count (count (:cols grid-data))
@@ -77,9 +142,9 @@
    (if (row-indicator? col-count index)
      [row-indicator])
    (if (= add-col-index index)
-    [add-col-indicator])
+    [modify-col])
    (if (= add-row-index index)
-    [add-row-indicator])]))
+    [modify-row])]))
 
   
 
