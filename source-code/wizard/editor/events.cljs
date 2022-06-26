@@ -127,24 +127,47 @@
  (fn [db [_]]
    (-> db :editor :selected :value-path))) 
 
+(defn rem-col-from-areas [areas]
+  (let [rem-last-from-vector (fn [area] (vec (butlast area)))]
+     (mapv rem-last-from-vector areas)))
+
+(defn add-col-to-areas [areas]
+ (let [add-point-to-vector (fn [area] (vec (concat area ["."])))]
+    (mapv add-point-to-vector areas)))
+
+(defn rem-row-from-areas [areas]
+  (vec (butlast areas)))
+
+(defn add-row-to-areas [areas]
+  (let [col-count (count (first areas))
+        new-row   (mapv (fn [a] ".") (range col-count))]
+     (vec (concat areas [new-row]))))
+
 (reg-event-db
  :grid/rem-col!
  (fn [db [_]]
    (let [path       (-> db :editor :selected :value-path)
          cols-path  (vec (concat path [:cols]))
          cols       (get-in db cols-path)
-         last-index (max 1 (dec (count cols)))]         
-    (assoc-in db cols-path (dissoc cols last-index)))))
-
+         last-index (max 1 (dec (count cols)))
+         areas-path (vec (concat path [:areas]))
+         areas      (get-in db areas-path)]         
+     (-> db 
+      (assoc-in cols-path  (dissoc cols last-index))
+      (assoc-in areas-path (rem-col-from-areas areas))))))
 
 (reg-event-db
  :grid/add-col!
  (fn [db [_]]
    (let [path       (-> db :editor :selected :value-path)
-         cols-path  (vec (concat path [:cols]))
+         cols-path  (vec (concat path [:cols]))        
          cols       (get-in db cols-path)
-         next-path  (concat path [:cols (count cols)])]
-     (assoc-in db next-path "1fr"))))
+         next-path  (concat path [:cols (count cols)])
+         areas-path (vec (concat path [:areas]))
+         areas      (get-in db areas-path)]            
+     (-> db
+      (assoc-in next-path "1fr")
+      (assoc-in areas-path (add-col-to-areas areas))))))
 
 (reg-event-db
  :grid/rem-row!
@@ -152,8 +175,12 @@
    (let [path       (-> db :editor :selected :value-path)
          rows-path  (vec (concat path [:rows]))
          rows       (get-in db rows-path)
-         last-index (max 1 (dec (count rows)))]
-     (assoc-in db rows-path (dissoc rows last-index)))))
+         last-index (max 1 (dec (count rows)))
+         areas-path (vec (concat path [:areas]))
+         areas      (get-in db areas-path)]
+     (-> db
+      (assoc-in rows-path    (dissoc rows last-index))
+      (assoc-in areas-path   (rem-row-from-areas areas))))))
 
 (reg-event-db
  :grid/add-row!
@@ -161,6 +188,10 @@
    (let [path       (-> db :editor :selected :value-path)
          rows-path  (vec (concat path [:rows]))
          rows       (get-in db rows-path)
-         next-path  (concat path [:rows (count rows)])]
-     (assoc-in db next-path "100px")))) 
+         next-path  (concat path [:rows (count rows)])
+         areas-path (vec (concat path [:areas]))
+         areas      (get-in db areas-path)]
+     (-> db 
+      (assoc-in next-path "100px")
+      (assoc-in areas-path (add-row-to-areas areas)))))) 
      

@@ -50,17 +50,19 @@
         rows             (:rows     value)
         cols             (:cols     value)
         areas            (:areas    value)]                
-    [:div.grid
-       {:id    (str "grid-" the-key)
-        :style {:display :grid
-                :grid-template-columns (map->grid-template cols)
-                :grid-template-rows    (map->grid-template rows)
-                :pointer-events "auto"
-                :justify-items :center
-                :grid-template-areas (areas->grid-areas-template areas)
-                ;:background :black               
-                :gap "2px"}}     
-       content])))  
+    [:div   
+     [:div (str areas)]
+     [:div.grid
+        {:id    (str "grid-" the-key)
+         :style {:display :grid
+                 :grid-template-columns (map->grid-template cols)
+                 :grid-template-rows    (map->grid-template rows)
+                 :pointer-events "auto"
+                 :justify-items :center
+                 :grid-template-areas (areas->grid-areas-template areas)
+                 ;:background :black               
+                 :gap "2px"}}     
+        content]])))  
 
 
 
