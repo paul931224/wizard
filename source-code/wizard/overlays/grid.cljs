@@ -32,39 +32,9 @@
            :width  "5px"}}])
 
 
-(defn get-grid-component []
-  @(subscribe [:editor/get-selected-component]))
-
-(defn add-to-component-path [path-vec]
-  (vec (concat @(subscribe [:editor/get-selected-component-path]) path-vec)))
-
-(defn get-map-length [the-map]
-  (count the-map))
-
-(defn rem-col []
-  (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
-        last-index  (max 1 (dec (get-map-length @cols)))]
-    (dispatch [:db/set (add-to-component-path [:cols]) (dissoc @cols last-index)])))
-
-(defn rem-row []
-  (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
-        last-index (max 1 (dec (get-map-length @rows)))]
-    (dispatch [:db/set (add-to-component-path [:rows]) (dissoc @rows last-index)])))
-
-(defn add-col []
-  (let [cols        (subscribe [:db/get (add-to-component-path [:cols])])
-        next-index  (get-map-length @cols)]
-    (dispatch [:db/set (add-to-component-path [:cols next-index]) "1fr"])))
-
-(defn add-row []
-  (let [rows       (subscribe [:db/get (add-to-component-path [:rows])])
-        next-index (get-map-length @rows)]
-    (dispatch [:db/set (add-to-component-path [:rows next-index]) "100px"])))
-
-
 (defn rem-col-indicator []
   [:div
-   {:on-click  rem-col
+   {:on-click  #(dispatch [:grid/rem-col!])
     :style {:cursor :pointer            
             :background :lightgreen
             :color :black
@@ -74,7 +44,7 @@
 
 (defn add-col-indicator []
   [:div
-   {:on-click  add-col
+   {:on-click  #(dispatch [:grid/add-col!])
     :style {:cursor :pointer            
             :background :lightgreen
             :color :black
@@ -93,7 +63,7 @@
 
 (defn rem-row-indicator []
   [:div
-   {:on-click  rem-row
+   {:on-click  #(dispatch [:grid/rem-row!])
     :style {:cursor :pointer
             :background :lightgreen
             :color :black
@@ -103,7 +73,7 @@
 
 (defn add-row-indicator []
   [:div
-   {:on-click  add-row
+   {:on-click  #(dispatch [:grid/add-row!])
     :style {:cursor :pointer
             :background :lightgreen
             :color :black

@@ -127,8 +127,40 @@
  (fn [db [_]]
    (-> db :editor :selected :value-path))) 
 
-   
+(reg-event-db
+ :grid/rem-col!
+ (fn [db [_]]
+   (let [path       (-> db :editor :selected :value-path)
+         cols-path  (vec (concat path [:cols]))
+         cols       (get-in db cols-path)
+         last-index (max 1 (dec (count cols)))]         
+    (assoc-in db cols-path (dissoc cols last-index)))))
 
 
-    
+(reg-event-db
+ :grid/add-col!
+ (fn [db [_]]
+   (let [path       (-> db :editor :selected :value-path)
+         cols-path  (vec (concat path [:cols]))
+         cols       (get-in db cols-path)
+         next-path  (concat path [:cols (count cols)])]
+     (assoc-in db next-path "1fr"))))
+
+(reg-event-db
+ :grid/rem-row!
+ (fn [db [_]]
+   (let [path       (-> db :editor :selected :value-path)
+         rows-path  (vec (concat path [:rows]))
+         rows       (get-in db rows-path)
+         last-index (max 1 (dec (count rows)))]
+     (assoc-in db rows-path (dissoc rows last-index)))))
+
+(reg-event-db
+ :grid/add-row!
+ (fn [db [_]]
+   (let [path       (-> db :editor :selected :value-path)
+         rows-path  (vec (concat path [:rows]))
+         rows       (get-in db rows-path)
+         next-path  (concat path [:rows (count rows)])]
+     (assoc-in db next-path "100px")))) 
      
