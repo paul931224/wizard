@@ -11,44 +11,74 @@
 
 (def dnd-context (r/adapt-react-class DndContext))
 
-
-(defn draggable-body [component id]
-  (let [style {:max-height "90vh" :overflow :scroll}]
-    [:div {:on-click #(dispatch [:db/set [:editor :toolbar :active] id])
-           :style style}
-     component]))
-
-(defn draggable-header [listeners label]
+(defn resizeable-item [listeners label component id]
   (let [style {:style {:font-weight :bold
                        :padding "10px"
-                       :border-bottom "1px solid white"
+                       :cursor :resize                       
                        :margin-bottom "10px"}}]
-    [:div.toolbar-header (merge listeners style) label]))
+    [:div.resizeable-area 
+     (merge listeners style
+            {:on-click #(dispatch [:db/set [:editor :toolbar :active] id])})
+     component]))
 
+
+
+(defn resize-s []
+  [:div {:style {:position :absolute
+                 :width "100%"
+                 :background :red
+                 :height "5px"
+                 :cursor "s-resize"
+                 :bottom 0
+                 :left 0}}])
+
+(defn resize-n []
+  [:div {:style {:position :absolute
+                 :width "100%"
+                 :background :red
+                 :height "5px"
+                 :cursor "n-resize"
+                 :top 0
+                 :left 0}}])
+
+(defn resize-e []
+  [:div {:style {:position :absolute
+                 :width "5px"
+                 :background :red
+                  :height "100%"
+                 :cursor "e-resize"
+                 :bottom 0
+                 :right 0}}])                                  
+
+(defn resize-w []
+ [:div {:style {:position :absolute
+                :width "5px"
+                :background :red 
+                :height "100%"
+                :cursor "w-resize"
+                :bottom 0}}])
 
 (defn draggable [props]
   (let [id                    (:id props)
         label                 (:label props)
         component             (:component props)
-        dragged-id            (subscribe [:db/get [:editor :toolbar  :dragged]])
-        active-id             (subscribe [:db/get [:editor :toolbar  :active]])
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
         {:keys [attributes
                 listeners
-                setNodeRef
-                transform]}   use-draggable
-        moved-style           (subscribe [:db/get [:editor :toolbars id]])
-        style                 (fn [] @moved-style)
-        dragged?               (fn [] (= @dragged-id id))
-        active?               (fn [] (= @active-id id))]
-    [:div (merge {:class ["toolbar"
-                          (if (dragged?) "dragged" nil)
-                          (if (active?)  "active" nil)]
-                  :ref (js->clj setNodeRef)
-                  :style (style)}
+                setNodeRef]}  use-draggable]
+       
+       
+    [:div (merge {:style {:position :relative}
+                  :class ["area"]                          
+                  :ref (js->clj setNodeRef)}                 
                  attributes)
-     [draggable-header listeners label]
-     [draggable-body   component id]]))
+     [resizeable-item listeners label component id]
+     [resize-w]
+     [resize-e]
+     [resize-n]
+     [resize-s]]))
+     
+     
 
 
 

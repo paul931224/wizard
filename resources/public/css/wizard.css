@@ -125,7 +125,11 @@ button {
      transition: 0.2s ease-out;
      transform: scale(1);
 }
-
+.resizeable-area {
+    background: rgb(255, 223, 39);
+    color: #333;
+    position: relative;
+}
 
 
 
