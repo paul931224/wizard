@@ -8,9 +8,8 @@
   ["react" :as react]
   ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
   ["@dnd-kit/utilities" :refer [CSS]]
-  ["@dnd-kit/modifiers" :refer [restrictToWindowEdges]]))
-
-
+  ["@dnd-kit/modifiers" :refer [restrictToWindowEdges]]
+  [wizard.utils :as utils]))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -18,12 +17,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def dnd-context (r/adapt-react-class DndContext))
-
-(defn to-clj-map [hash-map]
-  (js->clj hash-map :keywordize-keys true))
-
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Window types
@@ -68,7 +61,7 @@
        component             (:component props)
        dragged-id            (subscribe [:db/get [:editor :toolbar  :dragged]])
        active-id             (subscribe [:db/get [:editor :toolbar  :active]])
-       use-draggable         (to-clj-map (useDraggable (clj->js {:id id})))
+       use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
        {:keys [attributes 
                listeners
                setNodeRef  
@@ -89,19 +82,19 @@
 
 
 (defn handle-drag-start [event] 
-   (let [{:keys [active over]} (to-clj-map event)
+   (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)] 
        (dispatch [:db/set [:editor :toolbar  :dragged] id])))
                                   
 
 (defn handle-drag-end [event] 
-  (let [{:keys [active over]} (to-clj-map event)
+  (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)] 
     (dispatch [:db/set [:editor :toolbar  :dragged] nil])
     (dispatch [:db/set [:editor :toolbar  :active] id])))
 
 (defn handle-drag-move [event]
-  (let [{:keys [active over]} (to-clj-map event)
+  (let [{:keys [active over]} (utils/to-clj-map event)
         id      (:id active)
         new-pos (-> active :rect :current :translated)
         top-and-left (select-keys new-pos [:top :left])]
@@ -119,6 +112,7 @@
  [:div#toolbars {:style {:position :fixed 
                          :top 0
                          :z-index 100}} 
+
   [dnd-context {:onDragStart   handle-drag-start
                 :onDragMove    handle-drag-move
                 :onDragEnd     handle-drag-end
