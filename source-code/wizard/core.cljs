@@ -14,7 +14,8 @@
     [wizard.overlays.order       :as order]
     [wizard.overlays.grid        :as grid]
     [wizard.overlays.menu        :as menu]
-    [wizard.breadcrumb.view      :as breadcrumb]))
+    [wizard.breadcrumb.view      :as breadcrumb]
+    [wizard.resizeable.view      :as resizeable]))
     
 
 (def color-one "#EEE")
@@ -194,10 +195,15 @@
         [with-z-index 2 [menu/view]]
         [with-z-index 1 [page-wrapper  
                             [:<> 
-                             [with-z-index 1 [editor/view]]]]]
+                             [with-z-index 1 
+                              [:<> 
+                               [editor/view]
+                               [resizeable/view]]]]]]
                              
                              
         [with-z-index 3 [toolbars/view]]])
+       
+        
 
 (defn view []
   (reagent/create-class
@@ -218,6 +224,7 @@
             [area/view      @(subscribe [:db/get [:editor]])]
             [grid/view      @(subscribe [:db/get [:editor]])]
             [order/view     @(subscribe [:db/get [:editor]])]]]))}))
+            
             
        
          

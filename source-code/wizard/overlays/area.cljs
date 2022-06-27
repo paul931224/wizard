@@ -53,8 +53,7 @@
                    :color "#DDD"
                    :height "100%"
                    :width "100%"
-                   :position :relative}}
-                    
+                   :position :relative}}                    
        [:div {:style {:background "#333"
                       :height "30px"
                       :width "30px"
@@ -63,6 +62,7 @@
                       :align-items :center
                       :border-radius "15px"}}
         (str item)]])
+
 
 (defn area-item [item]
   (let [letter  (fn [] (utils/number-to-letter (:position (second item))))
