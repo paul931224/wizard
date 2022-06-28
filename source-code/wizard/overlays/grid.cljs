@@ -134,17 +134,17 @@
                                 
   (if (= :grid @overlay)
    [overlay-wrapper/view 
-    [:div#grid-overlay
-       {:style {:height "100%"
-                :width "100%"   
-                :position :absolute
-                :left 0
-                :backdrop-filter "blur(3px)"
-                :pointer-events :auto
-                :z-index 2}}                                      
-       [grid/grid-wrapper
-            (map-indexed (fn [index item] [grid-item index (grid-data)])
-                         (items))
-            (vector 
-                   (last (value-path)) 
-                   @(subscribe [:db/get (value-path)]))]]])))
+      [:div#grid-overlay
+         {:style {:height "100%"
+                  :width "100%"   
+                  :position :absolute
+                  :left 0
+                  :backdrop-filter "blur(3px)"
+                  :pointer-events :auto
+                  :z-index 2}}                                      
+         [grid/grid-wrapper
+              (map-indexed (fn [index item] [grid-item index (grid-data)])
+                           (items))
+              (vector 
+                     (last (value-path)) 
+                     @(subscribe [:db/get (value-path)]))]]])))

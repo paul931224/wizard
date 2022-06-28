@@ -51,7 +51,7 @@
         cols             (:cols     value)
         areas            (:areas    value)]                
     [:div   
-     [:div (str areas)]
+     [:div (map (fn [area] [:div (str area)]) areas)]
      [:div.grid
         {:id    (str "grid-" the-key)
          :style {:display :grid

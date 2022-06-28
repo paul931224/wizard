@@ -14,7 +14,7 @@
   (let [bounding-rect (get-bounding-client-rect element)]
     (if bounding-rect
      {:top            (.-top     bounding-rect)
-      ;:bottom         (.-bottom  bounding-rect)
+      :bottom         (.-bottom  bounding-rect)
       :width          (.-width   bounding-rect)
       :height         (.-height  bounding-rect)
       :left           (.-left    bounding-rect)
