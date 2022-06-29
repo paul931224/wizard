@@ -14,8 +14,7 @@
     [wizard.overlays.order       :as order]
     [wizard.overlays.grid        :as grid]
     [wizard.overlays.menu        :as menu]
-    [wizard.breadcrumb.view      :as breadcrumb]
-    [wizard.resizeable.view      :as resizeable]))
+    [wizard.breadcrumb.view      :as breadcrumb]))  
     
 
 (def color-one "#EEE")
@@ -196,11 +195,7 @@
         [with-z-index 1 [page-wrapper  
                             [:<> 
                              [with-z-index 1 
-                              [:<> 
-                               [editor/view]
-                               [resizeable/view]]]]]]
-                             
-                             
+                              [editor/view]]]]]                   
         [with-z-index 3 [toolbars/view]]])
        
         
