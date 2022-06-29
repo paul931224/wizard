@@ -28,7 +28,7 @@
             area-top    (:top    (second area))
             area-bottom (:bottom (second area))
             area-left   (:left   (second area))
-            area-right  (:right  (second area))]
+            area-right  (:right  (second area))]        
          (or (and (>= this-bottom area-top)
                   (<= this-top    area-bottom))
             (and  (>= this-left   area-right)
@@ -45,9 +45,9 @@
                        :cursor :resize
                        :height "100%"}}
         set-overlapping-areas (fn [e]
-                                (.log js/console (mapv first (get-overlapping-areas
-                                                              (dom-utils/get-rect-data @ref)
-                                                              @area-dropzones)))
+                                (.log js/console (str (mapv first (get-overlapping-areas
+                                                                   (dom-utils/get-rect-data @ref)
+                                                                   @area-dropzones))))
                                 (dispatch [:db/set [:overlapping-areas]
                                            (get-overlapping-areas
                                             (dom-utils/get-rect-data @ref)
@@ -62,38 +62,6 @@
                {:ref (fn [e] (reset! ref e))
                 :on-click #(dispatch [:db/set [:editor :toolbar :active] id])})
         component])})))
-
-
-
-
-(defn drop-zone [{:keys [id component]}]
-  (let [ref (r/atom nil)]
-     (r/create-class
-      {:component-did-mount  (fn [e] (dispatch [:db/set [:area-dropzones id] (dom-utils/get-rect-data @ref)]))
-       :component-did-update (fn [e] (dispatch [:db/set [:area-dropzones id] (dom-utils/get-rect-data @ref)]))
-       :reagent-render
-       (fn [props]
-         [:div {:ref (fn [e] (reset! ref e))}
-
-          component])})))
-
-(defn draggable [props]
-  (let [id                    (:id props)       
-        component             (:component props)
-        use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
-        {:keys [attributes
-                listeners
-                setNodeRef]}  use-draggable]
-
-
-    [:div (merge {:style {:position :absolute
-                          :height (str (:height @resize-atom) "px")
-                          :width  (str (:width  @resize-atom)  "px")}
-                  :class ["area"]
-                  :ref (js->clj setNodeRef)}
-                 attributes
-                 listeners)
-     [resizeable-item @resize-atom component id]]))
 
 
 (defn handle-drag-start [event]
@@ -130,8 +98,28 @@
 
 
 
-(defn area [config]
-  [:f> draggable config])
+(defn resizeable-area-inner [props]
+  (let [id                    (:id props)
+        component             (:component props)
+        use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
+        {:keys [attributes
+                listeners
+                setNodeRef]}  use-draggable]
+
+
+    [:div (merge {:style {:position :relative
+                          ;:height (str (:height @resize-atom) "px")
+                          ;:width  (str (:width  @resize-atom)  "px")
+                          :width "100%"
+                          :grid-area (utils/number-to-letter (:position (second id)))}
+                  :class ["area"]
+                  :ref (js->clj setNodeRef)}
+                 attributes
+                 listeners)
+     [resizeable-item @resize-atom component id]]))
+
+(defn resizeable-area [config]
+  [:f> resizeable-area-inner config])
 
 
 
@@ -165,11 +153,13 @@
             :width  "5px"}}])
 
 
+;;
+;; UTILS
+;;
+
 (defn generate-abc-matrix [how-many]
  (let [numbers (range how-many)]
   (vec (map utils/number-to-letter numbers))))
-
-
 
 (defn randomize-rgb [a]
   (let [value-range (range 256)
@@ -184,53 +174,39 @@
  (mapv randomize-rgb (range 26)))
 
 
+;;
+;; GRID LAYER
+;;
+
+(defn grid-item-drop-zone [{:keys [id component]}]
+  (let [ref (r/atom nil)]
+    (r/create-class
+     {:component-did-mount  (fn [e] (dispatch [:db/set [:area-dropzones id] (dom-utils/get-rect-data @ref)]))
+      :component-did-update (fn [e] (dispatch [:db/set [:area-dropzones id] (dom-utils/get-rect-data @ref)]))
+      :reagent-render
+      (fn [props]
+        [:div {:ref (fn [e] (reset! ref e))}
+
+         component])})))
+
 (defn grid-item [index item]
- [:div {:style    {:background "rgba(0,0,0,0.3)"
+  [:div {:style    {:background "rgba(0,0,0,0.3)"
+                    :display :flex
+                    :justify-content :center
+                    :align-items :center
+                    :color "#DDD"
+                    :height "100%"
+                    :width "100%"
+                    :position :relative}}
+    [:div {:style {:background "#333"
+                   :height "30px"
+                   :width "30px"
                    :display :flex
                    :justify-content :center
                    :align-items :center
-                   :color "#DDD"
-                   :height "100%"
-                   :width "100%"
-                   :position :relative}}                    
-       [:div {:style {:background "#333"
-                      :height "30px"
-                      :width "30px"
-                      :display :flex 
-                      :justify-content :center
-                      :align-items :center
-                      :border-radius "15px"}}
-        (str item)]])
+                   :border-radius "15px"}}
+     (str item)]])
 
-
-(defn area-item [item]
-  (let [letter  (fn [] (utils/number-to-letter (:position (second item))))
-        active  (fn [] @(subscribe [:db/get [:overlay :active]])) 
-        active? (fn [] (= (letter) (active)))]
-   [:div {:on-click (fn [e] (dispatch [:db/set [:overlay :active] (letter)]))
-          :style    {:background (get random-colors (:position (second item)))
-                     :display :flex
-                     :justify-content :center
-                     :align-items :center
-                     :color "#DDD"
-                     :height "100%"
-                     :width "100%"
-                     :border (if (active?) "1px solid black" nil)
-                     :position :relative
-                     :grid-area (letter)}}
-       [:div {:style {:background "#333"
-                      :height "30px"
-                      :width "30px"
-                      :display :flex 
-                      :justify-content :center
-                      :align-items :center
-                      :border-radius "15px"}}
-        (str (letter))]
-       (if (active?) 
-         [:<> 
-          [expand-horizontal-indicator]
-          [expand-vertical-indicator]])]))
-   
 (defn grid-layer [value-path all-area-cells]
  [overlay-wrapper/view
   [:div#area-overlay
@@ -242,11 +218,43 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index item] [drop-zone {:id index :component [grid-item index item]}])
+    (map-indexed (fn [index item] [grid-item-drop-zone {:id index :component [grid-item index item]}])
                  all-area-cells)
     (vector
      (last value-path)
      @(subscribe [:db/get value-path]))]]])
+
+;;
+;; AREA LAYER
+;;
+
+(defn area-item [item]
+  (let [letter  (fn [] (utils/number-to-letter (:position (second item))))
+        active  (fn [] @(subscribe [:db/get [:overlay :active]]))
+        active? (fn [] (= (letter) (active)))]
+    [:div {:on-click (fn [e] (dispatch [:db/set [:overlay :active] (letter)]))
+           :style    {:background (get random-colors (:position (second item)))
+                      :display :flex
+                      :justify-content :center
+                      :align-items :center
+                      :color "#DDD"
+                      :height "100%"
+                      :width "100%"
+                      :border (if (active?) "1px solid black" nil)
+                      :position :relative
+                      :grid-area (letter)}}
+      [:div {:style {:background "#333"
+                     :height "30px"
+                     :width "30px"
+                     :display :flex
+                     :justify-content :center
+                     :align-items :center
+                     :border-radius "15px"}}
+       (str (letter))]
+      (if (active?)
+       [:<>
+        [expand-horizontal-indicator]
+        [expand-vertical-indicator]])]))
 
 (defn area-layer [value-path components grid-data]
  [overlay-wrapper/view
@@ -259,12 +267,15 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index item] [area {:id item
-                                         :component [area-item item grid-data]}])
+    (map-indexed (fn [index item] [area-item])
                  components)
     (vector
      (last value-path)
      @(subscribe [:db/get value-path]))]]])
+
+;;
+;; SUMMARY
+;;
 
 (defn view []
   (let [overlay (subscribe [:db/get [:editor :overlay :type]])
