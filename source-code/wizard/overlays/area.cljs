@@ -36,7 +36,7 @@
     areas)))
 
 
-(defn resizeable-item [resize-data label component id]
+(defn resizeable-item [resize-data component id]
   (let [ref (atom nil)
         area-dropzones  (subscribe [:db/get [:area-dropzones]])
         areas-overlapped (atom [])
@@ -45,9 +45,9 @@
                        :cursor :resize
                        :height "100%"}}
         set-overlapping-areas (fn [e]
-                                (.log js/console (get-overlapping-areas
-                                                  (dom-utils/get-rect-data @ref)
-                                                  @area-dropzones))
+                                (.log js/console (mapv first (get-overlapping-areas
+                                                              (dom-utils/get-rect-data @ref)
+                                                              @area-dropzones)))
                                 (dispatch [:db/set [:overlapping-areas]
                                            (get-overlapping-areas
                                             (dom-utils/get-rect-data @ref)
@@ -56,13 +56,12 @@
      {:component-did-mount  set-overlapping-areas
       :component-did-update set-overlapping-areas
       :reagent-render
-      (fn [resize-data label component id]
+      (fn [resize-data component id]
        [:div.resizeable-area
         (merge style
                {:ref (fn [e] (reset! ref e))
                 :on-click #(dispatch [:db/set [:editor :toolbar :active] id])})
-        [:div {:style {:padding "10px"}}
-         component]])})))
+        component])})))
 
 
 
@@ -79,8 +78,7 @@
           component])})))
 
 (defn draggable [props]
-  (let [id                    (:id props)
-        label                 (:label props)
+  (let [id                    (:id props)       
         component             (:component props)
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
         {:keys [attributes
@@ -95,7 +93,7 @@
                   :ref (js->clj setNodeRef)}
                  attributes
                  listeners)
-     [resizeable-item @resize-atom label component id]]))
+     [resizeable-item @resize-atom component id]]))
 
 
 (defn handle-drag-start [event]
@@ -134,31 +132,6 @@
 
 (defn area [config]
   [:f> draggable config])
-
-(defn one-area []
-  [:div
-   "Look at me MeeSeeks"])
-
-(defn areas-view []
-  [:div {:style {:position :relative}}
-   [:div#areas {:style {:position :fixed
-                        :top 0
-                        :z-index 100}}
-
-     [dnd-context {:onDragStart   handle-drag-start
-                   :onDragMove     handle-drag-move
-                   :onDragEnd      handle-drag-end}
-                   ;:modifiers      [restrictToWindowEdges]}
-      [area {:id "a"
-             :component [one-area]
-             :label     "Area a"}]
-      [:div {:style {:height "200px"}}]
-      [drop-zone {:id "area-b"}]
-      [drop-zone {:id "area-c"}]]]])
-
-
-
-
 
 
 
@@ -286,7 +259,8 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index item] [area-item item grid-data])
+    (map-indexed (fn [index item] [area {:id item
+                                         :component [area-item item grid-data]}])
                  components)
     (vector
      (last value-path)
@@ -307,10 +281,7 @@
       [dnd-context {:onDragStart   handle-drag-start
                     :onDragMove     handle-drag-move
                     :onDragEnd      handle-drag-end}
-                    ;:modifiers      [restrictToWindowEdges]}[:<>         
-        [area {:id "a"}
-             :component [one-area]
-             :label     "Area a"]
-        [grid-layer (value-path) (all-area-cells)]])))
-        ;[area-layer (value-path) (components) (grid-data)]])))
+                    ;:modifiers      [restrictToWindowEdges]}[:<>                 
+        [grid-layer (value-path) (all-area-cells)]
+        [area-layer (value-path) (components) (grid-data)]])))
         

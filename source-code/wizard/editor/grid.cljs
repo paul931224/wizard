@@ -50,9 +50,7 @@
         rows             (:rows     value)
         cols             (:cols     value)
         areas            (:areas    value)]                
-    [:div   
-     [:div (map (fn [area] [:div (str area)]) areas)]
-     [:div.grid
+    [:div.grid
         {:id    (str "grid-" the-key)
          :style {:display :grid
                  :grid-template-columns (map->grid-template cols)
@@ -62,7 +60,7 @@
                  :grid-template-areas (areas->grid-areas-template areas)
                  ;:background :black               
                  :gap "2px"}}     
-        content]])))  
+        content])))  
 
 
 
