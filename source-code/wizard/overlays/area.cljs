@@ -98,8 +98,6 @@
             :height "10px"
             :width  "5px"}}])
 
-
-
 ;;
 ;; GRID LAYER
 ;;
@@ -154,43 +152,27 @@
 ;; AREA LAYER
 ;;
 
-(defn area-item [item]
+(defn area-item-letter [item]
   (let [letter  (fn [] (utils/number-to-letter (:position item)))
         active  (fn [] @(subscribe [:db/get [:overlay :active]]))
         active? (fn [] (= (letter) (active)))]
-    [:div {:on-click (fn [e] (dispatch [:db/set [:overlay :active] (letter)]))
-           :style    {:background (get utils/random-colors (:position (second item)))
-                      :display :flex
-                      :justify-content :center
-                      :align-items :center
-                      :color "#DDD"
-                      :height "100%"
-                      :width "100%"
-                      :border (if (active?) "1px solid black" nil)
-                      :position :relative
-                      :grid-area (letter)}}
-      [:div {:style {:background "#333"
-                     :height "30px"
-                     :width "30px"
-                     :display :flex
-                     :justify-content :center
-                     :align-items :center
-                     :border-radius "15px"}}
-       (str (letter))]
-      (if (active?)
-       [:<>
-        [expand-horizontal-indicator]
-        [expand-vertical-indicator]])]))
+    [:div {:style {:background "#333"
+                   :height "30px"
+                   :width "30px"
+                   :display :flex
+                   :justify-content :center
+                   :align-items :center
+                   :border-radius "15px"}}
+       (str (letter))
+       (if (active?)
+        [:<>
+         [expand-horizontal-indicator]
+         [expand-vertical-indicator]])]))
 
-(defn resizeable-item [resize-data position id]
+(defn area-item-inner [resize-data position id]
   (let [ref (atom nil)
         area-dropzones  (subscribe [:db/get [:area-dropzones]])
-        areas-overlapped (atom [])
-        style {:style {:font-weight :bold
-                       :cursor :resize
-                       :background (rand-nth utils/random-colors)
-                       :width "100%"
-                       :height "100%"}}
+        
         set-overlapping-areas (fn [e]
                                 (dispatch [:db/set [:overlapping-areas]
                                            (get-overlapping-areas
@@ -201,32 +183,33 @@
       :component-did-update set-overlapping-areas
       :reagent-render
       (fn [resize-data component id]
-        [:div.resizeable-area
-         (merge style
-                {:ref (fn [e] (reset! ref e))
-                 :on-click #(dispatch [:db/set [:editor :toolbar :active] id])})
-         [area-item component]])})))
+        [:div
+         {:ref (fn [e] (reset! ref e))
+          :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
+         [area-item-letter component]])})))
 
-(defn resizeable-area-inner [props]
+(defn area-item [props]
   (let [id                    (:id props)
         component             (:component props)
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
         {:keys [attributes
                 listeners
+                transform
                 setNodeRef]}  use-draggable]
     [:div (merge {:style {:position :relative
-                          ;:height (str (:height @resize-atom) "px")
-                          ;:width  (str (:width  @resize-atom)  "px")
-                          :width "100%"
+                          :background :red
+                          :height (str (:height @resize-atom) "px")
+                          :width  (str (:width  @resize-atom)  "px") 
+                          :transform (.toString (.-Transform CSS) (clj->js transform))                         
                           :grid-area (utils/number-to-letter (:position component))}
                   :class ["area"]
                   :ref (js->clj setNodeRef)}
                  attributes
                  listeners)
-     [resizeable-item @resize-atom component id]]))
+     [area-item-inner @resize-atom component id]]))
 
-(defn resizeable-area [config]
-  [:f> resizeable-area-inner config])
+(defn area-item-function [config]
+  [:f> area-item config])
 
 (defn area-layer [value-path components grid-data]
  [overlay-wrapper/view
@@ -239,8 +222,8 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index [item-key item-value]] [resizeable-area {:id        item-key
-                                                                     :component item-value}])
+    (map-indexed (fn [index [item-key item-value]] [area-item-function {:id        item-key
+                                                                        :component item-value}])
                  components)
     (vector
      (last value-path)
