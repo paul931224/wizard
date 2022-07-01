@@ -197,9 +197,9 @@
                 transform
                 setNodeRef]}  use-draggable]
     [:div (merge {:style {:position :relative
-                          :background :red
-                          :height (str (:height @resize-atom) "px")
-                          :width  (str (:width  @resize-atom)  "px") 
+                          :background (rand-nth utils/random-colors)
+                          :height "100%"
+                          :width  "100%"
                           :transform (.toString (.-Transform CSS) (clj->js transform))                         
                           :grid-area (utils/number-to-letter (:position component))}
                   :class ["area"]

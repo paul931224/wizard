@@ -39,4 +39,4 @@
     (str "rgba(" rgba-code ")")))
 
 (def random-colors
-  (mapv randomize-rgb (range 26)))
+  (mapv randomize-rgb (range 1000)))
