@@ -24,6 +24,7 @@
             ["@dnd-kit/utilities" :refer [CSS]]
             [wizard.utils :as utils]))
 
+
 (def dnd-context (r/adapt-react-class DndContext))
 (def sortable-context (r/adapt-react-class SortableContext))
 (def drag-overlay   (r/adapt-react-class DragOverlay))
@@ -38,19 +39,12 @@
    :position :relative
    :width "100%"})
    
-
-
-
-
 (defn sortable-item [props]
   (let [item            (:item props)
         id              (:id item)
-        type            (:type item)
-        component-data  (:component-data props)
         path            (:path props)
         position        (:position props)        
-        new-path        (vec (concat path [id]))
-        {:keys [attributes listeners setNodeRef transform transition]}
+        {:keys [attributes listeners setNodeRef transform transition]} 
         (utils/to-clj-map (useSortable (clj->js {:id (str id)})))]
     [:div (merge {:id    (str id)
                   :ref   (js->clj setNodeRef)
@@ -60,21 +54,9 @@
                  attributes
                  listeners)
      [:div {:style {:background "rgba(0,0,255,0.3)"
-                    :display :flex 
-                    :justify-content :center 
-                    :align-items :center
-                    :color "#DDD" 
                     :height "100%"
-                    :width "100%"
-                    :position :relative}} 
-      [:div {:style {:background "#333"
-                     :height "30px"
-                     :width "30px"
-                     :display :flex 
-                     :justify-content :center
-                     :align-items :center
-                     :border-radius "15px"}}                
-       (inc position)]]]))
+                    :width "100%"}}
+      (inc position)]]))
     
        
         

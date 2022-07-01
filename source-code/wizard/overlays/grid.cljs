@@ -4,6 +4,7 @@
              [wizard.editor.grid :as grid]
              [wizard.utils :as utils]))
             
+            
 
 
 (defn row-indicator? [col-count index]
@@ -111,15 +112,15 @@
                   :justify-content :center
                   :align-items :center
                   :border-radius "15px"}}
-    index]
-   (if (col-indicator? col-count index)
-    [col-indicator])
-   (if (row-indicator? col-count index)
-     [row-indicator])
-   (if (= add-col-index index)
-    [modify-col])
-   (if (= add-row-index index)
-    [modify-row])]))
+    index
+    (if (col-indicator? col-count index)
+     [col-indicator])
+    (if (row-indicator? col-count index)
+      [row-indicator])
+    (if (= add-col-index index)
+     [modify-col])
+    (if (= add-row-index index)
+     [modify-row])]]))
 
   
 
@@ -143,9 +144,9 @@
                   :backdrop-filter "blur(3px)"
                   :pointer-events :auto
                   :z-index 2}}                                      
-         [grid/grid-wrapper
-              (map-indexed (fn [index item] [grid-item index (grid-data)])
-                           (items))
-              (vector 
-                     (last (value-path)) 
-                     @(subscribe [:db/get (value-path)]))]]])))
+       [grid/grid-wrapper
+            (map-indexed (fn [index item] [grid-item index (grid-data)])
+                         (items))
+            (vector 
+                   (last (value-path)) 
+                   @(subscribe [:db/get (value-path)]))]]])))
