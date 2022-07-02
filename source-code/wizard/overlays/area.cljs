@@ -27,18 +27,22 @@
   (vec
    (filter
     (fn [area]
-      (let [this-top    (:top    this-area)
+      (let [this-width  (:width    this-area)
+            this-height (:height this-area)
+            this-top    (:top    this-area)
             this-bottom (:bottom this-area)
             this-left   (:left   this-area)
             this-right  (:right  this-area)
+            area-width   (:width  (second area))
+            area-height  (:height  (second area))
             area-top    (:top    (second area))
             area-bottom (:bottom (second area))
             area-left   (:left   (second area))
-            area-right  (:right  (second area))]        
-         (or (and (>= this-bottom area-top)
-                  (<= this-top    area-bottom))
-            (and  (>= this-left   area-right)
-                  (<= this-right  area-left)))))
+            area-right  (:right  (second area))]                
+         (and  (< this-bottom (+ area-bottom area-height))
+               (< this-top    (+ area-top    area-height))
+               (< this-left   (+ area-left   area-width))
+               (< this-right  (+ area-right  area-width)))))
     areas)))
 
 
@@ -177,7 +181,6 @@
           overlapping-areas (get-overlapping-areas
                              (dom-utils/get-rect-data @ref)
                              @area-dropzones)]
-      (.log js/console (str position (mapv first overlapping-areas)))      
       (dispatch [:db/set [:overlapping-areas] overlapping-areas]))))
 
 (defn area-item-inner [resize-data component id]
@@ -230,7 +233,7 @@
    [grid/grid-wrapper
     (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        item-key
                                                                    :component item-value}])
-                 components)
+                 (vector (first components)))
     (vector
      (last value-path)
      @(subscribe [:db/get value-path]))]]])
