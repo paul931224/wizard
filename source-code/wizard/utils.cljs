@@ -47,7 +47,7 @@
  [:div (str tree)])
  
 (defn state-viewer--map-display-item [recur-fn the-key sub-tree]
- (let [open? (r/atom false)] 
+ (let [open? (r/atom true)] 
    (fn [recur-fn the-key sub-stree] 
     [:div {:style {:display :flex}} 
          [:div {:style {:cursor :pointer}
@@ -58,18 +58,17 @@
             [recur-fn sub-tree]])])))
 
 (defn state-viewer--map-display [recur-fn tree]
-  (fn [recur-fn tree] 
-     [:div {:style {:border-left "2px solid #881616"}}
+  [:div {:style {:border-left "2px solid #881616"}}
       (map (fn [[the-key sub-tree]] 
              [state-viewer--map-display-item recur-fn the-key sub-tree])    
-           tree)]))
+           tree)])
 
 (defn state-viewer--recursion [tree]
- (cond 
-   (vector? tree) [state-viewer--vector-display state-viewer--recursion tree]
-   (map? tree)    [state-viewer--map-display    state-viewer--recursion tree]
-   :else          [:div (str tree)])) 
+ [:div (do (cond 
+             (vector? tree) ^{:key (str (random-uuid))}[state-viewer--vector-display state-viewer--recursion tree]
+             (map? tree)    ^{:key (str (random-uuid))}[state-viewer--map-display    state-viewer--recursion tree]
+             :else          ^{:key (str (random-uuid))}[:div (str tree)]))]) 
 
 (defn state-viewer []
  (let [state (subscribe [:db/get []])] 
-  [state-viewer--recursion @state]))  
+  [state-viewer--recursion (dissoc @state :all-guilds)]))  
