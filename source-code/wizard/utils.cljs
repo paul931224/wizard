@@ -1,4 +1,6 @@
-(ns wizard.utils)
+(ns wizard.utils
+ (:require  [re-frame.core :refer [dispatch subscribe]]
+            [reagent.core :as r]))
 
 
 (defn to-clj-map [hash-map]
@@ -40,3 +42,34 @@
 
 (def random-colors
   (mapv randomize-rgb (range 1000)))
+
+(defn state-viewer--vector-display [recur-fn tree]
+ [:div (str tree)])
+ 
+(defn state-viewer--map-display-item [recur-fn the-key sub-tree]
+ (let [open? (r/atom false)] 
+   (fn [recur-fn the-key sub-stree] 
+    [:div {:style {:display :flex}} 
+         [:div {:style {:cursor :pointer}
+                :on-click (fn [e] (reset! open? (not @open?)))} (str the-key)]              
+         (if @open? 
+          [:div {:style {:margin-left "10px"}}
+            [:div {:style {:height "20px"}}] 
+            [recur-fn sub-tree]])])))
+
+(defn state-viewer--map-display [recur-fn tree]
+  (fn [recur-fn tree] 
+     [:div {:style {:border-left "2px solid #881616"}}
+      (map (fn [[the-key sub-tree]] 
+             [state-viewer--map-display-item recur-fn the-key sub-tree])    
+           tree)]))
+
+(defn state-viewer--recursion [tree]
+ (cond 
+   (vector? tree) [state-viewer--vector-display state-viewer--recursion tree]
+   (map? tree)    [state-viewer--map-display    state-viewer--recursion tree]
+   :else          [:div (str tree)])) 
+
+(defn state-viewer []
+ (let [state (subscribe [:db/get []])] 
+  [state-viewer--recursion @state]))  

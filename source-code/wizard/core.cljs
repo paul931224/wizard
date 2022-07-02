@@ -14,7 +14,8 @@
     [wizard.overlays.order       :as order]
     [wizard.overlays.grid        :as grid]
     [wizard.overlays.menu        :as menu]
-    [wizard.breadcrumb.view      :as breadcrumb]))  
+    [wizard.breadcrumb.view      :as breadcrumb]
+    [wizard.utils                :as utils]))  
     
 
 (def color-one "#EEE")
@@ -208,17 +209,19 @@
      :reagent-render 
      (fn [] 
        (let [guild-selected (subscribe [:db/get [:guild-selected]])] 
-         [main-content-wrapper
-          [:<> 
-            [:div {:style {:flex-grow 1}}
-             (if @guild-selected
-               [hero-title]
-               [the-editor])
-             (identity [modal])] 
-            [selection/view @(subscribe [:db/get [:editor]])]
-            [area/view      @(subscribe [:db/get [:editor]])]
-            [grid/view      @(subscribe [:db/get [:editor]])]
-            [order/view     @(subscribe [:db/get [:editor]])]]]))}))
+         [:div 
+          [utils/state-viewer]
+          [main-content-wrapper
+           [:<> 
+             [:div {:style {:flex-grow 1}}
+              (if @guild-selected
+                [hero-title]
+                [the-editor])
+              (identity [modal])] 
+             [selection/view @(subscribe [:db/get [:editor]])]
+             [area/view      @(subscribe [:db/get [:editor]])]
+             [grid/view      @(subscribe [:db/get [:editor]])]
+             [order/view     @(subscribe [:db/get [:editor]])]]]]))}))
             
             
        

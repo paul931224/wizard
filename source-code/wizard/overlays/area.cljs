@@ -152,64 +152,70 @@
 ;; AREA LAYER
 ;;
 
-(defn area-item-letter [item]
-  (let [letter  (fn [] (utils/number-to-letter (:position item)))
-        active  (fn [] @(subscribe [:db/get [:overlay :active]]))
-        active? (fn [] (= (letter) (active)))]
-    [:div {:style {:background "#333"
+(def letter-style {:background "#333"
                    :height "30px"
                    :width "30px"
                    :display :flex
                    :justify-content :center
                    :align-items :center
-                   :border-radius "15px"}}
+                   :border-radius "15px"})
+
+(defn area-item-letter [item]
+  (let [letter  (fn [] (utils/number-to-letter (:position item)))
+        active  (fn [] @(subscribe [:db/get [:overlay :active]]))
+        active? (fn [] (= (letter) (active)))]
+    [:div {:style letter-style}
        (str (letter))
        (if (active?)
         [:<>
          [expand-horizontal-indicator]
          [expand-vertical-indicator]])]))
 
-(defn area-item-inner [resize-data position id]
-  (let [ref (atom nil)
-        area-dropzones  (subscribe [:db/get [:area-dropzones]])
-        
-        set-overlapping-areas (fn [e]
-                                (dispatch [:db/set [:overlapping-areas]
-                                           (get-overlapping-areas
-                                            (dom-utils/get-rect-data @ref)
-                                            @area-dropzones)]))]
+(defn set-overlapping-areas-func [position ref]
+  (fn [e] 
+    (let [area-dropzones    (subscribe [:db/get [:area-dropzones]])
+          overlapping-areas (get-overlapping-areas
+                             (dom-utils/get-rect-data @ref)
+                             @area-dropzones)]
+      (.log js/console (str position (mapv first overlapping-areas)))      
+      (dispatch [:db/set [:overlapping-areas] overlapping-areas]))))
+
+(defn area-item-inner [resize-data component id]
+  (let [ref (atom nil)       
+        position        (:position component)]   
     (r/create-class
-     {:component-did-mount  set-overlapping-areas
-      :component-did-update set-overlapping-areas
+     {:component-did-mount  (set-overlapping-areas-func position ref)
+      :component-did-update (set-overlapping-areas-func position ref)
       :reagent-render
       (fn [resize-data component id]
-        [:div
-         {:ref (fn [e] (reset! ref e))
-          :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
+        [:div {:ref (fn [e] (reset! ref e))
+               :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
          [area-item-letter component]])})))
+
+(defn draggable-area-style [transform position]
+  {:position :relative
+   :background (rand-nth utils/random-colors)
+   :height "100%"
+   :width  "100%"
+   :transform (.toString (.-Transform CSS) (clj->js transform))                         
+   :grid-area (utils/number-to-letter position)})
 
 (defn area-item [props]
   (let [id                    (:id props)
         component             (:component props)
+        position              (:position component)
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
         {:keys [attributes
                 listeners
                 transform
                 setNodeRef]}  use-draggable]
-    [:div (merge {:style {:position :relative
-                          :background (rand-nth utils/random-colors)
-                          :height "100%"
-                          :width  "100%"
-                          :transform (.toString (.-Transform CSS) (clj->js transform))                         
-                          :grid-area (utils/number-to-letter (:position component))}
+    [:div (merge {:style (draggable-area-style transform position) 
                   :class ["area"]
                   :ref (js->clj setNodeRef)}
                  attributes
                  listeners)
      [area-item-inner @resize-atom component id]]))
 
-(defn area-item-function [config]
-  [:f> area-item config])
 
 (defn area-layer [value-path components grid-data]
  [overlay-wrapper/view
@@ -222,8 +228,8 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index [item-key item-value]] [area-item-function {:id        item-key
-                                                                        :component item-value}])
+    (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        item-key
+                                                                   :component item-value}])
                  components)
     (vector
      (last value-path)
