@@ -27,22 +27,24 @@
   (vec
    (filter
     (fn [area]
-      (let [this-width  (:width    this-area)
-            this-height (:height this-area)
-            this-top    (:top    this-area)
-            this-bottom (:bottom this-area)
-            this-left   (:left   this-area)
-            this-right  (:right  this-area)
-            area-width   (:width  (second area))
-            area-height  (:height  (second area))
-            area-top    (:top    (second area))
-            area-bottom (:bottom (second area))
-            area-left   (:left   (second area))
-            area-right  (:right  (second area))]                
-         (and  (< this-bottom (+ area-bottom area-height))
-               (< this-top    (+ area-top    area-height))
-               (< this-left   (+ area-left   area-width))
-               (< this-right  (+ area-right  area-width)))))
+      (let [first-width  (:width  this-area)
+            first-height (:height this-area)
+            first-top    (:top    this-area)
+            first-left   (:left   this-area)
+            first-bottom (+ first-top  first-height)            
+            first-right  (+ first-left first-width)
+            second-width  (:width   (second area))
+            second-height (:height  (second area))
+            second-top    (:top     (second area))
+            second-left   (:left    (second area))
+            second-bottom (+ second-top  second-height)
+            second-right  (+ second-left second-width)]
+            
+         (println first-left ":" first-right " - " second-left " - " second-right)   
+         (cond 
+          (or (> first-left second-right)  (> second-left first-right)) false
+          (or (< first-top  second-bottom) (< second-top first-bottom)) false
+          :else area)))
     areas)))
 
 

@@ -72,5 +72,5 @@
 (defn state-viewer []
  (let [state (subscribe [:db/get []])] 
   [:div 
-   [state-viewer--recursion (dissoc @state :all-guilds)]
+   ;[state-viewer--recursion (dissoc @state :all-guilds)]
    (str (mapv first (:overlapping-areas @state)))]))
