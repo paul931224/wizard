@@ -41,10 +41,17 @@
              second-left   (:left    (second area))
              second-bottom (+ second-top  second-height)
              second-right  (+ second-left second-width)]
-            
+         (println
+           (> first-left  second-right) 
+           (> second-left first-right) 
+           (> first-top  second-bottom) 
+           (> second-top first-bottom) " " first-height)
+          
          (cond 
-          (or (> first-left second-right)  (> second-left first-right)) false
-          (or (> first-top  second-bottom) (> second-top first-bottom)) false
+          (> first-left  second-right)  false
+          (> second-left first-right)  false
+          (> first-top  second-bottom) false 
+          (> second-top first-bottom)  false
           :else true)))
      areas))))
 
@@ -182,17 +189,19 @@
                              (mapv 
                               (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
                               @area-dropzones))]
+      (.log js/console "I will set: "  (dom-utils/get-rect-data @ref))
       (dispatch [:db/set [:overlapping-areas] overlapping-areas]))))
 
 (defn area-item-inner [resize-data component id]
-  (let [ref (atom nil)       
+  (let [ref (r/atom nil)
         position        (:position component)]   
     (r/create-class
      {:component-did-mount  (set-overlapping-areas-func position ref)
       :component-did-update (set-overlapping-areas-func position ref)
       :reagent-render
       (fn [resize-data component id]
-        [:div {:ref (fn [e] (reset! ref e))
+        [:div {:ref (fn [a] (reset! ref a))
+               :style {:width "100%" :height "100%"}
                :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
          [area-item-letter component]])})))
 
