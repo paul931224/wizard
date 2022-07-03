@@ -25,27 +25,28 @@
 
 (defn get-overlapping-areas [this-area areas]
   (vec
-   (filter
-    (fn [area]
-      (let [first-width  (:width  this-area)
-            first-height (:height this-area)
-            first-top    (:top    this-area)
-            first-left   (:left   this-area)
-            first-bottom (+ first-top  first-height)            
-            first-right  (+ first-left first-width)
-            second-width  (:width   (second area))
-            second-height (:height  (second area))
-            second-top    (:top     (second area))
-            second-left   (:left    (second area))
-            second-bottom (+ second-top  second-height)
-            second-right  (+ second-left second-width)]
+   (map 
+    first
+    (filter
+     (fn [area]
+       (let [first-width  (:width  this-area)
+             first-height (:height this-area)
+             first-top    (:top    this-area)
+             first-left   (:left   this-area)
+             first-bottom (+ first-top  first-height)            
+             first-right  (+ first-left first-width)
+             second-width  (:width   (second area))
+             second-height (:height  (second area))
+             second-top    (:top     (second area))
+             second-left   (:left    (second area))
+             second-bottom (+ second-top  second-height)
+             second-right  (+ second-left second-width)]
             
-         (println first-left ":" first-right " - " second-left " - " second-right)   
          (cond 
           (or (> first-left second-right)  (> second-left first-right)) false
-          (or (< first-top  second-bottom) (< second-top first-bottom)) false
-          :else area)))
-    areas)))
+          (or (> first-top  second-bottom) (> second-top first-bottom)) false
+          :else true)))
+     areas))))
 
 
 (defn handle-drag-start [event]
@@ -110,13 +111,9 @@
 
 (defn grid-item-drop-zone [{:keys [id component]}]
   (let [ref (r/atom nil)]
-    (r/create-class
-     {:component-did-mount  (fn [e] (dispatch [:db/set [:area-dropzones id] (dom-utils/get-rect-data @ref)]))
-      :component-did-update (fn [e] (dispatch [:db/set [:area-dropzones id] (dom-utils/get-rect-data @ref)]))
-      :reagent-render
-      (fn [{:keys [id component]}]
-        [:div {:ref (fn [e] (reset! ref e))
-               :style {:background "rgba(0,0,0,0.3)"
+    (fn [{:keys [id component]}]
+        [:div {:ref (fn [e] (dispatch [:db/set [:area-dropzones id] e]))
+               :style {:background "red"
                        :display :flex
                        :justify-content :center
                        :align-items :center
@@ -124,7 +121,7 @@
                        :height "100%"
                        :width "100%"
                        :position :relative}}
-           component])})))
+           component])))
 
 
 (defn grid-item [index item]
@@ -182,7 +179,9 @@
     (let [area-dropzones    (subscribe [:db/get [:area-dropzones]])
           overlapping-areas (get-overlapping-areas
                              (dom-utils/get-rect-data @ref)
-                             @area-dropzones)]
+                             (mapv 
+                              (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
+                              @area-dropzones))]
       (dispatch [:db/set [:overlapping-areas] overlapping-areas]))))
 
 (defn area-item-inner [resize-data component id]
