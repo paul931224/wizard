@@ -40,13 +40,7 @@
              second-top    (:top     (second area))
              second-left   (:left    (second area))
              second-bottom (+ second-top  second-height)
-             second-right  (+ second-left second-width)]
-         (println
-           (> first-left  second-right) 
-           (> second-left first-right) 
-           (> first-top  second-bottom) 
-           (> second-top first-bottom) " " first-height)
-          
+             second-right  (+ second-left second-width)]      
          (cond 
           (> first-left  second-right)  false
           (> second-left first-right)  false
@@ -56,39 +50,43 @@
      areas))))
 
 
-(defn handle-drag-start [event]
-  (let [{:keys [active over]} (utils/to-clj-map event)
-        id      (:id active)]
-    (dispatch [:db/set [:editor :toolbar  :dragged] id])))
+(defn handle-drag-start [value-path]
+  (fn [event] 
+   (let [{:keys [active over]} (utils/to-clj-map event)
+         id      (:id active)]
+     (.log js/console (str "oi: " value-path " - " id))    
+     (dispatch [:db/set [:editor :toolbar  :dragged] id]))))
 
 
-(defn handle-drag-end [event]
-  (let [{:keys [active over]} (utils/to-clj-map event)
-        id      (:id active)]
-    (reset! resize-atom (dissoc @resize-atom :bottom :top :right :left))
-    (dispatch [:db/set [:area-editor :dragged] nil])
-    (dispatch [:db/set [:area-editor :active] id])))
+(defn handle-drag-end [value-path]
+  (fn [event] 
+    (let [{:keys [active over]} (utils/to-clj-map event)
+          id      (:id active)]
+      (reset! resize-atom (dissoc @resize-atom :bottom :top :right :left))
+      (dispatch [:db/set [:area-editor :dragged] nil])
+      (dispatch [:db/set [:area-editor :active] id]))))
 
 
-(defn handle-drag-move [event]
-  (let [{:keys [active over]} (utils/to-clj-map event)
-        id      (:id active)
-        new-pos (-> active :rect :current :translated)
+(defn handle-drag-move [value-path]
+  (fn [event]  
+   (let [{:keys [active over]} (utils/to-clj-map event)
+         id      (:id active)
+         new-pos (-> active :rect :current :translated)
 
-        old-directions (select-keys @resize-atom [:bottom :top
-                                                  :left   :right])
-        new-directions (select-keys new-pos [:bottom :top
-                                             :left   :right])
-        left-delta     (- (:left  old-directions) (:left  new-directions))
-        top-delta      (- (:top   old-directions) (:top   new-directions))]
+         old-directions (select-keys @resize-atom [:bottom :top
+                                                   :left   :right])
+         new-directions (select-keys new-pos [:bottom :top
+                                              :left   :right])
+         left-delta     (- (:left  old-directions) (:left  new-directions))
+         top-delta      (- (:top   old-directions) (:top   new-directions))]
 
-    (if (contains? old-directions :right)
-      (reset! resize-atom (merge @resize-atom
-                                 {:width  (- (:width @resize-atom) left-delta)
-                                  :height (- (:height @resize-atom) top-delta)
-                                  :top    (- (:top  @resize-atom)   top-delta)
-                                  :left   (- (:left @resize-atom) left-delta)}))
-      (reset! resize-atom (merge @resize-atom new-directions)))))
+     (if (contains? old-directions :right)
+       (reset! resize-atom (merge @resize-atom
+                                  {:width  (- (:width @resize-atom) left-delta)
+                                   :height (- (:height @resize-atom) top-delta)
+                                   :top    (- (:top  @resize-atom)   top-delta)
+                                   :left   (- (:left @resize-atom) left-delta)}))
+       (reset! resize-atom (merge @resize-atom new-directions))))))
 
 
 
@@ -120,7 +118,7 @@
   (let [ref (r/atom nil)]
     (fn [{:keys [id component]}]
         [:div {:ref (fn [e] (dispatch [:db/set [:area-dropzones id] e]))
-               :style {:background "red"
+               :style {:background "rgba(0,0,0,0.3)"
                        :display :flex
                        :justify-content :center
                        :align-items :center
@@ -189,7 +187,6 @@
                              (mapv 
                               (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
                               @area-dropzones))]
-      (.log js/console "I will set: "  (dom-utils/get-rect-data @ref))
       (dispatch [:db/set [:overlapping-areas] overlapping-areas]))))
 
 (defn area-item-inner [resize-data component id]
@@ -231,22 +228,23 @@
 
 
 (defn area-layer [value-path components grid-data]
- [overlay-wrapper/view
-  [:div#area-overlay
-   {:style {:height "100%"
-            :width "100%"
-            :backdrop-filter "blur(1px)"
-            :position :absolute
-            :pointer-events :auto
-            :left 0
-            :z-index 2}}
-   [grid/grid-wrapper
-    (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        item-key
-                                                                   :component item-value}])
-                 (vector (first components)))
-    (vector
-     (last value-path)
-     @(subscribe [:db/get value-path]))]]])
+ (let [the-grid (fn [] @(subscribe [:db/get value-path]))]
+   [overlay-wrapper/view
+    [:div#area-overlay
+     {:style {:height "100%"
+              :width "100%"
+              :backdrop-filter "blur(1px)"
+              :position :absolute
+              :pointer-events :auto
+              :left 0
+              :z-index 2}}
+     [grid/grid-wrapper
+      (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        (utils/number-to-letter (:position item-value))
+                                                                     :component item-value}])
+                   components)
+      (vector
+       (last value-path)
+       (the-grid))]]]))
 
 ;;
 ;; SUMMARY
@@ -264,9 +262,9 @@
         items-count  (fn [] (count (components)))
         abc-matrix   (fn [] (utils/generate-abc-matrix (items-count)))]
      (if (= :area @overlay)
-      [dnd-context {:onDragStart    handle-drag-start
-                    :onDragMove     handle-drag-move
-                    :onDragEnd      handle-drag-end}
+      [dnd-context {:onDragStart    (handle-drag-start (value-path))
+                    :onDragMove     (handle-drag-move  (value-path))
+                    :onDragEnd      (handle-drag-end   (value-path))}
                     ;:modifiers      [restrictToWindowEdges]}[:<>                 
         [grid-layer (value-path) (all-area-cells)]
         [area-layer (value-path) (components) (grid-data)]])))
