@@ -54,8 +54,7 @@
   (fn [event] 
    (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)]
-     (.log js/console (str "oi: " value-path " - " id))    
-     (dispatch [:db/set [:editor :toolbar  :dragged] id]))))
+     (dispatch [:db/set [:overlays :areas :dragged] id]))))
 
 
 (defn handle-drag-end [value-path]
@@ -63,23 +62,23 @@
     (let [{:keys [active over]} (utils/to-clj-map event)
           id      (:id active)]
       (reset! resize-atom (dissoc @resize-atom :bottom :top :right :left))
-      (dispatch [:db/set [:area-editor :dragged] nil])
-      (dispatch [:db/set [:area-editor :active] id]))))
+      (dispatch [:db/set [:overlays :areas :dragged] nil]))))      
 
 
 (defn handle-drag-move [value-path]
   (fn [event]  
    (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)
+         overlapping-positions  (subscribe [:db/get [:overlays :area :overlapping-areas]])
          new-pos (-> active :rect :current :translated)
-
+        
          old-directions (select-keys @resize-atom [:bottom :top
                                                    :left   :right])
          new-directions (select-keys new-pos [:bottom :top
                                               :left   :right])
          left-delta     (- (:left  old-directions) (:left  new-directions))
          top-delta      (- (:top   old-directions) (:top   new-directions))]
-
+     (.log js/console (str @overlapping-positions))
      (if (contains? old-directions :right)
        (reset! resize-atom (merge @resize-atom
                                   {:width  (- (:width @resize-atom) left-delta)
@@ -117,7 +116,7 @@
 (defn grid-item-drop-zone [{:keys [id component]}]
   (let [ref (r/atom nil)]
     (fn [{:keys [id component]}]
-        [:div {:ref (fn [e] (dispatch [:db/set [:area-dropzones id] e]))
+        [:div {:ref (fn [e] (dispatch [:db/set [:overlays :areas :area-dropzones id] e]))
                :style {:background "rgba(0,0,0,0.3)"
                        :display :flex
                        :justify-content :center
@@ -181,13 +180,13 @@
 
 (defn set-overlapping-areas-func [position ref]
   (fn [e] 
-    (let [area-dropzones    (subscribe [:db/get [:area-dropzones]])
+    (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
           overlapping-areas (get-overlapping-areas
                              (dom-utils/get-rect-data @ref)
                              (mapv 
                               (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
                               @area-dropzones))]
-      (dispatch [:db/set [:overlapping-areas] overlapping-areas]))))
+      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas]))))
 
 (defn area-item-inner [resize-data component id]
   (let [ref (r/atom nil)
@@ -251,7 +250,7 @@
 ;;
 
 (defn view []
-  (let [overlay (subscribe [:db/get [:editor :overlay :type]])
+  (let [overlay (subscribe [:db/get [:overlays :type]])
         value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         components-value-path (fn [] (vec (conj (value-path) :components)))
         grid-data             (fn [] @(subscribe [:db/get (value-path)]))

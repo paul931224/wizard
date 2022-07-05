@@ -5,7 +5,7 @@
 
 
 (defn set-overlay-type! [type type-name]
- (let [active-type (subscribe [:db/get [:editor :overlay :type]])]
+ (let [active-type (subscribe [:db/get [:overlays :type]])]
    [:div.overlay-button 
     {:style {:background (if (= type @active-type) "rgba(0,150,20,0.3)")}
      :on-click  (fn [e] (dispatch [:editor/set-overlay! type]))}

@@ -5,7 +5,7 @@
 
 
 (defn view []
- (let [overlay (subscribe [:db/get [:editor :overlay :type]])
+ (let [overlay (subscribe [:db/get [:overlays :type]])
        selected-path (subscribe [:db/get [:editor :selected :value-path]])]
   (fn [] 
    (if (= :order @overlay) 

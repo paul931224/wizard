@@ -125,7 +125,7 @@
   
 
 (defn view []
- (let [overlay (subscribe [:db/get [:editor :overlay :type]])
+ (let [overlay (subscribe [:db/get [:overlays :type]])
        value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
        components-value-path (fn [] (vec (conj (value-path) :components)))
        grid-data             (fn [] @(subscribe [:db/get (value-path)]))  
