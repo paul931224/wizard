@@ -50,44 +50,37 @@
      areas))))
 
 
+(defn set-overlapping-areas [id]
+  (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
+        overlapping-areas (get-overlapping-areas
+                           (dom-utils/get-rect-data (.getElementById js/document (str "area-" id)))
+                           (mapv
+                            (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
+                            @area-dropzones))]
+    (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])))
+
+
 (defn handle-drag-start [value-path]
   (fn [event] 
    (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)]
      (dispatch [:db/set [:overlays :areas :dragged] id]))))
 
+(defn handle-drag-move [value-path]
+  (fn [event]
+    (let [{:keys [active over]} (utils/to-clj-map event)
+          id      (:id active)     
+          overlapping-positions  (subscribe [:db/get [:overlays :areas :overlapping-areas]])] 
+      (set-overlapping-areas id)
+      (.log js/console (str @overlapping-positions)))))
 
 (defn handle-drag-end [value-path]
   (fn [event] 
     (let [{:keys [active over]} (utils/to-clj-map event)
-          id      (:id active)]
-      (reset! resize-atom (dissoc @resize-atom :bottom :top :right :left))
+          id      (:id active)]      
       (dispatch [:db/set [:overlays :areas :dragged] nil]))))      
 
-
-(defn handle-drag-move [value-path]
-  (fn [event]  
-   (let [{:keys [active over]} (utils/to-clj-map event)
-         id      (:id active)
-         overlapping-positions  (subscribe [:db/get [:overlays :area :overlapping-areas]])
-         new-pos (-> active :rect :current :translated)
-        
-         old-directions (select-keys @resize-atom [:bottom :top
-                                                   :left   :right])
-         new-directions (select-keys new-pos [:bottom :top
-                                              :left   :right])
-         left-delta     (- (:left  old-directions) (:left  new-directions))
-         top-delta      (- (:top   old-directions) (:top   new-directions))]
-     (.log js/console (str @overlapping-positions))
-     (if (contains? old-directions :right)
-       (reset! resize-atom (merge @resize-atom
-                                  {:width  (- (:width @resize-atom) left-delta)
-                                   :height (- (:height @resize-atom) top-delta)
-                                   :top    (- (:top  @resize-atom)   top-delta)
-                                   :left   (- (:left @resize-atom) left-delta)}))
-       (reset! resize-atom (merge @resize-atom new-directions))))))
-
-
+     
 
 (defn expand-horizontal-indicator []
   [:div
@@ -178,28 +171,14 @@
          [expand-horizontal-indicator]
          [expand-vertical-indicator]])]))
 
-(defn set-overlapping-areas-func [position ref]
-  (fn [e] 
-    (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
-          overlapping-areas (get-overlapping-areas
-                             (dom-utils/get-rect-data @ref)
-                             (mapv 
-                              (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
-                              @area-dropzones))]
-      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas]))))
+(defn area-item-inner [component id]
+  (let [position        (:position component)
+        area-id     (str "area-" id)]   
+     [:div {:id  area-id
+            :style {:width "100%" :height "100%"}
+            :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
+         [area-item-letter component]]))
 
-(defn area-item-inner [resize-data component id]
-  (let [ref (r/atom nil)
-        position        (:position component)]   
-    (r/create-class
-     {:component-did-mount  (set-overlapping-areas-func position ref)
-      :component-did-update (set-overlapping-areas-func position ref)
-      :reagent-render
-      (fn [resize-data component id]
-        [:div {:ref (fn [a] (reset! ref a))
-               :style {:width "100%" :height "100%"}
-               :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
-         [area-item-letter component]])})))
 
 (defn draggable-area-style [transform position]
   {:position :relative
@@ -223,7 +202,7 @@
                   :ref (js->clj setNodeRef)}
                  attributes
                  listeners)
-     [area-item-inner @resize-atom component id]]))
+     [area-item-inner component id]]))
 
 
 (defn area-layer [value-path components grid-data]
@@ -240,7 +219,7 @@
      [grid/grid-wrapper
       (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        (utils/number-to-letter (:position item-value))
                                                                      :component item-value}])
-                   components)
+                   (vector (first components)))
       (vector
        (last value-path)
        (the-grid))]]]))
