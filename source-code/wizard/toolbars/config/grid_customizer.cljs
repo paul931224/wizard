@@ -212,7 +212,6 @@
 
 (defn view []
   [:div
-    ;(str @(subscribe [:db/get [:toolbars :grid]])) 
     [grid-preview]
     [add-grid]])
 

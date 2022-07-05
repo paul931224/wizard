@@ -122,13 +122,14 @@
 
 
 (defn grid-item [index item]
-  [:div {:style {:background "#333"
-                   :height "30px"
-                   :width "30px"
-                   :display :flex
-                   :justify-content :center
-                   :align-items :center
-                   :border-radius "15px"}}
+  [:div {:style {:background "yellow"
+                 :color "#222"
+                 :height "30px"
+                 :width "30px"
+                 :display :flex
+                 :justify-content :center
+                 :align-items :center
+                 :border-radius "15px"}}
      (str item)])
 
 (defn grid-layer [value-path all-area-cells]
@@ -154,6 +155,7 @@
 
 (def letter-style {:background "#333"
                    :height "30px"
+                   :color :white
                    :width "30px"
                    :display :flex
                    :justify-content :center
@@ -175,8 +177,7 @@
   (let [position        (:position component)
         area-id     (str "area-" id)]   
      [:div {:id  area-id
-            :style {:width "100%" :height "100%"}
-            :on-click #(dispatch [:db/set [:editor :toolbar :active] id])}
+            :style {:width "100%" :height "100%"}}            
          [area-item-letter component]]))
 
 

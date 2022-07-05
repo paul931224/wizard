@@ -43,7 +43,7 @@
 
 (defn draggable-body [component id]
  (let [style {:max-height "90vh" :overflow :scroll}]
-  [:div {:on-click #(dispatch [:db/set [:editor :toolbar :active] id])
+  [:div {:on-click #(dispatch [:db/set [:toolbars :active] id])
          :style style} 
         component]))
 
@@ -59,14 +59,14 @@
  (let [id                    (:id props)
        label                 (:label props)
        component             (:component props)
-       dragged-id            (subscribe [:db/get [:editor :toolbar  :dragged]])
-       active-id             (subscribe [:db/get [:editor :toolbar  :active]])
+       dragged-id            (subscribe [:db/get [:toolbars  :dragged]])
+       active-id             (subscribe [:db/get [:toolbars  :active]])
        use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
        {:keys [attributes 
                listeners
                setNodeRef  
                transform]}   use-draggable 
-       moved-style           (subscribe [:db/get [:editor :toolbars id]])
+       moved-style           (subscribe [:db/get [:toolbars :positions id]])
        style                 (fn [] @moved-style)
        dragged?               (fn [] (= @dragged-id id))
        active?               (fn [] (= @active-id id))]
@@ -84,21 +84,21 @@
 (defn handle-drag-start [event] 
    (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)] 
-       (dispatch [:db/set [:editor :toolbar  :dragged] id])))
+       (dispatch [:db/set [:toolbars  :dragged] id])))
                                   
 
 (defn handle-drag-end [event] 
   (let [{:keys [active over]} (utils/to-clj-map event)
          id      (:id active)] 
-    (dispatch [:db/set [:editor :toolbar  :dragged] nil])
-    (dispatch [:db/set [:editor :toolbar  :active] id])))
+    (dispatch [:db/set [:toolbars  :dragged] nil])
+    (dispatch [:db/set [:toolbars  :active] id])))
 
 (defn handle-drag-move [event]
   (let [{:keys [active over]} (utils/to-clj-map event)
         id      (:id active)
         new-pos (-> active :rect :current :translated)
         top-and-left (select-keys new-pos [:top :left])]
-    (dispatch [:db/set [:editor :toolbars id] top-and-left])))
+    (dispatch [:db/set [:toolbars :positions id] top-and-left])))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
