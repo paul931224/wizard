@@ -180,29 +180,35 @@
          [area-item-letter component]]))
 
 
-(defn draggable-area-style [transform position]
-  {:position :relative
-   :background (rand-nth utils/random-colors)
-   :height "100%"
-   :width  "100%"
-   :transform (.toString (.-Transform CSS) (clj->js transform))                         
-   :grid-area (utils/number-to-letter position)})
+(defn draggable-area-style [dragged-letter transform position]
+  (let [letter (utils/number-to-letter position)] 
+   {:display  (cond
+                (= dragged-letter letter) :inherit
+                (= dragged-letter nil   ) :inherit
+                :else :none)
+    :position :relative
+    :background (rand-nth utils/random-colors)
+    :height "100%"
+    :width  "100%"
+    :transform (.toString (.-Transform CSS) (clj->js transform))                         
+    :grid-area letter}))
 
 (defn area-item [props]
   (let [id                    (:id props)
         component             (:component props)
+        dragged-id            (subscribe [:db/get [:overlays :areas :dragged]])
         position              (:position component)
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
         {:keys [attributes
                 listeners
                 transform
                 setNodeRef]}  use-draggable]
-    [:div (merge {:style (draggable-area-style transform position) 
-                  :class ["area"]
-                  :ref (js->clj setNodeRef)}
+    [:div (merge {:style (draggable-area-style @dragged-id transform position) 
+                   :class ["area"]
+                   :ref (js->clj setNodeRef)}
                  attributes
                  listeners)
-     [area-item-inner component id]]))
+      [area-item-inner component id]]))
 
 
 (defn area-layer [value-path components grid-data]
@@ -219,7 +225,7 @@
      [grid/grid-wrapper
       (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        (utils/number-to-letter (:position item-value))
                                                                      :component item-value}])
-                   (vector (first components)))
+                   components)
       (vector
        (last value-path)
        (the-grid))]]]))
