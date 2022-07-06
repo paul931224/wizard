@@ -21,6 +21,21 @@
 ;; UTILS
 ;;
 
+(defn modify-areas [{:keys [area-to-fill areas-config indexes-overlapped]}]
+    (let [column-count     (count (first areas-config))
+          flattened-config (vec (flatten areas-config))
+          overlapping?     (fn [index] (some 
+                                        (fn [overlapped-index] (= overlapped-index index)) 
+                                        indexes-overlapped))
+          decide-character (fn [index letter] (cond 
+                                               (overlapping? index)          area-to-fill
+                                               (= letter area-to-fill)       "."
+                                               :else                         letter))
+          new-characters   (vec (map-indexed  decide-character flattened-config))
+          new-config       (mapv vec (partition column-count new-characters))]                                                
+      new-config))
+     
+     
 
 
 (defn get-overlapping-areas [this-area areas]
@@ -69,15 +84,23 @@
 (defn handle-drag-move [value-path]
   (fn [event]
     (let [{:keys [active over]} (utils/to-clj-map event)
-          id      (:id active)     
-          overlapping-positions  (subscribe [:db/get [:overlays :areas :overlapping-areas]])] 
-      (set-overlapping-areas id)
-      (.log js/console (str @overlapping-positions)))))
+          id      (:id active)]                
+      (set-overlapping-areas id))))
+      
 
 (defn handle-drag-end [value-path]
   (fn [event] 
     (let [{:keys [active over]} (utils/to-clj-map event)
-          id      (:id active)]      
+          area                   (:id active)
+          areas-path             (vec (concat value-path [:areas]))
+          grid-areas             @(subscribe [:db/get areas-path])
+          overlapping-positions  @(subscribe [:db/get [:overlays :areas :overlapping-areas]])]
+      (dispatch [:db/set areas-path 
+                 (modify-areas {:area-to-fill        area 
+                                :areas-config        grid-areas
+                                :indexes-overlapped  overlapping-positions})])
+                                                    
+                               
       (dispatch [:db/set [:overlays :areas :dragged] nil]))))      
 
      
