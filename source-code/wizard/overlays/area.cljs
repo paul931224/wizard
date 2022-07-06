@@ -98,9 +98,7 @@
       (dispatch [:db/set areas-path 
                  (modify-areas {:area-to-fill        area 
                                 :areas-config        grid-areas
-                                :indexes-overlapped  overlapping-positions})])
-                                                    
-                               
+                                :indexes-overlapped  overlapping-positions})])                 
       (dispatch [:db/set [:overlays :areas :dragged] nil]))))      
 
      
@@ -130,10 +128,18 @@
 ;;
 
 (defn grid-item-drop-zone [{:keys [id component]}]
-  (let [ref (r/atom nil)]
+  (let [overlapping-areas (subscribe [:db/get [:overlays :areas :overlapping-areas]])
+        overlapping?      (fn [] 
+                           (boolean (some (fn [overlapped-index]
+                                           (= id overlapped-index))
+                                          @overlapping-areas))) 
+        ref (r/atom nil)]
     (fn [{:keys [id component]}]
         [:div {:ref (fn [e] (dispatch [:db/set [:overlays :areas :area-dropzones id] e]))
-               :style {:background "rgba(0,0,0,0.3)"
+               :style {:background (if (overlapping?)
+                                    "rgba(0,255,0,0.3)"
+                                    "rgba(0,0,0,0.3)")
+                                    
                        :display :flex
                        :justify-content :center
                        :align-items :center
@@ -146,14 +152,14 @@
 
 (defn grid-item [index item]
   [:div {:style {:background "yellow"
-                 :color "#222"
-                 :height "30px"
-                 :width "30px"
-                 :display :flex
-                 :justify-content :center
-                 :align-items :center
-                 :border-radius "15px"}}
-     (str item)])
+                  :color "#222"
+                  :height "30px"
+                  :width "30px"
+                  :display :flex
+                  :justify-content :center
+                  :align-items :center
+                  :border-radius "15px"}}      
+      (str item)])
 
 (defn grid-layer [value-path all-area-cells]
  [overlay-wrapper/view
@@ -166,7 +172,8 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index item] [grid-item-drop-zone {:id index :component [grid-item index item]}])
+    (map-indexed (fn [index item] [grid-item-drop-zone {:id index 
+                                                        :component [grid-item index item]}])
                  all-area-cells)
     (vector
      (last value-path)
