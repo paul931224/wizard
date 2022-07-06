@@ -200,7 +200,8 @@
   (let [position        (:position component)
         area-id     (str "area-" id)]   
      [:div {:id  area-id
-            :style {:width "100%" :height "100%"}}            
+            :style {:width "100%" :height "100%"
+                    :background (rand-nth utils/random-colors)}}            
          [area-item-letter component]]))
 
 
@@ -211,7 +212,7 @@
                 (= dragged-letter nil   ) :inherit
                 :else :none)
     :position :relative
-    :background (rand-nth utils/random-colors)
+    
     :height "100%"
     :width  "100%"
     :transform (.toString (.-Transform CSS) (clj->js transform))                         
@@ -227,7 +228,9 @@
                 listeners
                 transform
                 setNodeRef]}  use-draggable]
-    [:div (merge {:style (draggable-area-style @dragged-id transform position) 
+    [:div (merge {:style (merge 
+                          (draggable-area-style @dragged-id transform position))
+                           
                    :class ["area"]
                    :ref (js->clj setNodeRef)}
                  attributes
