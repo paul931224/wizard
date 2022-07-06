@@ -5,7 +5,7 @@
              ["react" :as react]
              ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
              ["@dnd-kit/utilities" :refer [CSS]]
-             ["@dnd-kit/modifiers" :refer [restrictToWindowEdges]]
+             ["@dnd-kit/modifiers" :refer [restrictToWindowEdges restrictToHorizontalAxis restrictToFirstScrollableAncestor]]
              [wizard.editor.grid :as grid]
              [wizard.utils :as utils]
              [wizard.dom-utils :as dom-utils]))
@@ -262,7 +262,9 @@
                    components)
       (vector
        (last value-path)
-       (the-grid))]]]))
+       (the-grid))]]
+    {:overflow-x :hidden 
+     :overflow-y :hidden}]))
 
 ;;
 ;; SUMMARY
@@ -283,7 +285,8 @@
       [dnd-context {:onDragStart    (handle-drag-start (value-path))
                     :onDragMove     (handle-drag-move  (value-path))
                     :onDragEnd      (handle-drag-end   (value-path))}
-                    ;:modifiers      [restrictToWindowEdges]}[:<>                 
-        [grid-layer (value-path) (all-area-cells)]
-        [area-layer (value-path) (components) (grid-data)]])))
+                    ;:modifiers      []}
+        [:<>                 
+         [grid-layer (value-path) (all-area-cells)]
+         [area-layer (value-path) (components) (grid-data)]]])))
         
