@@ -10,12 +10,20 @@
   (clojure.string/join " " (vals the-map)))
 
 
-(defn generate-default-blocks [elements]
+(defn generate-default-block [index]
+ (assoc {} (str (random-uuid)) {:type "block"
+                                :position 0
+                                :content (str index " - block")}))
+
+(defn generate-default-grid-blocks [elements]
   (reduce merge
            (map-indexed
-            (fn [index a] (assoc {} (str (random-uuid)) {:type "grid-block"
-                                                         :position index
-                                                         :content (str index " - block")}))                                                       
+            (fn [index a] 
+             (assoc {} 
+              (str (random-uuid)) 
+              {:type "grid-block"
+               :position index
+               :components (generate-default-block index)}))                                                                                                            
             elements)))
 
 (defn default []
@@ -30,7 +38,7 @@
                    ["a" "b"]
                    ["c" "c"]
                    ["d" "e"]]
-      :components (generate-default-blocks grid-elements)
+      :components (generate-default-grid-blocks grid-elements)
       :height 20
       :grid-padding 20
       :grid-background "#EEE"}))

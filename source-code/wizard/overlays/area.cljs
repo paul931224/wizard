@@ -246,11 +246,11 @@
 
 (defn area-layer [value-path components grid-data]
  (let [the-grid (fn [] @(subscribe [:db/get value-path]))
-       areas    (:areas (the-grid))
-       missing-area? (fn [area] (boolean 
-                                 (some (fn [this-area]
-                                        (not= this-area area))
-                                  areas)))]
+       areas    (flatten (:areas (the-grid)))
+       available-area? (fn [area] (boolean 
+                                   (some (fn [this-area]
+                                          (= this-area area))
+                                    areas)))]
                       
    [overlay-wrapper/view
     [:div#area-overlay
@@ -264,8 +264,9 @@
      [grid/grid-wrapper
       (map-indexed (fn [index [item-key item-value]]                     
                     (let [letter (utils/number-to-letter (:position item-value))] 
-                      [:f> area-item {:id        letter
-                                        :component item-value}]))
+                      (if (available-area? letter) 
+                       [:f> area-item {:id        letter
+                                         :component item-value}])))
                    components)
       (last value-path)
       (the-grid)]]

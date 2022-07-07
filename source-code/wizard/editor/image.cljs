@@ -7,7 +7,8 @@
 (defn view [comp-router tree path]
   (let [comp-state (get-in tree path)
         {:keys [image-source]}   comp-state]
-    [:div  {:style {:display :flex
-                    :justify-content :center 
-                    :align-items     :center}}
-     [:img {:src image-source :style {:width "100%"}}]]))     
+    [:div  {:style {:height "100%"
+                    :width "100%"
+                    :background-image (str "url(" image-source ")")
+                    :background-size  "cover"}}]))
+                     

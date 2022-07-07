@@ -12,23 +12,32 @@
    :content "Placeholder element"})
 
 (defn view [comp-router tree path]
-  (let [comp-state (get-in tree path)
+  (let [comp       (get-in tree path)
+        components (:components comp)
         grid-path  (vec (butlast (butlast path)))
-        {:keys [content col row width height
-                color background-color padding
-                position]}   comp-state]
+        grid       (get-in tree grid-path)
+        areas      (:areas grid)
         
+        
+        {:keys [position]} comp
+        letter  (utils/number-to-letter position)
+        area-exists? (boolean (some (fn [area] (= letter area))
+                               (flatten areas)))                     
+        sorted-comps     (fn [] 
+                           (sort-by
+                            (fn [[key value]] (:position (second value)))
+                            components))]
 
-    [:div {:style {:pointer-events "auto"
-                   :color color
-                   :grid-area (utils/number-to-letter position)
-                   :background-color (if background-color background-color "white")
-                   :width  "100%"
-                   :height "100%"
-                   :display :flex
-                   :justify-content :center
-                   :align-items :center}}
-     [:div.component {:style {:padding padding}}
-      [:<> 
-       [:div (str grid-path)]
-       (html->hiccup (str "<div>" content "</div>"))]]]))
+    (if area-exists? 
+     [:div {:style {:pointer-events "auto"
+                    :grid-area letter
+                    :width  "100%"
+                    :height "100%"
+                    :display :flex
+                    :justify-content :center
+                    :align-items :center}}                    
+      (map (fn [component]
+             ^{:key (first component)} 
+             [comp-router tree
+              (vec (concat path [:components (first component)]))])
+           (sorted-comps))])))
