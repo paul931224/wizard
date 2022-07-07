@@ -11,10 +11,9 @@
    :height 100
    :content "Placeholder element"})
 
-(defn view [comp-router key-and-comp path]
-  (let [the-key                                    (first key-and-comp)
-        comp-state                                 (second key-and-comp)
-        grid-path (vec (butlast (butlast path)))
+(defn view [comp-router tree path]
+  (let [comp-state (get-in tree path)
+        grid-path  (vec (butlast (butlast path)))
         {:keys [content col row width height
                 color background-color padding
                 position]}   comp-state]

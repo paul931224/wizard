@@ -41,36 +41,36 @@
         areas         (clojure.string/join " " (vec (map vec-to-string areas)))]
      areas))
 
-(defn grid-wrapper 
- ([comp-state]
-  [grid-wrapper nil comp-state])
- ([content comp-state]
-  (let [the-key          (first  comp-state)
-        value            (second comp-state)
-        rows             (:rows     value)
-        cols             (:cols     value)
-        areas            (:areas    value)]                
-    [:div.grid
-        {:id    (str "grid-" the-key)
-         :style {:display :grid
-                 :grid-template-columns (map->grid-template cols)
-                 :grid-template-rows    (map->grid-template rows)
-                 :pointer-events "auto"
-                 :justify-items :center
-                 :grid-template-areas (areas->grid-areas-template areas)               
-                 :gap "2px"}}     
-        content])))  
+
+(defn grid-wrapper [content  grid-key value]
+   (let [rows             (:rows     value)
+         cols             (:cols     value)
+         areas            (:areas    value)]
+      [:div.grid
+       {:id    (str "grid-" grid-key)
+        :style {:display :grid
+                :grid-template-columns (map->grid-template cols)
+                :grid-template-rows    (map->grid-template rows)
+                :pointer-events "auto"
+                :justify-items :center
+                :grid-template-areas (areas->grid-areas-template areas)
+                :gap "2px"}}
+       content]))
 
 
-
-
-(defn view [comp-router comp-state path]
-  (let [the-key          (first comp-state)
-        value            (second comp-state)
-        grid-components  (:components    value)]
+(defn view [comp-router tree path]
+  (let [comp-key         (last path)
+        comp             (get-in tree path)
+        grid-components  (:components comp)
+        sorted-comps     (fn [] 
+                           (sort-by
+                            (fn [[key value]] (:position (second value)))
+                            grid-components))]
    [grid-wrapper
       (map (fn [component]
-             ^{:key the-key} [comp-router component
-                              (vec (concat path [:components (first component)]))])
-           (sort-by (fn [a] (:position (second a))) grid-components))
-      comp-state]))
+             ^{:key (first component)} 
+             [comp-router tree
+              (vec (concat path [:components (first component)]))])
+           (sorted-comps)) 
+      comp-key
+      comp]))

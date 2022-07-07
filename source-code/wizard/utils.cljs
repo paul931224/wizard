@@ -48,7 +48,7 @@
  
 (defn state-viewer--map-display-item [recur-fn the-key sub-tree]
  (let [open? (r/atom true)] 
-   (fn [recur-fn the-key sub-stree] 
+   (fn [recur-fn the-key sub-tree] 
     [:div {:style {:display :flex}} 
          [:div {:style {:cursor :pointer}
                 :on-click (fn [e] (reset! open? (not @open?)))} (str the-key)]              

@@ -29,41 +29,33 @@
 (defn add-to-path [path & args]
  (vec (concat path args)))
 
-(defn component-router [comp-state path]
-  (let [id   (first comp-state)
-        type (:type (second comp-state))
-        position (:position (second comp-state))]
+(defn component-router [comp-tree path]
+  (let [id   (last path)
+        value (get-in comp-tree path)
+        {:keys [type position]} value]
+        
     [component-wrapper
-      (case type
-        "block"        [block/view  component-router comp-state path]
-        "grid-block"   [grid-block/view  component-router comp-state path]
-        "navbar"       [navbar/view component-router comp-state path]
-        "grid"         [grid/view   component-router comp-state path]
-        "root"         [component-router comp-state (add-to-path path :components)]
-        "image"        [image/view  component-router comp-state path]
-        [block/view component-router comp-state path])
-      id
-      path
-      type
-      position]))
-
+       (case type
+         "block"        [block/view       component-router comp-tree path]
+         "grid-block"   [grid-block/view  component-router comp-tree path]
+         "navbar"       [navbar/view      component-router comp-tree path]
+         "grid"         [grid/view        component-router comp-tree path]
+         "image"        [image/view       component-router comp-tree path]
+         "root"         [component-router comp-tree (add-to-path path :components)]
+         [block/view component-router comp-tree path])
+       id
+       path
+       type
+       position]))
+   
 
 (defn view []
-  (let [components (subscribe [:db/get [:editor :components]])]
-    [:div {:style {:width "100%" :position :relative}}
-      (map
-       (fn [comp-state] ^{:key (first comp-state)}
-         [component-router
-          comp-state
-          [:editor :components (first comp-state)]])
-       @components)]))     
-
-(defn alternate-view []
-  (let [components (subscribe [:db/get [:editor :components]])]
+  (let [tree       (subscribe [:db/get []])
+        components (subscribe [:db/get [:editor :components]])]
     [:div {:style {:width "100%" :position :relative}}
      (map
-      (fn [comp-state] ^{:key (first comp-state)}
+      (fn [this-comp] ^{:key (first this-comp)}
         [component-router
-         comp-state
-         [:editor :components (first comp-state)]])
+         @tree
+         [:editor :components (first this-comp)]])
       @components)]))       

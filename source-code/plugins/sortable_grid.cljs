@@ -103,9 +103,8 @@
                                                                :item item
                                                                :path value-path}])
                         (sort-by :position (utils/to-clj-map items)))
-           (vector 
-                  (last value-path) 
-                  @(subscribe [:db/get value-path]))]]]))
+           (last value-path) 
+           @(subscribe [:db/get value-path])]]]))
     ;[drag-overlay [:f> drag-overlay-item {:id (if activeId activeId nil)}]]]))
 
 

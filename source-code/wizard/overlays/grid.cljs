@@ -147,6 +147,5 @@
        [grid/grid-wrapper
             (map-indexed (fn [index item] [grid-item index (grid-data)])
                          (items))
-            (vector 
-                   (last (value-path)) 
-                   @(subscribe [:db/get (value-path)]))]]])))
+            (last (value-path)) 
+            @(subscribe [:db/get (value-path)])]]])))

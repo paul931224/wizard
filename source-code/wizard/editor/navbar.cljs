@@ -5,8 +5,8 @@
   :name "Navbar"
   :height "100"})
 
-(defn view [comp-router key-and-comp path]
-  (let [comp-state                     (second key-and-comp)
+(defn view [comp-router tree path]
+  (let [comp-state                     (get-in tree path)
         {:keys [height]}  comp-state]
     [:div {:style {:position  :relative
                    :width     "100%"

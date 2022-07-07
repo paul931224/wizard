@@ -175,9 +175,8 @@
     (map-indexed (fn [index item] [grid-item-drop-zone {:id index 
                                                         :component [grid-item index item]}])
                  all-area-cells)
-    (vector
-     (last value-path)
-     @(subscribe [:db/get value-path]))]]])
+    (last value-path)
+    @(subscribe [:db/get value-path])]]])
 
 ;;
 ;; AREA LAYER
@@ -268,9 +267,8 @@
                       [:f> area-item {:id        letter
                                         :component item-value}]))
                    components)
-      (vector
-       (last value-path)
-       (the-grid))]]
+      (last value-path)
+      (the-grid)]]
     {:overflow-x :hidden 
      :overflow-y :hidden}]))
 
