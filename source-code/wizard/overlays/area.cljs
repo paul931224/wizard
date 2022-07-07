@@ -246,7 +246,13 @@
 
 
 (defn area-layer [value-path components grid-data]
- (let [the-grid (fn [] @(subscribe [:db/get value-path]))]
+ (let [the-grid (fn [] @(subscribe [:db/get value-path]))
+       areas    (:areas (the-grid))
+       missing-area? (fn [area] (boolean 
+                                 (some (fn [this-area]
+                                        (not= this-area area))
+                                  areas)))]
+                      
    [overlay-wrapper/view
     [:div#area-overlay
      {:style {:height "100%"
@@ -257,8 +263,10 @@
               :left 0
               :z-index 2}}
      [grid/grid-wrapper
-      (map-indexed (fn [index [item-key item-value]] [:f> area-item {:id        (utils/number-to-letter (:position item-value))
-                                                                     :component item-value}])
+      (map-indexed (fn [index [item-key item-value]]                     
+                    (let [letter (utils/number-to-letter (:position item-value))] 
+                      [:f> area-item {:id        letter
+                                        :component item-value}]))
                    components)
       (vector
        (last value-path)

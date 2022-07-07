@@ -3,6 +3,7 @@
   [wizard.editor.navbar        :as navbar]
   [wizard.editor.block         :as block]
   [wizard.editor.grid          :as grid]
+  [wizard.editor.grid-block    :as grid-block]
   [wizard.editor.placeholder   :as placeholder]
   [wizard.editor.image         :as image]
   [re-frame.core :refer [dispatch subscribe]]
@@ -32,6 +33,7 @@
     [component-wrapper
      (case type
        "block"        [block/view  component-router comp-state path]
+       "grid-block"   [grid-block/view  component-router comp-state path]
        "navbar"       [navbar/view component-router comp-state path]
        "grid"         [grid/view   component-router comp-state path]
        ;"placeholder"  [grid/view   component-router comp-state path]

@@ -13,7 +13,7 @@
 (defn generate-default-blocks [elements]
   (reduce merge
            (map-indexed
-            (fn [index a] (assoc {} (str (random-uuid)) {:type "block"
+            (fn [index a] (assoc {} (str (random-uuid)) {:type "grid-block"
                                                          :position index
                                                          :content (str index " - block")}))                                                       
             elements)))
@@ -57,8 +57,7 @@
                  :grid-template-rows    (map->grid-template rows)
                  :pointer-events "auto"
                  :justify-items :center
-                 :grid-template-areas (areas->grid-areas-template areas)
-                 ;:background :black               
+                 :grid-template-areas (areas->grid-areas-template areas)               
                  :gap "2px"}}     
         content])))  
 
