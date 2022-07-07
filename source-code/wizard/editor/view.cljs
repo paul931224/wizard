@@ -26,23 +26,26 @@
              :height "100%"}}            
     content]))
 
+(defn add-to-path [path & args]
+ (vec (concat path args)))
+
 (defn component-router [comp-state path]
   (let [id   (first comp-state)
         type (:type (second comp-state))
         position (:position (second comp-state))]
     [component-wrapper
-     (case type
-       "block"        [block/view  component-router comp-state path]
-       "grid-block"   [grid-block/view  component-router comp-state path]
-       "navbar"       [navbar/view component-router comp-state path]
-       "grid"         [grid/view   component-router comp-state path]
-       ;"placeholder"  [grid/view   component-router comp-state path]
-       "image"        [image/view  component-router comp-state path]
-       [block/view component-router comp-state path])
-     id
-     path
-     type
-     position]))
+      (case type
+        "block"        [block/view  component-router comp-state path]
+        "grid-block"   [grid-block/view  component-router comp-state path]
+        "navbar"       [navbar/view component-router comp-state path]
+        "grid"         [grid/view   component-router comp-state path]
+        "root"         [component-router comp-state (add-to-path path :components)]
+        "image"        [image/view  component-router comp-state path]
+        [block/view component-router comp-state path])
+      id
+      path
+      type
+      position]))
 
 
 (defn view []
@@ -54,3 +57,13 @@
           comp-state
           [:editor :components (first comp-state)]])
        @components)]))     
+
+(defn alternate-view []
+  (let [components (subscribe [:db/get [:editor :components]])]
+    [:div {:style {:width "100%" :position :relative}}
+     (map
+      (fn [comp-state] ^{:key (first comp-state)}
+        [component-router
+         comp-state
+         [:editor :components (first comp-state)]])
+      @components)]))       

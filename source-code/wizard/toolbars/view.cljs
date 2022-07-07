@@ -127,11 +127,11 @@
            [toolbar {:id "rte-window"  
                      :component [rte-window]         
                      :label "Rich Text Editor"}])          
-       (if (= :root selected-element-type) 
+       (if (= "root" selected-element-type) 
            [toolbar {:id "components-window"  
                      :component [components-window]    
                      :label "Components"}])
-       (if (not= :root selected-element-type) 
+       (if (not= "root" selected-element-type) 
            [toolbar {:id "config-window"  
                      :component [config-window]    
                      :label "Config"}])]]))
