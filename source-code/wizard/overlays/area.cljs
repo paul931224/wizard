@@ -28,7 +28,7 @@
 
 
 (defn everything-identical? [coll]
- (= 1 (count (set coll))))
+ (boolean (= 1 (count (set coll)))))
 
 (defn same-amount-of-rows? [cells]
  (let [point? (= 1 (count cells))
@@ -51,8 +51,8 @@
                                                      col-values))
                                              config)))
        only-letter-positions (keep-only-letter-coordinates letter-positions)]                 
-   (mapv (fn [[letter cells]] (same-amount-of-rows? cells)) 
-    (group-by first only-letter-positions)))) 
+   (everything-identical? (mapv (fn [[letter cells]] (same-amount-of-rows? cells)) 
+                           (group-by first only-letter-positions))))) 
  
 
 (defn modify-areas [{:keys [area-to-fill areas-config indexes-overlapped]}]
@@ -99,14 +99,14 @@
      areas))))
 
 
-(defn set-overlapping-areas [id]
+(defn calculate-overlapping-areas [id]
   (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
         overlapping-areas (get-overlapping-areas
                            (dom-utils/get-rect-data (.getElementById js/document (str "area-" id)))
                            (mapv
                             (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
                             @area-dropzones))]
-    (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])))
+    overlapping-areas))
 
 
 (defn handle-drag-start [value-path]
@@ -117,9 +117,18 @@
 
 (defn handle-drag-move [value-path]
   (fn [event]
-    (let [{:keys [active over]} (utils/to-clj-map event)
-          id      (:id active)]                
-      (set-overlapping-areas id))))
+    (let [{:keys [active over]}  (utils/to-clj-map event)
+          area                   (:id active)
+          overlapping-areas      (calculate-overlapping-areas area)
+          areas-path             (vec (concat value-path [:areas]))
+          areas                  @(subscribe [:db/get areas-path])
+          possible-config?       (correct-area-config? 
+                                  (modify-areas {:area-to-fill        areas
+                                                 :areas-config        areas
+                                                 :indexes-overlapped  overlapping-areas}))]
+                          
+      (dispatch [:db/set [:overlays :areas :possible-config?]  possible-config?])
+      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas]))))
       
 
 (defn handle-drag-end [value-path]
@@ -128,11 +137,13 @@
           area                   (:id active)
           areas-path             (vec (concat value-path [:areas]))
           grid-areas             @(subscribe [:db/get areas-path])
-          overlapping-positions  @(subscribe [:db/get [:overlays :areas :overlapping-areas]])]
-      (dispatch [:db/set areas-path 
-                 (modify-areas {:area-to-fill        area 
-                                :areas-config        grid-areas
-                                :indexes-overlapped  overlapping-positions})])                 
+          overlapping-positions  @(subscribe [:db/get [:overlays :areas :overlapping-areas]])
+          modified-areas         (modify-areas {:area-to-fill        area 
+                                                :areas-config        grid-areas
+                                                :indexes-overlapped  overlapping-positions})    
+          area-config-correct? (correct-area-config? modified-areas)]
+      (if area-config-correct? 
+        (dispatch [:db/set areas-path modified-areas]))                            
       (dispatch [:db/set [:overlays :areas :dragged] nil]))))      
 
      
@@ -206,7 +217,8 @@
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index item] [grid-item-drop-zone {:id index 
+    (map-indexed (fn [index item] [grid-item-drop-zone {:id index
+     
                                                         :component [grid-item index item]}])
                  all-area-cells)
     (last value-path)
