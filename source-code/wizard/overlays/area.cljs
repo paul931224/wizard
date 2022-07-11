@@ -144,7 +144,8 @@
           area-config-correct? (correct-area-config? modified-areas)]
       (if area-config-correct? 
         (dispatch [:db/set areas-path modified-areas]))                            
-      (dispatch [:db/set [:overlays :areas :dragged] nil]))))      
+      (dispatch [:db/set [:overlays :areas :dragged] nil])
+      (dispatch [:db/set [:overlays :areas :possible-config?]  true]))))
 
      
 
@@ -173,17 +174,19 @@
 ;;
 
 (defn grid-item-drop-zone [{:keys [id component]}]
-  (let [overlapping-areas (subscribe [:db/get [:overlays :areas :overlapping-areas]])
-        overlapping?      (fn [] 
-                           (boolean (some (fn [overlapped-index]
-                                           (= id overlapped-index))
-                                          @overlapping-areas))) 
+  (let [overlapping-areas   (subscribe [:db/get [:overlays :areas :overlapping-areas]])
+        impossible-config?  (fn [] (not @(subscribe [:db/get [:overlays :areas :possible-config?]])))
+        overlapping?        (fn [] 
+                             (boolean (some (fn [overlapped-index]
+                                             (= id overlapped-index))
+                                            @overlapping-areas))) 
         ref (r/atom nil)]
     (fn [{:keys [id component]}]
         [:div {:ref (fn [e] (dispatch [:db/set [:overlays :areas :area-dropzones id] e]))
-               :style {:background (if (overlapping?)
-                                    "rgba(0,255,0,0.3)"
-                                    "rgba(0,0,0,0.3)")
+               :style {:background (cond 
+                                    (impossible-config?)  "rgba(255,0,0,0.8)"
+                                    (overlapping?)        "rgba(0,255,0,0.3)"                                    
+                                    :else                 "rgba(0,0,0,0.3)")
                                     
                        :display :flex
                        :justify-content :center
