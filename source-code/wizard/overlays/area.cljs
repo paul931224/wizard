@@ -28,7 +28,10 @@
 
 
 (defn everything-identical? [coll]
- (boolean (= 1 (count (set coll)))))
+ (let [set-count (count (set coll))] 
+  (boolean 
+    (or (= 1 set-count)
+        (= 0 set-count)))))
 
 (defn same-amount-of-rows? [cells]
  (let [point? (= 1 (count cells))
@@ -42,7 +45,7 @@
       
  
 
-(defn correct-area-config? [config]
+(defn correct-area-config? [config selected-area]
  (let [letter-positions (vec (reduce concat (map-indexed 
                                                 (fn [row-index col-values]
                                                     (map-indexed 
@@ -50,9 +53,14 @@
                                                       [value row-index col-index])
                                                      col-values))
                                              config)))
-       only-letter-positions (keep-only-letter-coordinates letter-positions)]                 
-   (everything-identical? (mapv (fn [[letter cells]] (same-amount-of-rows? cells)) 
-                           (group-by first only-letter-positions))))) 
+       only-letter-positions (keep-only-letter-coordinates letter-positions)
+       without-selected-area (vec (filter 
+                                   (fn [cell] (not= selected-area (first cell)))
+                                   only-letter-positions))
+                                               
+       grouped-by-letters-and-counted (mapv (fn [[letter cells]] (same-amount-of-rows? cells)) 
+                                            (group-by first without-selected-area))]
+   (everything-identical? grouped-by-letters-and-counted))) 
  
 
 (defn modify-areas [{:keys [area-to-fill areas-config indexes-overlapped]}]
@@ -122,11 +130,10 @@
           overlapping-areas      (calculate-overlapping-areas area)
           areas-path             (vec (concat value-path [:areas]))
           areas                  @(subscribe [:db/get areas-path])
-          possible-config?       (correct-area-config? 
-                                  (modify-areas {:area-to-fill        areas
-                                                 :areas-config        areas
-                                                 :indexes-overlapped  overlapping-areas}))]
-                          
+          modified-areas         (modify-areas {:area-to-fill        areas
+                                                :areas-config        areas
+                                                :indexes-overlapped  overlapping-areas})
+          possible-config?       (correct-area-config? modified-areas area)]                            
       (dispatch [:db/set [:overlays :areas :possible-config?]  possible-config?])
       (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas]))))
       
@@ -141,11 +148,12 @@
           modified-areas         (modify-areas {:area-to-fill        area 
                                                 :areas-config        grid-areas
                                                 :indexes-overlapped  overlapping-positions})    
-          area-config-correct? (correct-area-config? modified-areas)]
+          area-config-correct? (correct-area-config? modified-areas area)]            
       (if area-config-correct? 
         (dispatch [:db/set areas-path modified-areas]))                            
       (dispatch [:db/set [:overlays :areas :dragged] nil])
-      (dispatch [:db/set [:overlays :areas :possible-config?]  true]))))
+      (dispatch [:db/set [:overlays :areas :possible-config?]  true])
+      (dispatch [:db/set [:overlays :areas :overlapping-areas] []]))))
 
      
 
