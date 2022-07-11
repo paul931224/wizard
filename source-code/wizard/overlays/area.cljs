@@ -21,6 +21,40 @@
 ;; UTILS
 ;;
 
+(defn keep-only-letter-coordinates [letters-with-coordinates]
+ (filter (fn [[letter row-index col-index]]
+          (not= letter "."))
+         letters-with-coordinates))  
+
+
+(defn everything-identical? [coll]
+ (= 1 (count (set coll))))
+
+(defn same-amount-of-rows? [cells]
+ (let [point? (= 1 (count cells))
+       row-index-counts (mapv
+                         (fn [[row-index values]] (count values))
+                         (group-by second cells))]    
+  (if point?
+         ;This must be a rect if it's one point
+      true
+      (everything-identical? row-index-counts))))
+      
+ 
+
+(defn correct-area-config? [config]
+ (let [letter-positions (vec (reduce concat (map-indexed 
+                                                (fn [row-index col-values]
+                                                    (map-indexed 
+                                                     (fn [col-index value]
+                                                      [value row-index col-index])
+                                                     col-values))
+                                             config)))
+       only-letter-positions (keep-only-letter-coordinates letter-positions)]                 
+   (mapv (fn [[letter cells]] (same-amount-of-rows? cells)) 
+    (group-by first only-letter-positions)))) 
+ 
+
 (defn modify-areas [{:keys [area-to-fill areas-config indexes-overlapped]}]
     (let [column-count     (count (first areas-config))
           flattened-config (vec (flatten areas-config))
