@@ -120,8 +120,11 @@
 (defn handle-drag-start [value-path]
   (fn [event] 
    (let [{:keys [active over]} (utils/to-clj-map event)
-         id      (:id active)]
-     (dispatch [:db/set [:overlays :areas :dragged] id]))))
+         area      (:id active)
+         overlapping-areas      (calculate-overlapping-areas area)]
+     (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
+     (dispatch [:db/set [:overlays :areas :active]  area])
+     (dispatch [:db/set [:overlays :areas :dragged] area]))))
 
 (defn handle-drag-move [value-path]
   (fn [event]
@@ -145,11 +148,12 @@
           areas-path             (vec (concat value-path [:areas]))
           grid-areas             @(subscribe [:db/get areas-path])
           overlapping-positions  @(subscribe [:db/get [:overlays :areas :overlapping-areas]])
+          possible-config?       @(subscribe [:db/get [:overlays :areas :possible-config?]])
           modified-areas         (modify-areas {:area-to-fill        area 
                                                 :areas-config        grid-areas
                                                 :indexes-overlapped  overlapping-positions})    
           area-config-correct? (correct-area-config? modified-areas area)]            
-      (if area-config-correct? 
+      (if possible-config?
         (dispatch [:db/set areas-path modified-areas]))                            
       (dispatch [:db/set [:overlays :areas :dragged] nil])
       (dispatch [:db/set [:overlays :areas :possible-config?]  true])
@@ -157,25 +161,44 @@
 
      
 
-(defn expand-horizontal-indicator []
-  [:div
-   {:style {:cursor :pointer
-            :position :absolute
-            :bottom "0px"
-            :right  "-10px"
-            :background :blue
-            :height "5px"
-            :width  "10px"}}])
+(defn east-west-style []
+ {:position :absolute
+  :height "100%"
+  :background "red"
+  :width  "5px"})
 
-(defn expand-vertical-indicator []
+(defn north-south-style []
+  {:position :absolute
+   :height "5px"
+   :width  "100%"
+   :background "blue"})
+
+(defn expand-east-indicator []
+  [:div {:style (merge  
+                  (east-west-style)
+                  {:right 0
+                   :cursor "e-resize"})}])
+            
+(defn expand-west-indicator []
   [:div
-   {:style {:cursor :pointer
-            :position :absolute
-            :top "-10px"
-            :right 0
-            :background :red
-            :height "10px"
-            :width  "5px"}}])
+   {:style (merge  
+            (east-west-style)
+            {:left 0
+             :cursor "w-resize"})}])
+
+(defn expand-south-indicator []
+  [:div
+   {:style (merge
+            (north-south-style)
+            {:bottom 0
+             :cursor "s-resize"})}])
+
+(defn expand-north-indicator []
+  [:div
+   {:style (merge
+            (north-south-style)
+            {:top    0
+             :cursor "n-resize"})}])            
 
 ;;
 ;; GRID LAYER
@@ -201,8 +224,7 @@
                        :align-items :center
                        :color "#DDD"
                        :height "100%"
-                       :width "100%"
-                       :position :relative}}
+                       :width "100%"}}                       
            component])))
 
 
@@ -246,26 +268,32 @@
                    :display :flex
                    :justify-content :center
                    :align-items :center
+                   :position :relative
                    :border-radius "15px"})
 
-(defn area-item-letter [item]
-  (let [letter  (fn [] (utils/number-to-letter (:position item)))
-        active  (fn [] @(subscribe [:db/get [:overlay :active]]))
-        active? (fn [] (= (letter) (active)))]
-    [:div {:style letter-style}
-       (str (letter))
-       (if (active?)
-        [:<>
-         [expand-horizontal-indicator]
-         [expand-vertical-indicator]])]))
+(defn area-item-letter [letter item]
+  [:div {:style letter-style}
+       (str (letter))])
+       
 
 (defn area-item-inner [component id]
-  (let [position        (:position component)
-        area-id     (str "area-" id)]   
+  (let [position    (:position component)
+        area-id     (str "area-" id)
+        letter      (fn [] (utils/number-to-letter position))
+        active      (fn [] @(subscribe [:db/get [:overlays :areas :active]]))
+        active?     (fn [] (= (letter) (active)))]   
      [:div {:id  area-id
             :style {:width "100%" :height "100%"
+                    :position :relative
                     :background (rand-nth utils/random-colors)}}            
-         [area-item-letter component]]))
+         (if (active?)
+           [:<>
+            [expand-north-indicator]
+            [expand-east-indicator]
+            [expand-south-indicator]
+            [expand-west-indicator]])
+         [area-item-letter letter component]]))
+         
 
 
 (defn draggable-area-style [dragged-letter transform position]
