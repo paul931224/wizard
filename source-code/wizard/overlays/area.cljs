@@ -3,7 +3,16 @@
              [re-frame.core :refer [dispatch subscribe]]
              [wizard.overlays.wrapper :as overlay-wrapper]
              ["react" :as react]
-             ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
+             ["@dnd-kit/core" :refer [closestCenter
+                                      KeyboardSensor
+                                      PointerSensor
+                                      TouchSensor
+                                      DragOverlay
+                                      useSensor
+                                      useSensors
+                                      useDraggable 
+                                      useDroppable 
+                                      DndContext]]
              ["@dnd-kit/utilities" :refer [CSS]]
              ["@dnd-kit/modifiers" :refer [restrictToWindowEdges restrictToHorizontalAxis restrictToFirstScrollableAncestor]]
              [wizard.editor.grid :as grid]
@@ -122,6 +131,7 @@
    (let [{:keys [active over]} (utils/to-clj-map event)
          area      (:id active)
          overlapping-areas      (calculate-overlapping-areas area)]
+     (.log js/console "Is it resize or drag?" event)
      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
      (dispatch [:db/set [:overlays :areas :active]  area])
      (dispatch [:db/set [:overlays :areas :dragged] area]))))
@@ -173,39 +183,54 @@
    :width  "100%"
    :background "blue"})
 
-(defn resize-east-indicator []
+(defn resize-east-indicator [id]
   [:div {:style (merge  
-                  (east-west-style)
-                  {:right 0
-                   :cursor "e-resize"})}])
+                 (east-west-style)
+                 {:right 0
+                  :cursor "e-resize"})}])
             
-(defn resize-west-indicator []
+(defn resize-west-indicator [id]
   [:div
    {:style (merge  
             (east-west-style)
             {:left 0
              :cursor "w-resize"})}])
 
-(defn resize-south-indicator []
+(defn resize-south-indicator [id]
   [:div
    {:style (merge
             (north-south-style)
             {:bottom 0
              :cursor "s-resize"})}])
 
-(defn resize-north-indicator []
-  [:div
-   {:style (merge
-            (north-south-style)
-            {:top    0
-             :cursor "n-resize"})}])            
+(defn resize-north-indicator [id]
+  (let [use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id (str id "resize")})))
+        {:keys [attributes
+                listeners
+                transform
+                setNodeRef]}  use-draggable
+        sensors (useSensors
+                 (useSensor PointerSensor)
+                 (useSensor KeyboardSensor, TouchSensor))] 
+    [dnd-context {:sensors  sensors
+                  :collisionDetection closestCenter
+                  :onDragStart (fn [e] (.log js/console "Start the resize"))}
+                  
+       [:div
+        (merge
+         attributes listeners
+         {:ref (js->clj setNodeRef)
+          :style (merge
+                   (north-south-style)
+                   {:top    0
+                    :cursor "n-resize"})})]]))            
 
-(defn resize-indicators []
+(defn resize-indicators [id]
  [:<>
-  [resize-north-indicator]
-  [resize-east-indicator]
-  [resize-south-indicator]
-  [resize-west-indicator]])
+  [:f> resize-north-indicator id]
+  [:f> resize-east-indicator  id]
+  [:f> resize-south-indicator id]
+  [:f> resize-west-indicator  id]])
 
 ;;
 ;; GRID LAYER
@@ -217,8 +242,7 @@
         overlapping?        (fn [] 
                              (boolean (some (fn [overlapped-index]
                                              (= id overlapped-index))
-                                            @overlapping-areas))) 
-        ref (r/atom nil)]
+                                            @overlapping-areas)))]        
     (fn [{:keys [id component]}]
         [:div {:ref (fn [e] (dispatch [:db/set [:overlays :areas :area-dropzones id] e]))
                :style {:background (cond 
@@ -296,7 +320,9 @@
 
 
 (defn draggable-area-style [dragged-letter transform position]
-  (let [letter (utils/number-to-letter position)] 
+  (let [dragged? (subscribe [:db/get [:overlays :areas :dragged]])
+        resized? (subscribe [:db/get [:overlays :areas :dragged]])
+        letter   (utils/number-to-letter position)] 
    {:display  (cond
                 (= dragged-letter letter) :inherit
                 (= dragged-letter nil   ) :inherit
@@ -305,7 +331,10 @@
     
     :height "100%"
     :width  "100%"
-    :transform (.toString (.-Transform CSS) (clj->js transform))                         
+    :transform (cond 
+                @dragged? (.toString (.-Transform CSS) (clj->js transform))
+                @resized? ""
+                :else     "")                         
     :grid-area letter}))
 
 (defn area-item [props]
@@ -324,15 +353,17 @@
     [:div (merge {:style (merge 
                           (draggable-area-style @dragged-id transform position))
                            
-                   :class ["area"]})
+                  :class ["area"]})
                    
       [:div (merge 
              {:ref (js->clj setNodeRef)}
+             
+                      
              attributes 
              listeners) 
         [area-item-inner component id]]    
       (if (active?)
-       [resize-indicators])]))
+       [resize-indicators id])]))
      
 
 
@@ -358,7 +389,7 @@
                     (let [letter (utils/number-to-letter (:position item-value))] 
                       (if (available-area? letter) 
                        [:f> area-item {:id        letter
-                                         :component item-value}])))
+                                       :component item-value}])))
                    components)
       (last value-path)
       (the-grid)]]
@@ -369,7 +400,7 @@
 ;; SUMMARY
 ;;
 
-(defn view []
+(defn functional-view []
   (let [overlay (subscribe [:db/get [:overlays :type]])
         value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
         components-value-path (fn [] (vec (conj (value-path) :components)))
@@ -379,13 +410,23 @@
         row-count    (fn [] (count (:rows (grid-data))))
         all-area-cells    (fn [] (flatten (:areas (grid-data))))
         items-count  (fn [] (count (components)))
-        abc-matrix   (fn [] (utils/generate-abc-matrix (items-count)))]
+        abc-matrix   (fn [] (utils/generate-abc-matrix (items-count)))
+        sensors (useSensors
+                 (useSensor PointerSensor)
+                 (useSensor KeyboardSensor, TouchSensor))]
+        
      (if (= :area @overlay)
       [dnd-context {:onDragStart    (handle-drag-start (value-path))
                     :onDragMove     (handle-drag-move  (value-path))
-                    :onDragEnd      (handle-drag-end   (value-path))}
+                    :onDragEnd      (handle-drag-end   (value-path))
+                    :sensors            sensors
+                    :collisionDetection closestCenter}
+                    
                     ;:modifiers      []}
         [:<>                 
          [grid-layer (value-path) (all-area-cells)]
          [area-layer (value-path) (components) (grid-data)]]])))
         
+
+(defn view []
+ [:f> functional-view])        
