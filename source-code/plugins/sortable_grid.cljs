@@ -30,7 +30,7 @@
 (def drag-overlay   (r/adapt-react-class DragOverlay))
 
 (defn sortable-container-style [transform transition]
-  {:transform (.toString (.-Transform CSS) (clj->js transform))
+  {:transform (.toString (.-Translate CSS) (clj->js transform))
    :transition transition
    :display :flex
    :justify-content :center 
