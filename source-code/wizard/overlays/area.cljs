@@ -173,32 +173,39 @@
    :width  "100%"
    :background "blue"})
 
-(defn expand-east-indicator []
+(defn resize-east-indicator []
   [:div {:style (merge  
                   (east-west-style)
                   {:right 0
                    :cursor "e-resize"})}])
             
-(defn expand-west-indicator []
+(defn resize-west-indicator []
   [:div
    {:style (merge  
             (east-west-style)
             {:left 0
              :cursor "w-resize"})}])
 
-(defn expand-south-indicator []
+(defn resize-south-indicator []
   [:div
    {:style (merge
             (north-south-style)
             {:bottom 0
              :cursor "s-resize"})}])
 
-(defn expand-north-indicator []
+(defn resize-north-indicator []
   [:div
    {:style (merge
             (north-south-style)
             {:top    0
              :cursor "n-resize"})}])            
+
+(defn resize-indicators []
+ [:<>
+  [resize-north-indicator]
+  [resize-east-indicator]
+  [resize-south-indicator]
+  [resize-west-indicator]])
 
 ;;
 ;; GRID LAYER
@@ -271,7 +278,7 @@
                    :position :relative
                    :border-radius "15px"})
 
-(defn area-item-letter [letter item]
+(defn area-item-letter [letter]
   [:div {:style letter-style}
        (str (letter))])
        
@@ -279,20 +286,12 @@
 (defn area-item-inner [component id]
   (let [position    (:position component)
         area-id     (str "area-" id)
-        letter      (fn [] (utils/number-to-letter position))
-        active      (fn [] @(subscribe [:db/get [:overlays :areas :active]]))
-        active?     (fn [] (= (letter) (active)))]   
+        letter      (fn [] (utils/number-to-letter position))]   
      [:div {:id  area-id
             :style {:width "100%" :height "100%"
                     :position :relative
                     :background (rand-nth utils/random-colors)}}            
-         (if (active?)
-           [:<>
-            [expand-north-indicator]
-            [expand-east-indicator]
-            [expand-south-indicator]
-            [expand-west-indicator]])
-         [area-item-letter letter component]]))
+         [area-item-letter letter]]))
          
 
 
@@ -315,18 +314,26 @@
         dragged-id            (subscribe [:db/get [:overlays :areas :dragged]])
         position              (:position component)
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
+        letter                (fn [] (utils/number-to-letter (:position component)))
         {:keys [attributes
                 listeners
                 transform
-                setNodeRef]}  use-draggable]
+                setNodeRef]}  use-draggable
+        active      (fn [] @(subscribe [:db/get [:overlays :areas :active]]))
+        active?     (fn [] (= (letter) (active)))]        
     [:div (merge {:style (merge 
                           (draggable-area-style @dragged-id transform position))
                            
-                   :class ["area"]
-                   :ref (js->clj setNodeRef)}
-                 attributes
-                 listeners)
-      [area-item-inner component id]]))
+                   :class ["area"]})
+                   
+      [:div (merge 
+             {:ref (js->clj setNodeRef)}
+             attributes 
+             listeners) 
+        [area-item-inner component id]]    
+      (if (active?)
+       [resize-indicators])]))
+     
 
 
 (defn area-layer [value-path components grid-data]
