@@ -219,12 +219,28 @@
                   :cursor "n-resize"})})]))
 
 (defn handle-resize-start [event]
- (let [{:keys [active over]} (utils/to-clj-map event)
-       area      (:id active)
+ (let [{:keys [active over]}  (utils/to-clj-map event)
+       area                   (:id active)
        overlapping-areas      (calculate-overlapping-areas area)]
-   (.log js/console "Resize started.")  
+   (.log js/console "Resize started.: " event)  
    (dispatch [:db/set [:overlays :areas :dragged] nil])
-   (dispatch [:db/set [:overlays :areas :resized] area])))
+   (dispatch [:db/set [:overlays :areas :resized] area])
+   (dispatch [:db/set [:overlays :areas :resize-direction] :north])))
+
+(defn handle-resize-move [event]
+  (let [{:keys [active over]} (utils/to-clj-map event)
+        area      (:id active)
+        overlapping-areas      (calculate-overlapping-areas area)]
+    (.log js/console "Resizing.")))
+   
+
+(defn handle-resize-end [event]
+  (let [{:keys [active over]} (utils/to-clj-map event)
+        area      (:id active)
+        overlapping-areas      (calculate-overlapping-areas area)]
+    (.log js/console "Resize ended.")
+    (dispatch [:db/set [:overlays :areas :resized] nil])
+    (dispatch [:db/set [:overlays :areas :resize-direction] nil])))
 
 (defn resize-north-indicator [id]
   (let [sensors (useSensors
@@ -233,8 +249,8 @@
     [dnd-context {:sensors  sensors
                   :collisionDetection closestCenter
                   :onDragStart    handle-resize-start
-                  :onDragMove     (fn [e] (.log js/console e))
-                  :onDragEnd      #(.log js/console "hello")}
+                  :onDragMove     handle-resize-move
+                  :onDragEnd      handle-resize-end}
        [:f> resize-north-indicator-drag id]]))
                     
                                 
@@ -347,7 +363,7 @@
     :width  "100%"
     :transform (cond 
                 @dragged? (.toString (.-Transform CSS) (clj->js transform))
-                @resized? ""
+                @resized? "scale(1.2)"
                 :else     "")                         
     :grid-area letter}))
 
