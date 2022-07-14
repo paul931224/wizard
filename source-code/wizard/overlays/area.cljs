@@ -131,7 +131,7 @@
    (let [{:keys [active over]} (utils/to-clj-map event)
          area      (:id active)
          overlapping-areas      (calculate-overlapping-areas area)]
-     (.log js/console "Is it resize or drag?" event)
+     (.log js/console "Drag started.")
      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
      (dispatch [:db/set [:overlays :areas :active]  area])
      (dispatch [:db/set [:overlays :areas :dragged] area]))))
@@ -218,14 +218,22 @@
                  {:top    0
                   :cursor "n-resize"})})]))
 
+(defn handle-resize-start [event]
+ (let [{:keys [active over]} (utils/to-clj-map event)
+       area      (:id active)
+       overlapping-areas      (calculate-overlapping-areas area)]
+   (.log js/console "Resize started.")  
+   (dispatch [:db/set [:overlays :areas :dragged] nil])
+   (dispatch [:db/set [:overlays :areas :resized] area])))
+
 (defn resize-north-indicator [id]
   (let [sensors (useSensors
                  (useSensor PointerSensor)
                  (useSensor KeyboardSensor, TouchSensor))] 
     [dnd-context {:sensors  sensors
                   :collisionDetection closestCenter
-                  :onDragStart    #(.log js/console "hello")
-                  :onDragMove     #(.log js/console "hello")
+                  :onDragStart    handle-resize-start
+                  :onDragMove     (fn [e] (.log js/console e))
                   :onDragEnd      #(.log js/console "hello")}
        [:f> resize-north-indicator-drag id]]))
                     
@@ -327,7 +335,7 @@
 
 (defn draggable-area-style [dragged-letter transform position]
   (let [dragged? (subscribe [:db/get [:overlays :areas :dragged]])
-        resized? (subscribe [:db/get [:overlays :areas :dragged]])
+        resized? (subscribe [:db/get [:overlays :areas :resized]])
         letter   (utils/number-to-letter position)] 
    {:display  (cond
                 (= dragged-letter letter) :inherit
