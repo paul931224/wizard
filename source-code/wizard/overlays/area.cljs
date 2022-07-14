@@ -203,27 +203,33 @@
             {:bottom 0
              :cursor "s-resize"})}])
 
+(defn resize-north-indicator-drag [id]
+ (let [use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id (str id "resize")})))
+       {:keys [attributes
+               listeners
+               transform
+               setNodeRef]}  use-draggable]       
+  [:div
+   (merge
+    attributes listeners
+    {:ref (js->clj setNodeRef)
+     :style (merge
+                 (north-south-style)
+                 {:top    0
+                  :cursor "n-resize"})})]))
+
 (defn resize-north-indicator [id]
-  (let [use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id (str id "resize")})))
-        {:keys [attributes
-                listeners
-                transform
-                setNodeRef]}  use-draggable
-        sensors (useSensors
+  (let [sensors (useSensors
                  (useSensor PointerSensor)
                  (useSensor KeyboardSensor, TouchSensor))] 
     [dnd-context {:sensors  sensors
                   :collisionDetection closestCenter
-                  :onDragStart (fn [e] (.log js/console "Start the resize"))}
-                  
-       [:div
-        (merge
-         attributes listeners
-         {:ref (js->clj setNodeRef)
-          :style (merge
-                   (north-south-style)
-                   {:top    0
-                    :cursor "n-resize"})})]]))            
+                  :onDragStart    #(.log js/console "hello")
+                  :onDragMove     #(.log js/console "hello")
+                  :onDragEnd      #(.log js/console "hello")}
+       [:f> resize-north-indicator-drag id]]))
+                    
+                                
 
 (defn resize-indicators [id]
  [:<>
@@ -351,19 +357,16 @@
         active      (fn [] @(subscribe [:db/get [:overlays :areas :active]]))
         active?     (fn [] (= (letter) (active)))]        
     [:div (merge {:style (merge 
-                          (draggable-area-style @dragged-id transform position))
-                           
+                          (draggable-area-style @dragged-id transform position))      
                   :class ["area"]})
                    
       [:div (merge 
              {:ref (js->clj setNodeRef)}
-             
-                      
+ 
              attributes 
              listeners) 
         [area-item-inner component id]]    
-      (if (active?)
-       [resize-indicators id])]))
+      [resize-indicators id]]))
      
 
 
@@ -421,8 +424,6 @@
                     :onDragEnd      (handle-drag-end   (value-path))
                     :sensors            sensors
                     :collisionDetection closestCenter}
-                    
-                    ;:modifiers      []}
         [:<>                 
          [grid-layer (value-path) (all-area-cells)]
          [area-layer (value-path) (components) (grid-data)]]])))
