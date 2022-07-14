@@ -204,7 +204,7 @@
              :cursor "s-resize"})}])
 
 (defn resize-north-indicator-drag [id]
- (let [use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id (str id "resize")})))
+ (let [use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
        {:keys [attributes
                listeners
                transform
@@ -218,29 +218,41 @@
                  {:top    0
                   :cursor "n-resize"})})]))
 
-(defn handle-resize-start [event]
- (let [{:keys [active over]}  (utils/to-clj-map event)
-       area                   (:id active)
-       overlapping-areas      (calculate-overlapping-areas area)]
+(defn handle-resize-start [resize-direction]
+ (fn [event]
+  (let [{:keys [active over]}  (utils/to-clj-map event)
+        area                   (:id active)
+        overlapping-areas      (calculate-overlapping-areas area)]
    (.log js/console "Resize started.: " event)  
    (dispatch [:db/set [:overlays :areas :dragged] nil])
    (dispatch [:db/set [:overlays :areas :resized] area])
-   (dispatch [:db/set [:overlays :areas :resize-direction] :north])))
+   (dispatch [:db/set [:overlays :areas :resize-direction] resize-direction])
+   (dispatch [:db/set [:overlays :areas :resize-delta] {:x 0 :y 0}]))))
 
-(defn handle-resize-move [event]
-  (let [{:keys [active over]} (utils/to-clj-map event)
-        area      (:id active)
-        overlapping-areas      (calculate-overlapping-areas area)]
-    (.log js/console "Resizing.")))
+(defn handle-resize-move [resize-direction]
+  (fn [event]
+   (let [{:keys [active over]} (utils/to-clj-map event)
+         area         (:id active)
+         event-delta  (utils/to-clj-map (.-delta event))
+         x-delta      (:x event-delta)
+         y-delta      (:y event-delta)
+         overlapping-areas      (calculate-overlapping-areas area)]
+     (dispatch [:db/set [:overlays :areas :resized] area])
+     (dispatch [:db/set [:overlays :areas :resize-direction] resize-direction])
+     (dispatch [:db/set [:overlays :areas :resize-delta] {:x x-delta
+                                                          :y y-delta}])
+     (.log js/console "Resizing." overlapping-areas))))
+     
    
 
-(defn handle-resize-end [event]
-  (let [{:keys [active over]} (utils/to-clj-map event)
-        area      (:id active)
-        overlapping-areas      (calculate-overlapping-areas area)]
-    (.log js/console "Resize ended.")
-    (dispatch [:db/set [:overlays :areas :resized] nil])
-    (dispatch [:db/set [:overlays :areas :resize-direction] nil])))
+(defn handle-resize-end []
+  (fn [event]
+   (let [{:keys [active over]} (utils/to-clj-map event)
+         area      (:id active)
+         overlapping-areas      (calculate-overlapping-areas area)]
+     (.log js/console "Resize ended.")
+     (dispatch [:db/set [:overlays :areas :resized] nil])
+     (dispatch [:db/set [:overlays :areas :resize-direction] nil]))))
 
 (defn resize-north-indicator [id]
   (let [sensors (useSensors
@@ -248,9 +260,9 @@
                  (useSensor KeyboardSensor, TouchSensor))] 
     [dnd-context {:sensors  sensors
                   :collisionDetection closestCenter
-                  :onDragStart    handle-resize-start
-                  :onDragMove     handle-resize-move
-                  :onDragEnd      handle-resize-end}
+                  :onDragStart    (handle-resize-start :north)
+                  :onDragMove     (handle-resize-move  :north)
+                  :onDragEnd      (handle-resize-end)}
        [:f> resize-north-indicator-drag id]]))
                     
                                 
@@ -349,29 +361,29 @@
          
 
 
-(defn draggable-area-style [dragged-letter transform position]
-  (let [dragged? (subscribe [:db/get [:overlays :areas :dragged]])
-        resized? (subscribe [:db/get [:overlays :areas :resized]])
-        letter   (utils/number-to-letter position)] 
+(defn draggable-area-style [dragged-letter resized-letter transform position]
+  (let [letter   (utils/number-to-letter position)] 
    {:display  (cond
-                (= dragged-letter letter) :inherit
-                (= dragged-letter nil   ) :inherit
-                :else :none)
-    :position :relative
-    
+                (= dragged-letter letter)      :inherit                
+                (= resized-letter letter)      :inherit
+                (and (= dragged-letter nil)
+                     (= resized-letter nil))   :inherit
+                :else                          :none)
+    :position :relative    
     :height "100%"
     :width  "100%"
     :transform (cond 
-                @dragged? (.toString (.-Transform CSS) (clj->js transform))
-                @resized? "scale(1.2)"
+                dragged-letter (.toString (.-Transform CSS) (clj->js transform))
+                resized-letter "scale(1.2)"
                 :else     "")                         
     :grid-area letter}))
 
 (defn area-item [props]
   (let [id                    (:id props)
         component             (:component props)
-        dragged-id            (subscribe [:db/get [:overlays :areas :dragged]])
         position              (:position component)
+        dragged-letter (subscribe [:db/get [:overlays :areas :dragged]])
+        resized-letter (subscribe [:db/get [:overlays :areas :resized]])
         use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
         letter                (fn [] (utils/number-to-letter (:position component)))
         {:keys [attributes
@@ -381,7 +393,7 @@
         active      (fn [] @(subscribe [:db/get [:overlays :areas :active]]))
         active?     (fn [] (= (letter) (active)))]        
     [:div (merge {:style (merge 
-                          (draggable-area-style @dragged-id transform position))      
+                          (draggable-area-style @dragged-letter @resized-letter transform position))      
                   :class ["area"]})
                    
       [:div (merge 
