@@ -143,7 +143,7 @@
           overlapping-areas      (calculate-overlapping-areas area)
           areas-path             (vec (concat value-path [:areas]))
           areas                  @(subscribe [:db/get areas-path])
-          modified-areas         (modify-areas {:area-to-fill        areas
+          modified-areas         (modify-areas {:area-to-fill        area
                                                 :areas-config        areas
                                                 :indexes-overlapped  overlapping-areas})
           possible-config?       (correct-area-config? modified-areas area)]                            
@@ -161,15 +161,14 @@
           possible-config?       @(subscribe [:db/get [:overlays :areas :possible-config?]])
           modified-areas         (modify-areas {:area-to-fill        area 
                                                 :areas-config        grid-areas
-                                                :indexes-overlapped  overlapping-positions})    
-          area-config-correct? (correct-area-config? modified-areas area)]            
+                                                :indexes-overlapped  overlapping-positions})]                          
       (if possible-config?
         (dispatch [:db/set areas-path modified-areas]))                            
       (dispatch [:db/set [:overlays :areas :dragged] nil])
       (dispatch [:db/set [:overlays :areas :possible-config?]  true])
       (dispatch [:db/set [:overlays :areas :overlapping-areas] []]))))
 
-(defn handle-resize-start [resize-direction]
+(defn handle-resize-start [value-path resize-direction]
   (fn [event]
      (let [{:keys [active over]}  (utils/to-clj-map event)
              area                   (:id active)
@@ -181,26 +180,42 @@
       (dispatch [:db/set [:overlays :areas :resize-direction] resize-direction])
       (dispatch [:db/set [:overlays :areas :resize-delta] {:x 0 :y 0}]))))
 
-(defn handle-resize-move [resize-direction]
+(defn handle-resize-move [value-path resize-direction]
   (fn [event]
     (let [{:keys [active over]} (utils/to-clj-map event)
           area         (:id active)
           event-delta  (utils/to-clj-map (.-delta event))
           x-delta      (:x event-delta)
           y-delta      (:y event-delta)
-          overlapping-areas      (calculate-overlapping-areas area)]
-      (dispatch [:db/set [:overlays :areas :resized] area])
-      (dispatch [:db/set [:overlays :areas :resize-direction] resize-direction])
-      (dispatch [:db/set [:overlays :areas :resize-delta] {:x x-delta
-                                                           :y y-delta}])
+          overlapping-areas      (calculate-overlapping-areas area)
+          areas-path             (vec (concat value-path [:areas]))
+          areas                  @(subscribe [:db/get areas-path])
+          modified-areas         (modify-areas {:area-to-fill        area
+                                                :areas-config        areas
+                                                :indexes-overlapped  overlapping-areas})
+          possible-config?       (correct-area-config? modified-areas area)]                       
+      (dispatch [:db/set [:overlays :areas :possible-config?]  possible-config?])
+      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
+      (dispatch [:db/set [:overlays :areas :resized]           area])
+      (dispatch [:db/set [:overlays :areas :resize-direction]  resize-direction])
+      (dispatch [:db/set [:overlays :areas :resize-delta]      {:x x-delta
+                                                                 :y y-delta}])
       (.log js/console "Resizing." overlapping-areas))))
 
-(defn handle-resize-end []
+(defn handle-resize-end [value-path]
   (fn [event]
     (let [{:keys [active over]} (utils/to-clj-map event)
-          area      (:id active)
-          overlapping-areas      (calculate-overlapping-areas area)]
+          area                   (:id active)
+          areas-path             (vec (concat value-path [:areas]))
+          grid-areas             @(subscribe [:db/get areas-path])
+          overlapping-positions  @(subscribe [:db/get [:overlays :areas :overlapping-areas]])
+          possible-config?       @(subscribe [:db/get [:overlays :areas :possible-config?]])
+          modified-areas         (modify-areas {:area-to-fill        area 
+                                                :areas-config        grid-areas
+                                                :indexes-overlapped  overlapping-positions})]                          
       (.log js/console "Resize ended.")
+      (if possible-config?
+        (dispatch [:db/set areas-path modified-areas]))
       (dispatch [:db/set [:overlays :areas :resized] nil])
       (dispatch [:db/set [:overlays :areas :resize-direction] nil])
       (dispatch [:db/set [:overlays :areas :resized-area-rect] nil]))))     
@@ -245,23 +260,23 @@
                  {:ref (js->clj setNodeRef)
                   :style style})]))
 
-(defn resize-indicator-context [id direction style]
+(defn resize-indicator-context [id direction style value-path]
   (let [sensors (useSensors
                  (useSensor PointerSensor)
                  (useSensor KeyboardSensor, TouchSensor))]
     [dnd-context {:sensors  sensors
                   :collisionDetection closestCenter
-                  :onDragStart    (handle-resize-start direction)
-                  :onDragMove     (handle-resize-move  direction)
-                  :onDragEnd      (handle-resize-end)}
+                  :onDragStart    (handle-resize-start value-path direction)
+                  :onDragMove     (handle-resize-move  value-path direction)
+                  :onDragEnd      (handle-resize-end   value-path)}
      [:f> resize-indicator-draggable id style]]))                                
 
-(defn resize-indicators [id]
+(defn resize-indicators [id value-path]
  [:<>
-  [:f> resize-indicator-context id :north north-style]
-  [:f> resize-indicator-context id :east  east-style]
-  [:f> resize-indicator-context id :south south-style]
-  [:f> resize-indicator-context id :west  west-style]])
+  [:f> resize-indicator-context id :north north-style value-path]
+  [:f> resize-indicator-context id :east  east-style  value-path]
+  [:f> resize-indicator-context id :south south-style value-path]
+  [:f> resize-indicator-context id :west  west-style  value-path]])
 
 ;;
 ;; GRID LAYER
@@ -352,29 +367,32 @@
 (defn resize-transform [{:keys [direction area-width area-height delta-y delta-x]}]
  (let [new-area-width  (+ area-width  delta-x)
        new-area-height (+ area-height delta-y)
-       scale-x         (/ area-width  new-area-width)
-       scale-y         (/ area-height new-area-height)
-       half-delta-x   (/ delta-x 2)
-       half-delta-y   (/ delta-y 2)
-       north?         (= direction :north)
-       east?          (= direction :east)
-       south?         (= direction :south)
-       west?          (= direction :west)
-       horizontal?    (or east? west?)
-       vertical?      (or north? south?)
-       scale-str      (str 
-                       "scale(" 
-                       (if horizontal? scale-x "1") 
-                       "," 
-                       (if vertical?   scale-y "1")
-                       ")")
+       scale-x         (/  area-width  new-area-width)
+       scale-y         (/  area-height new-area-height)
+       half-delta-x    (/ delta-x 2)
+       half-delta-y    (/ delta-y 2)
+       north?          (= direction :north)
+       east?           (= direction :east)
+       south?          (= direction :south)
+       west?           (= direction :west)
+       horizontal?     (or east? west?)
+       vertical?       (or north? south?)
+       scale-str       (str 
+                        "scale(" 
+                        (if horizontal? scale-x "1") 
+                        "," 
+                        (if vertical?   scale-y "1")
+                        ")")
        translate-str   (str 
                         "translate(" 
-                        (if horizontal? half-delta-x "0")
+                        (if horizontal? 
+                         half-delta-x 
+                         "0")
                         "px, " 
-                        (if vertical?   half-delta-y "0")
-                        "px)")]         
-    
+                        (if vertical?   
+                         half-delta-y 
+                         "0")
+                        "px)")]             
     (str scale-str " " translate-str)))
          
 
@@ -400,7 +418,7 @@
     :width  "100%"
     :transform (cond 
                 dragged-letter (.toString (.-Transform CSS) (clj->js transform))
-                resized-letter (resize-transform {:direction @resize-direction
+                resized-letter (resize-transform {:direction   @resize-direction
                                                   :area-height area-height 
                                                   :area-width  area-width 
                                                   :delta-x     delta-x 
@@ -411,6 +429,7 @@
 (defn area-item [props]
   (let [id                    (:id props)
         component             (:component props)
+        value-path            (:value-path props)
         position              (:position component)
         dragged-letter (subscribe [:db/get [:overlays :areas :dragged]])
         resized-letter (subscribe [:db/get [:overlays :areas :resized]])
@@ -432,7 +451,7 @@
              attributes 
              listeners) 
         [area-item-inner component id]]    
-      [resize-indicators id]]))
+      [resize-indicators id value-path]]))
      
 
 
@@ -457,8 +476,9 @@
       (map-indexed (fn [index [item-key item-value]]                     
                     (let [letter (utils/number-to-letter (:position item-value))] 
                       (if (available-area? letter) 
-                       [:f> area-item {:id        letter
-                                       :component item-value}])))
+                       [:f> area-item {:id         letter
+                                       :component  item-value
+                                       :value-path value-path}])))
                    components)
       (last value-path)
       (the-grid)]]
