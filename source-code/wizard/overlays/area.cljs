@@ -350,12 +350,33 @@
          
 
 (defn resize-transform [{:keys [direction area-width area-height delta-y delta-x]}]
- (let [scale-x (/ area-width  (+ area-width  delta-x))
-       scale-y (/ area-height (+ area-height delta-y))
-       half-delta-x (/ delta-x 2)
-       half-delta-y (/ delta-y 2)]
-    (str "scale(" scale-x "," scale-y ") "
-         "translate(" half-delta-x "px, " half-delta-y "px)")))
+ (let [new-area-width  (+ area-width  delta-x)
+       new-area-height (+ area-height delta-y)
+       scale-x         (/ area-width  new-area-width)
+       scale-y         (/ area-height new-area-height)
+       half-delta-x   (/ delta-x 2)
+       half-delta-y   (/ delta-y 2)
+       north?         (= direction :north)
+       east?          (= direction :east)
+       south?         (= direction :south)
+       west?          (= direction :west)
+       horizontal?    (or east? west?)
+       vertical?      (or north? south?)
+       scale-str      (str 
+                       "scale(" 
+                       (if horizontal? scale-x "1") 
+                       "," 
+                       (if vertical?   scale-y "1")
+                       ")")
+       translate-str   (str 
+                        "translate(" 
+                        (if horizontal? half-delta-x "0")
+                        "px, " 
+                        (if vertical?   half-delta-y "0")
+                        "px)")]         
+    
+    (str scale-str " " translate-str)))
+         
 
 
 (defn draggable-area-style [dragged-letter resized-letter transform position]
