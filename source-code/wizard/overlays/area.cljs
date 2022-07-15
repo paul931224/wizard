@@ -378,24 +378,14 @@
        horizontal?     (or east? west?)
        vertical?       (or north? south?)
        scale-str       (str 
-                        "scale(" 
-                        (if horizontal? scale-x "1") 
-                        "," 
-                        (if vertical?   scale-y "1")
-                        ")")
+                        (str "scaleX(" (if horizontal?  scale-x 1) ") ")
+                        (str "scaleY(" (if vertical?    scale-y 1) ") "))                      
        translate-str   (str 
-                        "translate(" 
-                        (if horizontal? 
-                         half-delta-x 
-                         "0")
-                        "px, " 
-                        (if vertical?   
-                         half-delta-y 
-                         "0")
-                        "px)")]             
+                        (str "translateX(" (if horizontal? half-delta-x 0) "px) ") 
+                        (str "translateY(" (if vertical?   half-delta-y 0) "px) "))]                           
     (.log js/console " new-area-height" new-area-height " area-height: " area-height
                      "delta-y: "        delta-y   " delta-y-half" half-delta-y)
-    (str  translate-str " " scale-str)))
+    (str  translate-str scale-str)))
          
 
 
