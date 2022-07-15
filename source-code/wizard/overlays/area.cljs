@@ -365,10 +365,10 @@
          
 
 (defn resize-transform [{:keys [direction area-width area-height delta-y delta-x]}]
- (let [new-area-width  (+ area-width  delta-x)
-       new-area-height (+ area-height delta-y)
-       scale-x         (/  area-width  new-area-width)
-       scale-y         (/  area-height new-area-height)
+ (let [new-area-width  (- area-width  delta-x)
+       new-area-height (- area-height delta-y)
+       scale-x         (/  new-area-width  area-width)
+       scale-y         (/  new-area-height area-height)
        half-delta-x    (/ delta-x 2)
        half-delta-y    (/ delta-y 2)
        north?          (= direction :north)
@@ -393,7 +393,9 @@
                          half-delta-y 
                          "0")
                         "px)")]             
-    (str scale-str " " translate-str)))
+    (.log js/console " new-area-height" new-area-height " area-height: " area-height
+                     "delta-y: "        delta-y   " delta-y-half" half-delta-y)
+    (str  translate-str " " scale-str)))
          
 
 
