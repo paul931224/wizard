@@ -32,9 +32,16 @@
         :reagent-render
         (fn [content]
           @editor
-          [:div.overlay-wrapper {:style (merge 
-                                         plus-style
-                                         {:pointer-events :none
-                                          :position :absolute} 
-                                         @rect-data)}
-           content])}))))
+          [:div {:style {:position :absolute
+                         :overflow-x :hidden
+                         :height "100%"
+                         :width  "100%" 
+                         :pointer-events :none}}
+           [:div.overlay-wrapper {:style (merge 
+                                                  plus-style
+                                                  {:pointer-events :none
+                                                   :position :absolute}
+                                          
+                                           
+                                                  @rect-data)}
+                    content]])}))))

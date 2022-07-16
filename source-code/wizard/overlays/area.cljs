@@ -474,7 +474,8 @@
               :position :absolute
               :pointer-events :auto
               :left 0
-              :z-index 2}}
+              :z-index 2}} 
+              
      [grid/grid-wrapper
       (map-indexed (fn [index [item-key item-value]]                     
                     (let [letter (utils/number-to-letter (:position item-value))] 
@@ -485,8 +486,8 @@
                    components)
       (last value-path)
       (the-grid)]]
-    {:overflow-x :hidden 
-     :overflow-y :hidden}]))
+         {}]));:overflow-x :hidden 
+     ;:overflow-y :hidden}]))
 
 ;;
 ;; SUMMARY
