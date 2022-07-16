@@ -172,8 +172,17 @@
   (fn [event]
      (let [{:keys [active over]}  (utils/to-clj-map event)
              area                   (:id active)
-             original-area-rect     (dom-utils/get-rect-data (.getElementById js/document (str "area-" area)))]
+             original-area-rect     (dom-utils/get-rect-data (.getElementById js/document (str "area-" area)))
+             overlapping-areas      (calculate-overlapping-areas area)
+             areas-path             (vec (concat value-path [:areas]))
+             areas                  @(subscribe [:db/get areas-path])
+             modified-areas         (modify-areas {:area-to-fill        area
+                                                   :areas-config        areas
+                                                   :indexes-overlapped  overlapping-areas})
+             possible-config?       (correct-area-config? modified-areas area)]    
       (.log js/console "Resize started.: " original-area-rect)
+      (dispatch [:db/set [:overlays :areas :possible-config?]  possible-config?])
+      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
       (dispatch [:db/set [:overlays :areas :dragged] nil])
       (dispatch [:db/set [:overlays :areas :resized] area])
       (dispatch [:db/set [:overlays :areas :resized-area-rect] original-area-rect])
@@ -378,12 +387,9 @@
                         (/  area-width      new-area-width))
        scale-y         (if north? 
                         (/  new-area-height area-height)
-                        (/  area-height     new-area-height))
-       
+                        (/  area-height     new-area-height))       
        offset-x        (/ delta-x 2)
-                        
        offset-y        (/ delta-y 2)
-                       
        scale-str       (str 
                         (str "scaleX(" (if horizontal?  scale-x 1) ") ")
                         (str "scaleY(" (if vertical?    scale-y 1) ") "))                      
