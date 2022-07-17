@@ -369,6 +369,7 @@
      [:div {:id  area-id
             :style {:width "100%" :height "100%"
                     :position :relative
+                    :cursor :move
                     :background (rand-nth utils/random-colors)}}            
          [area-item-letter letter]]))
          
@@ -456,7 +457,34 @@
         [area-item-inner component id]]    
       [resize-indicators id value-path]]))
      
-
+(defn area-item-left-out [props]
+  (let [id                    (:id props)
+        component             (:component props)
+        value-path            (:value-path props)
+        position              (:position component)
+        dragged-letter (subscribe [:db/get [:overlays :areas :dragged]])
+        resized-letter (subscribe [:db/get [:overlays :areas :resized]])
+        use-draggable         (utils/to-clj-map (useDraggable (clj->js {:id id})))
+        letter                (fn [] (utils/number-to-letter (:position component)))
+        {:keys [attributes
+                listeners
+                transform
+                setNodeRef]}  use-draggable
+        active      (fn [] @(subscribe [:db/get [:overlays :areas :active]]))
+        active?     (fn [] (= (letter) (active)))]
+    [:div {:position :relative
+           :height "100%"
+           :width  "100%"}                                                
+     [:div (merge
+            {:ref       (js->clj setNodeRef)
+             :style {:transform (.toString (.-Transform CSS) (clj->js transform))}
+             :class ["area"]
+             
+             }
+            attributes
+            listeners)
+      [area-item-inner component id]]]))
+     
 
 (defn area-layer [value-path components grid-data]
  (let [the-grid (fn [] @(subscribe [:db/get value-path]))
@@ -476,17 +504,29 @@
               :left 0
               :z-index 2}} 
               
-     [grid/grid-wrapper
-      (map-indexed (fn [index [item-key item-value]]                     
-                    (let [letter (utils/number-to-letter (:position item-value))] 
-                      (if (available-area? letter) 
-                       [:f> area-item {:id         letter
-                                       :component  item-value
-                                       :value-path value-path}])))
-                   components)
-      (last value-path)
-      (the-grid)]]
-         {}]));:overflow-x :hidden 
+     [:div 
+      [:div {:style {:display :flex
+                     :position :absolute 
+                     :top "-40px"
+                     :background "white"}}
+        (map-indexed (fn [index [item-key item-value]]                     
+                      (let [letter (utils/number-to-letter (:position item-value))] 
+                        (if (not (available-area? letter)) 
+                         [:f> area-item-left-out {:id         letter
+                                                  :component  item-value
+                                                  :value-path value-path}])))
+                    components)]
+      [grid/grid-wrapper
+       (map-indexed (fn [index [item-key item-value]]                     
+                     (let [letter (utils/number-to-letter (:position item-value))] 
+                       (if (available-area? letter) 
+                        [:f> area-item {:id         letter
+                                        :component  item-value
+                                        :value-path value-path}])))
+                    components)
+       (last value-path)
+       (the-grid)]]]
+    {}]));:overflow-x :hidden 
      ;:overflow-y :hidden}]))
 
 ;;
