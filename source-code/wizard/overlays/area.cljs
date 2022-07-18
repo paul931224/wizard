@@ -133,8 +133,8 @@
          overlapping-areas      (calculate-overlapping-areas area)]
      (.log js/console "Drag started.")
      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
-     (dispatch [:db/set [:overlays :areas :active]  area])
-     (dispatch [:db/set [:overlays :areas :dragged] area]))))
+     (dispatch [:db/set [:overlays :areas :active]            area])
+     (dispatch [:db/set [:overlays :areas :dragged]           area]))))
 
 (defn handle-drag-move [value-path]
   (fn [event]
@@ -375,8 +375,10 @@
          
 
 (defn resize-transform [{:keys [direction area-width area-height delta-y delta-x]}]
- (let [new-area-width  (- area-width  delta-x)
-       new-area-height (- area-height delta-y)
+ (let [new-area-width-west    (- area-width  delta-x)
+       new-area-width-east    (+ area-width  delta-x)
+       new-area-height-north  (- area-height delta-y)
+       new-area-height-south  (+ area-height delta-y)
        north?          (= direction :north)
        east?           (= direction :east)
        south?          (= direction :south)
@@ -384,12 +386,14 @@
        horizontal?     (or east? west?)
        vertical?       (or north? south?)
        scale-x         (if west? 
-                        (/  new-area-width  area-width)
-                        (/  area-width      new-area-width))
+                         (/  new-area-width-west area-width)
+                         (/  new-area-width-east area-width))                         
        scale-y         (if north? 
-                        (/  new-area-height area-height)
-                        (/  area-height     new-area-height))       
-       offset-x        (/ delta-x 2)
+                         (/  new-area-height-north area-height)
+                         (/  new-area-height-south area-height))     
+       offset-x        (if west? 
+                         (/ delta-x 2)
+                         (/ delta-x 2))
        offset-y        (/ delta-y 2)
        scale-str       (str 
                         (str "scaleX(" (if horizontal?  scale-x 1) ") ")
@@ -526,8 +530,7 @@
                     components)
        (last value-path)
        (the-grid)]]]
-    {}]));:overflow-x :hidden 
-     ;:overflow-y :hidden}]))
+    {}]))
 
 ;;
 ;; SUMMARY

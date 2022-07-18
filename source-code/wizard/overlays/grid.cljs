@@ -4,8 +4,7 @@
              [wizard.editor.grid :as grid]
              [wizard.utils :as utils]))
             
-            
-
+          
 
 (defn row-indicator? [col-count index]
   (= 0 (rem (inc index) col-count)))
@@ -15,23 +14,23 @@
 
 (defn row-indicator []
   [:div
-   {:style {:cursor :pointer 
-            :position :absolute
-            :bottom "0px"
-            :right  "-10px"
+   {:style {:cursor     :pointer 
+            :position   :absolute
+            :bottom     "0px"
+            :right      "-10px"
             :background :blue
-            :height "5px"
-            :width  "10px"}}])
+            :height     "5px"
+            :width      "10px"}}])
 
 (defn col-indicator []
  [:div
-  {:style {:cursor :pointer
-           :position :absolute
-           :top "-10px"
-           :right 0
-           :background :red
-           :height "10px"
-           :width  "5px"}}])
+  {:style {:cursor      :pointer
+           :position    :absolute
+           :top         "-10px"
+           :right       0
+           :background  :red
+           :height      "10px"
+           :width       "5px"}}])
 
 
 (defn rem-col-indicator []
@@ -125,16 +124,16 @@
   
 
 (defn view []
- (let [overlay (subscribe [:db/get [:overlays :type]])
+ (let [overlay-type          (fn [] @(subscribe [:db/get [:overlays :type]]))
        value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
        components-value-path (fn [] (vec (conj (value-path) :components)))
        grid-data             (fn [] @(subscribe [:db/get (value-path)]))  
        components            (fn [] @(subscribe [:db/get (components-value-path)]))     
-       col-count (fn [] (count (:cols (grid-data))))
-       row-count (fn [] (count (:rows (grid-data))))
-       items     (fn [] (range (* (col-count) (row-count))))]
+       col-count             (fn [] (count (:cols (grid-data))))
+       row-count             (fn [] (count (:rows (grid-data))))
+       items                 (fn [] (range (* (col-count) (row-count))))]
                                 
-  (if (= :grid @overlay)
+  (if (= :grid (overlay-type))
    [overlay-wrapper/view 
       [:div#grid-overlay
          {:style {:height "100%"
