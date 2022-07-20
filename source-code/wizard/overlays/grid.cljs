@@ -91,6 +91,20 @@
    [:div {:style {:width "5px"}}]
    [add-row-indicator]])
 
+(defn col-modifier []
+  [:input {:style {:position :absolute 
+                   :top "-40px"
+                   :width "50px"
+                   :text-align :center}
+           :value "hello"}])
+
+(defn row-modifier []
+  [:input {:style {:position    :absolute
+                   :right       "-80px"
+                   :width       "50px"
+                   :text-align  :center}
+           :value "hello"}])
+
 (defn grid-item [index grid-data]
  (let [col-count (count (:cols grid-data))
        row-count (count (:rows grid-data))
@@ -113,9 +127,13 @@
                   :border-radius "15px"}}
     index
     (if (col-indicator? col-count index)
-     [col-indicator])
+     [:<> 
+      [col-modifier]
+      [col-indicator]])
     (if (row-indicator? col-count index)
-      [row-indicator])
+      [:<> 
+       [row-modifier]
+       [row-indicator]])
     (if (= add-col-index index)
      [modify-col])
     (if (= add-row-index index)
