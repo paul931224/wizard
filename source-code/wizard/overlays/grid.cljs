@@ -6,6 +6,11 @@
             
           
 
+(defn get-row-index [col-count index]
+  (if (= 0 (rem (inc index) col-count))
+    (dec (quot (inc index) col-count))
+    nil))
+
 (defn row-indicator? [col-count index]
   (= 0 (rem (inc index) col-count)))
 
@@ -91,23 +96,33 @@
    [:div {:style {:width "5px"}}]
    [add-row-indicator]])
 
-(defn col-modifier []
-  [:input {:style {:position :absolute 
-                   :top "-40px"
-                   :width "50px"
-                   :text-align :center}
-           :value "hello"}])
+(defn col-modifier [index value-path]
+  (let [col-val-path (fn [] (vec (concat value-path [:cols index])))
+        col-data     (fn [] (str @(subscribe [:db/get (col-val-path)])))]
+    (fn [index value-path]
+      [:input {:style       {:position :absolute
+                             :top "-40px"
+                             :width "50px"
+                             :text-align :center}
+               :value       (col-data)
+               :placeholder "idushaidasj"
+               :on-change   (fn [e] (dispatch [:db/set (col-val-path) (-> e .-target .-value)]))}])))
+ 
+(defn row-modifier [index value-path]
+  (let [row-val-path (fn [] (vec (concat value-path [:rows index])))
+        row-data     (fn [] @(subscribe [:db/get (row-val-path)]))]
+    [:input {:style {:position    :absolute
+                     :right       "-80px"
+                     :width       "50px"
+                     :text-align  :center}
+             :value  (str (row-data))
+             :on-change    (fn [e] (dispatch [:db/set (row-val-path) (-> e .-target .-value)]))}]))
 
-(defn row-modifier []
-  [:input {:style {:position    :absolute
-                   :right       "-80px"
-                   :width       "50px"
-                   :text-align  :center}
-           :value "hello"}])
-
-(defn grid-item [index grid-data]
- (let [col-count (count (:cols grid-data))
-       row-count (count (:rows grid-data))
+(defn grid-item [index grid-data value-path]
+ (let [cols      (:cols grid-data) 
+       rows      (:rows grid-data)  
+       col-count (count cols)
+       row-count (count rows)
        add-col-index (dec col-count)
        add-row-index (dec (* col-count row-count))] 
   [:div {:style {:background "rgba(0,0,0,0.3)"
@@ -127,12 +142,12 @@
                   :border-radius "15px"}}
     index
     (if (col-indicator? col-count index)
-     [:<> 
-      [col-modifier]
+     [:div
+      [col-modifier index value-path]
       [col-indicator]])
     (if (row-indicator? col-count index)
       [:<> 
-       [row-modifier]
+       [row-modifier (get-row-index col-count index) value-path]
        [row-indicator]])
     (if (= add-col-index index)
      [modify-col])
@@ -162,7 +177,7 @@
                   :pointer-events :auto
                   :z-index 2}}                                      
        [grid/grid-wrapper
-            (map-indexed (fn [index item] [grid-item index (grid-data)])
+            (map-indexed (fn [index item] [grid-item index (grid-data) (value-path)])
                          (items))
             (last (value-path)) 
             @(subscribe [:db/get (value-path)])]]])))
