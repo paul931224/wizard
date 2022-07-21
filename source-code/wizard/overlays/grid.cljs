@@ -2,9 +2,26 @@
    (:require [re-frame.core :refer [subscribe dispatch]]
              [wizard.overlays.wrapper :as overlay-wrapper]
              [wizard.editor.grid :as grid]
-             [wizard.utils :as utils]))
+             [wizard.utils :as utils]
+             [reagent.core :as r]
+             ["react" :as react]
+             ["@dnd-kit/core" :refer [closestCenter
+                                      KeyboardSensor
+                                      PointerSensor
+                                      TouchSensor
+                                      DragOverlay
+                                      useSensor
+                                      useSensors
+                                      useDraggable
+                                      useDroppable
+                                      DndContext]]
+             ["@dnd-kit/utilities" :refer [CSS]]
+             ["@dnd-kit/modifiers" :refer [restrictToWindowEdges 
+                                           restrictToHorizontalAxis
+                                           restrictToVerticalAxis
+                                           restrictToFirstScrollableAncestor]]))
             
-          
+(def dnd-context (r/adapt-react-class DndContext))          
 
 (defn get-row-index [col-count index]
   (if (= 0 (rem (inc index) col-count))
@@ -17,25 +34,71 @@
 (defn col-indicator? [col-count index]
  (< index col-count))
 
-(defn row-indicator []
-  [:div
-   {:style {:cursor     :pointer 
-            :position   :absolute
-            :bottom     "0px"
-            :right      "-10px"
-            :background :blue
-            :height     "5px"
-            :width      "10px"}}])
 
-(defn col-indicator []
- [:div
-  {:style {:cursor      :pointer
-           :position    :absolute
-           :top         "-10px"
-           :right       0
-           :background  :red
-           :height      "10px"
-           :width       "5px"}}])
+(defn row-indicator-draggable [props]
+  (let [id            (:id props) 
+        use-draggable (utils/to-clj-map (useDraggable (clj->js {:id id})))
+        {:keys [attributes
+                listeners
+                transform
+                setNodeRef]}  use-draggable]        
+    [:div (merge
+           {:style {:cursor     :pointer
+                    :position   :absolute
+                    :bottom     "0px"
+                    :right      "-10px"
+                    :background :blue
+                    :height     "5px"
+                    :width      "10px"
+                    :transform  (.toString (.-Transform CSS) (clj->js transform))}
+            :ref (js->clj setNodeRef)}
+           attributes
+           listeners)]))
+          
+(defn col-indicator-draggable [props]
+  (let [id            (:id props)
+        use-draggable (utils/to-clj-map (useDraggable (clj->js {:id id})))
+        {:keys [attributes
+                listeners
+                transform
+                setNodeRef]}  use-draggable]
+    [:div (merge
+           {:style {:cursor      :pointer
+                    :position    :absolute
+                    :top         "-10px"
+                    :right       0
+                    :background  :red
+                    :height      "10px"
+                    :width       "5px"
+                    :transform  (.toString (.-Transform CSS) (clj->js transform))}
+            :ref (js->clj setNodeRef)}
+           attributes
+           listeners)]))   
+
+(defn row-indicator [index]
+  (let [sensors (useSensors
+                 (useSensor PointerSensor)
+                 (useSensor KeyboardSensor, TouchSensor))]
+    [dnd-context {:sensors  sensors
+                  :modifiers     [restrictToVerticalAxis]
+                  :collisionDetection closestCenter
+                  :onDragStart    (fn [a] (.log js/console "gello"))
+                  :onDragMove     (fn [a] (.log js/console "gello"))
+                  :onDragEnd      (fn [a] (.log js/console "gello"))}
+     [:f> row-indicator-draggable {:id (str "row-" index)}]]))
+
+(defn col-indicator [index]
+  (let [sensors (useSensors
+                 (useSensor PointerSensor)
+                 (useSensor KeyboardSensor, TouchSensor))]
+    [dnd-context {:sensors  sensors
+                  :modifiers     [restrictToHorizontalAxis]
+                  :collisionDetection closestCenter
+                  :onDragStart    (fn [a] (.log js/console "gello"))
+                  :onDragMove     (fn [a] (.log js/console "gello"))
+                  :onDragEnd      (fn [a] (.log js/console "gello"))}
+     [:f> col-indicator-draggable {:id (str "col-" index)}]]))
+  
 
 
 (defn rem-col-indicator []
@@ -147,11 +210,11 @@
     (if (col-indicator? col-count index)
      [:<>
       [col-modifier index value-path]
-      [col-indicator]])
+      [:f> col-indicator]])
     (if (row-indicator? col-count index)
       [:<> 
        [row-modifier (get-row-index col-count index) value-path]
-       [row-indicator]])
+       [:f> row-indicator]])
     (if (= add-col-index index)
      [modify-col])
     (if (= add-row-index index)

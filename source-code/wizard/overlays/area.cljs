@@ -21,11 +21,6 @@
 
 (def dnd-context (r/adapt-react-class DndContext))
 
-(def resize-atom (r/atom {:top 0
-                          :left 0
-                          :height 50
-                          :width 100}))
-
 ;;
 ;; UTILS
 ;;
@@ -482,9 +477,9 @@
      [:div (merge
             {:ref       (js->clj setNodeRef)
              :style {:transform (.toString (.-Transform CSS) (clj->js transform))}
-             :class ["area"]
+             :class ["area"]}
              
-             }
+             
             attributes
             listeners)
       [area-item-inner component id]]]))
