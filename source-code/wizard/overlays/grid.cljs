@@ -61,8 +61,8 @@
 (defn modify-col []
  [:div {:style {:display :flex 
                 :position :absolute
-                :top "-50px"
-                :right 0}}
+                :top   "-50px"
+                :right "-70px"}}
   [rem-col-indicator]
   [:div {:style {:width "5px"}}]
   [add-col-indicator]])   
@@ -88,10 +88,10 @@
    "+"])                     
 
 (defn modify-row []
-  [:div {:style {:display :flex 
-                 :position :absolute
-                 :bottom "0px"
-                 :right  "-50px"}}
+  [:div {:style {:display   :flex 
+                 :position  :absolute
+                 :bottom    "-50px"
+                 :right     "-70px"}}
    [rem-row-indicator]
    [:div {:style {:width "5px"}}]
    [add-row-indicator]])
@@ -102,10 +102,11 @@
     (fn [index value-path]
       [:input {:style       {:position :absolute
                              :top "-40px"
+                             :left "50%"
+                             :transform "translateX(-50%)"
                              :width "50px"
                              :text-align :center}
-               :value       (col-data)
-               :placeholder "idushaidasj"
+               :value       (col-data)               
                :on-change   (fn [e] (dispatch [:db/set (col-val-path) (-> e .-target .-value)]))}])))
  
 (defn row-modifier [index value-path]
@@ -114,6 +115,8 @@
     [:input {:style {:position    :absolute
                      :right       "-80px"
                      :width       "50px"
+                     :top         "50%"
+                     :transform "translateY(-50%)"
                      :text-align  :center}
              :value  (str (row-data))
              :on-change    (fn [e] (dispatch [:db/set (row-val-path) (-> e .-target .-value)]))}]))
@@ -142,7 +145,7 @@
                   :border-radius "15px"}}
     index
     (if (col-indicator? col-count index)
-     [:div
+     [:<>
       [col-modifier index value-path]
       [col-indicator]])
     (if (row-indicator? col-count index)
