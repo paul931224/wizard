@@ -66,40 +66,49 @@
 
 (def touch-events ["touchstart" "touchmove" "touchend" "touchcancel"])
 
-(defn mouse-position [event]
- (.log js/console (str {:x (.-clientX event)
-                        :y (.-clientY event)})))
+(defn mouse-position [event-handler]
+ (fn [event] 
+  (event-handler 
+   {:x (.-clientX event)
+    :y (.-clientY event)})))
 
-(defn touch-position [event]
-  (let [touches (or (.-touches event) (.-changedTouches event))
-        touch (get touches 0)]         
-    {:x (.-clientX touch)
-     :y (.-clientY touch)}))
+(defn touch-position [event-handler]
+  (fn [event] 
+   (let [touches (or (.-touches event) (.-changedTouches event))
+         touch (get touches 0)]         
+     (event-handler 
+      {:x (.-clientX touch)
+       :y (.-clientY touch)}))))
 
+(def touch-fn-atom (atom nil))
 
-(defn remove-touch-listeners [listener-names]
+(def mouse-fn-atom (atom nil))
+
+(defn remove-touch-listeners [listener-names event-handler]
   (doseq [listener-name listener-names]
-     (.removeEventListener js/document listener-name touch-position)))
+     (.removeEventListener js/document listener-name @touch-fn-atom)))
 
-(defn remove-mouse-listeners [listener-names]
+(defn remove-mouse-listeners [listener-names event-handler]
   (doseq [listener-name listener-names]
-    (.removeEventListener js/document listener-name mouse-position)))
+    (.removeEventListener js/document listener-name @mouse-fn-atom)))
 
-(defn add-touch-listeners [listener-names]
- (doseq [listener-name listener-names]
-  (.addEventListener js/document listener-name touch-position)))
-
-(defn add-mouse-listeners [listener-names]
+(defn add-touch-listeners [listener-names event-handler]
+  (reset! touch-fn-atom (touch-position event-handler))
   (doseq [listener-name listener-names]
-     (.addEventListener js/document listener-name mouse-position)))
+   (.addEventListener js/document listener-name @touch-fn-atom)))
 
-(defn add-pointer-listeners []
- (add-touch-listeners touch-events)
- (add-mouse-listeners mouse-events))
+(defn add-mouse-listeners [listener-names event-handler]
+  (reset! mouse-fn-atom (mouse-position event-handler))
+  (doseq [listener-name listener-names]
+     (.addEventListener js/document listener-name @mouse-fn-atom)))
+
+(defn add-pointer-listeners [event-handler]
+ (add-touch-listeners touch-events event-handler)
+ (add-mouse-listeners mouse-events event-handler))
   
-(defn remove-pointer-listeners []
-  (remove-touch-listeners touch-events)
-  (remove-mouse-listeners mouse-events))
+(defn remove-pointer-listeners [event-handler]
+  (remove-touch-listeners touch-events event-handler)
+  (remove-mouse-listeners mouse-events event-handler))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
