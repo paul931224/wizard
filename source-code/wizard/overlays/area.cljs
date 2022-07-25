@@ -286,6 +286,17 @@
 ;; GRID LAYER
 ;;
 
+(defn grid-item [index item]
+  [:div {:style {:background "yellow"
+                 :color "#222"
+                 :height "30px"
+                 :width "30px"
+                 :display :flex
+                 :justify-content :center
+                 :align-items :center
+                 :border-radius "15px"}}
+   (str item)])
+
 (defn grid-item-drop-zone [{:keys [id component]}]
   (let [overlapping-areas   (subscribe [:db/get [:overlays :areas :overlapping-areas]])
         impossible-config?  (fn [] (not @(subscribe [:db/get [:overlays :areas :possible-config?]])))
@@ -305,34 +316,22 @@
                        :align-items :center
                        :color "#DDD"
                        :height "100%"
-                       :width "100%"}}                       
+                       :width "100%"
+                       :visibility :hidden}}                       
            component])))
-
-
-(defn grid-item [index item]
-  [:div {:style {:background "yellow"
-                  :color "#222"
-                  :height "30px"
-                  :width "30px"
-                  :display :flex
-                  :justify-content :center
-                  :align-items :center
-                  :border-radius "15px"}}      
-      (str item)])
 
 (defn grid-layer [value-path all-area-cells]
  [overlay-wrapper/view
   [:div#area-overlay
    {:style {:height "100%"
             :width "100%"
-            :backdrop-filter "blur(1px)"
+            ;:backdrop-filter "blur(1px)"
             :position :absolute
             :pointer-events :auto
             :left 0
             :z-index 2}}
    [grid/grid-wrapper
-    (map-indexed (fn [index item] [grid-item-drop-zone {:id index
-     
+    (map-indexed (fn [index item] [grid-item-drop-zone {:id index     
                                                         :component [grid-item index item]}])
                  all-area-cells)
     (last value-path)
@@ -496,8 +495,7 @@
    [overlay-wrapper/view
     [:div#area-overlay
      {:style {:height "100%"
-              :width "100%"
-              :backdrop-filter "blur(1px)"
+              :width "100%"              
               :position :absolute
               :pointer-events :auto
               :left 0
@@ -553,7 +551,7 @@
                     :sensors            sensors
                     :collisionDetection closestCenter}
         [:<>                 
-         ;[grid-layer (value-path) (all-area-cells)]
+         [grid-layer (value-path) (all-area-cells)]
          [area-layer (value-path) (components) (grid-data)]]])))
         
 

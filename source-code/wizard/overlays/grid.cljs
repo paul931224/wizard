@@ -190,8 +190,11 @@
        col-count (count cols)
        row-count (count rows)
        add-col-index (dec col-count)
-       add-row-index (dec (* col-count row-count))] 
-  [:div {:style {:background "rgba(0,0,0,0.3)"
+       add-row-index (dec (* col-count row-count))
+       flattened-areas (fn [] (vec (flatten (:areas grid-data))))
+       letter          (fn [] (get (flattened-areas) index))]
+        
+  [:div {:style {:border "0.5px solid rgba(0,0,0,0.2)"
                  :display :flex
                  :justify-content :center
                  :align-items :center
@@ -206,7 +209,7 @@
                   :justify-content :center
                   :align-items :center
                   :border-radius "15px"}}
-    index
+    (letter)
     (if (col-indicator? col-count index)
      [:<>
       [col-modifier index value-path]
@@ -239,7 +242,7 @@
                   :width "100%"   
                   :position :absolute
                   :left 0
-                  :backdrop-filter "blur(3px)"
+                  ;:backdrop-filter "blur(1px)"
                   :pointer-events :auto
                   :z-index 2}}                                      
        [grid/grid-wrapper
