@@ -126,7 +126,7 @@
    (let [{:keys [active over]} (utils/to-clj-map event)
          area      (:id active)
          overlapping-areas      (calculate-overlapping-areas area)]
-     (.log js/console "Drag started.")
+     (utils/add-pointer-listeners)
      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
      (dispatch [:db/set [:overlays :areas :active]            area])
      (dispatch [:db/set [:overlays :areas :dragged]           area]))))
@@ -157,6 +157,7 @@
           modified-areas         (modify-areas {:area-to-fill        area 
                                                 :areas-config        grid-areas
                                                 :indexes-overlapped  overlapping-positions})]                          
+      (utils/remove-pointer-listeners)
       (if possible-config?
         (dispatch [:db/set areas-path modified-areas]))                            
       (dispatch [:db/set [:overlays :areas :dragged] nil])

@@ -2,6 +2,9 @@
  (:require  [re-frame.core :refer [dispatch subscribe]]
             [reagent.core :as r]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Data  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn to-clj-map [hash-map]
   (js->clj hash-map :keywordize-keys true))
@@ -25,7 +28,14 @@
 (defn number-to-letter [index]
   (clojure.string/lower-case (str (char (+ 65 index)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Data  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Colors  ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn generate-abc-matrix [how-many]
   (let [numbers (range how-many)]
@@ -42,6 +52,63 @@
 
 (def random-colors
   (mapv randomize-rgb (range 1000)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Colors  ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Mouse/Touch listeners  ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def mouse-events ["mousedown" "mouseup" "mousemove"
+                   "mouseout" "mouseleave" "mouseenter"])
+
+(def touch-events ["touchstart" "touchmove" "touchend" "touchcancel"])
+
+(defn mouse-position [event]
+ (.log js/console (str {:x (.-clientX event)
+                        :y (.-clientY event)})))
+
+(defn touch-position [event]
+  (let [touches (or (.-touches event) (.-changedTouches event))
+        touch (get touches 0)]         
+    {:x (.-clientX touch)
+     :y (.-clientY touch)}))
+
+
+(defn remove-touch-listeners [listener-names]
+  (doseq [listener-name listener-names]
+     (.removeEventListener js/document listener-name touch-position)))
+
+(defn remove-mouse-listeners [listener-names]
+  (doseq [listener-name listener-names]
+    (.removeEventListener js/document listener-name mouse-position)))
+
+(defn add-touch-listeners [listener-names]
+ (doseq [listener-name listener-names]
+  (.addEventListener js/document listener-name touch-position)))
+
+(defn add-mouse-listeners [listener-names]
+  (doseq [listener-name listener-names]
+     (.addEventListener js/document listener-name mouse-position)))
+
+(defn add-pointer-listeners []
+ (add-touch-listeners touch-events)
+ (add-mouse-listeners mouse-events))
+  
+(defn remove-pointer-listeners []
+  (remove-touch-listeners touch-events)
+  (remove-mouse-listeners mouse-events))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Mouse/Touch listeners  ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; State viewer ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn state-viewer--vector-display [recur-fn tree]
  [:div (str tree)])
@@ -74,3 +141,7 @@
   [:div])) 
    ;[state-viewer--recursion (dissoc @state :all-guilds)]]))
    ;(str (mapv first (:overlapping-areas @state)))]))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; State viewer ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
