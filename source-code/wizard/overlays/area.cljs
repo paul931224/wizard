@@ -553,7 +553,7 @@
                     :sensors            sensors
                     :collisionDetection closestCenter}
         [:<>                 
-         [grid-layer (value-path) (all-area-cells)]
+         ;[grid-layer (value-path) (all-area-cells)]
          [area-layer (value-path) (components) (grid-data)]]])))
         
 

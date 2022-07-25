@@ -232,7 +232,7 @@
        row-count             (fn [] (count (:rows (grid-data))))
        items                 (fn [] (range (* (col-count) (row-count))))]
                                 
-  (if (= :grid (overlay-type))
+  (if (= :area (overlay-type))
    [overlay-wrapper/view 
       [:div#grid-overlay
          {:style {:height "100%"

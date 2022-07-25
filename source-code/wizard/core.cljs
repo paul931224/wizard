@@ -11,7 +11,6 @@
     [wizard.toolbars.view        :as toolbars]
     [wizard.overlays.selection   :as selection]
     [wizard.overlays.area        :as area]
-    [wizard.overlays.order       :as order]
     [wizard.overlays.grid        :as grid]
     [wizard.overlays.menu        :as menu]
     [wizard.breadcrumb.view      :as breadcrumb]
@@ -219,9 +218,9 @@
                 [the-editor])
               (identity [modal])] 
              [selection/view @(subscribe [:db/get [:editor]])]
-             [area/view      @(subscribe [:db/get [:editor]])]
              [grid/view      @(subscribe [:db/get [:editor]])]
-             [order/view     @(subscribe [:db/get [:editor]])]]]]))}))
+             [area/view      @(subscribe [:db/get [:editor]])]]]]))}))
+                          
             
             
        
