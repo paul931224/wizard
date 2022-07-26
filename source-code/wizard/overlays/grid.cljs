@@ -201,27 +201,19 @@
                  :color "#DDD"
                  :height "100%"
                  :width "100%"
-                 :position :relative}}                
-   [:div {:style {:background "#333"
-                  :height "30px"
-                  :width "30px"
-                  :display :flex 
-                  :justify-content :center
-                  :align-items :center
-                  :border-radius "15px"}}
-    (letter)
-    (if (col-indicator? col-count index)
+                 :position :relative}}                   
+   (if (col-indicator? col-count index)
      [:<>
       [col-modifier index value-path]
       [:f> col-indicator]])
-    (if (row-indicator? col-count index)
+   (if (row-indicator? col-count index)
       [:<> 
        [row-modifier (get-row-index col-count index) value-path]
        [:f> row-indicator]])
-    (if (= add-col-index index)
+   (if (= add-col-index index)
      [modify-col])
-    (if (= add-row-index index)
-     [modify-row])]]))
+   (if (= add-row-index index)
+     [modify-row])]))
 
   
 
