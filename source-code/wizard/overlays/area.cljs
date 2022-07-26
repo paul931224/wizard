@@ -66,6 +66,41 @@
                                             (group-by first without-selected-area))]
    (everything-identical? grouped-by-letters-and-counted))) 
  
+(def empty-letter ".")
+
+(defn switch-area  [switch-letter overlapped-letter config]
+ (let [new-letter (fn [this-letter]
+                    (cond 
+                      (= switch-letter     this-letter)  overlapped-letter
+                      (= overlapped-letter this-letter)  switch-letter
+                     :else                               this-letter))] 
+  (vec (map new-letter config))))
+
+(defn replace-area [overlapped-index switch-letter config]
+ (let [new-letter (fn [this-index this-letter] 
+                    (cond
+                     (= this-letter switch-letter)     empty-letter
+                     (=  this-index overlapped-index)  switch-letter
+                     :else                             this-letter))] 
+   (vec (map-indexed new-letter config))))
+
+(defn change-area-cond [overlapped-index switch-letter config]
+  (let [overlapped-letter (get config overlapped-index)]
+    (cond 
+     (= overlapped-letter switch-letter)
+     (vec config)
+     (= overlapped-letter empty-letter)
+     (replace-area overlapped-index switch-letter config)
+     :else 
+     (switch-area  switch-letter overlapped-letter config))))
+
+(defn change-area [{:keys [area-to-switch areas-config index-overlapped]}]
+  (let [column-count      (count (first areas-config))
+        flattened-config  (vec (flatten areas-config))
+        overlapping?      (fn [index] (= index-overlapped index))                       
+        new-characters   (change-area-cond index-overlapped area-to-switch flattened-config)
+        new-config       (mapv vec (partition column-count new-characters))]
+    new-config))
 
 (defn modify-areas [{:keys [area-to-fill areas-config indexes-overlapped]}]
     (let [column-count     (count (first areas-config))
@@ -82,10 +117,9 @@
       new-config))
      
      
-(defn get-overlapping-areas-with-coordinate [this-area areas]
-  (vec
-   (map
-    first
+(defn get-overlapping-area-with-coordinate [this-area areas]
+  (first 
+   (first
     (filter
      (fn [area]
        (let [{:keys [x y]}  this-area
@@ -130,14 +164,15 @@
      areas))))
 
 
-(defn calculate-overlapping-areas-by-coordinate [pointer-data]
+(defn calculate-overlapping-area-by-coordinate [pointer-data]
   (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
         processed-dropzones (mapv
                              (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
                              @area-dropzones)
-        overlapping-areas (get-overlapping-areas-with-coordinate
-                           pointer-data processed-dropzones)]    
-    overlapping-areas))
+        overlapping-area (get-overlapping-area-with-coordinate
+                          pointer-data processed-dropzones)]    
+    (println overlapping-area)
+    overlapping-area))
 
 (defn calculate-overlapping-areas [id]
   (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
@@ -166,15 +201,15 @@
     (let [{:keys [active over]}  (utils/to-clj-map event)
           area                   (:id active)
           pointer                @(subscribe [:db/get [:overlays :areas :pointer]])
-          overlapping-areas      (calculate-overlapping-areas-by-coordinate pointer)
+          overlapping-area       (calculate-overlapping-area-by-coordinate pointer)
           areas-path             (vec (concat value-path [:areas]))
           areas                  @(subscribe [:db/get areas-path])
-          modified-areas         (modify-areas {:area-to-fill        area
-                                                :areas-config        areas
-                                                :indexes-overlapped  overlapping-areas})
+          modified-areas         (change-area {:area-to-switch      area
+                                               :areas-config        areas
+                                               :index-overlapped    overlapping-area})
           possible-config?       (correct-area-config? modified-areas area)]                            
       (dispatch [:db/set [:overlays :areas :possible-config?]  possible-config?])
-      (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas]))))
+      (dispatch [:db/set [:overlays :areas :overlapping-area]  overlapping-area]))))
       
 
 (defn handle-drag-end [value-path]
