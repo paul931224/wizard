@@ -172,8 +172,10 @@
 (defn page-wrapper [content]
   [:div {:style {:display :flex
                  :justify-content :center
-                 :margin-top "60px"}}
-   [:div {:style {:max-width "1200px"
+                 :margin-top "60px"
+                 :margin-bottom "60px"}}
+   [:div {:id "page"
+          :style {:max-width "1200px"
                   :position :relative                  
                   :width "100%"}}
     content]])

@@ -16,19 +16,21 @@
           element-height (atom 0)
           get-full-height (fn [] (let [rect (page-rect)]
                                   (+
-                                   (:height rect)
+                                   50
+                                   (:height rect)                                   
                                    (max 
                                      (:top rect) 
                                      (- (:top rect))))))
-          reset-element-height! (reset! element-height (get-full-height))
-          editor         (subscribe [:db/get [:editor]])]    
+          reset-element-height! (fn [] (reset! element-height (get-full-height)))
+          editor         (subscribe [:db/get [:editor :selected]])]    
       (reagent/create-class
-       {:component-did-mount  (fn [e] (reset! rect-data (element-rect)))
+       {:component-did-mount  (fn [e] 
+                                (reset-element-height!)
+                                (reset! rect-data (element-rect)))
         :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
                                 (let [old-rect @rect-data
                                       new-rect (element-rect)]
                                       
-                                  (.log js/console (get-full-height))
                                   (if (or
                                       ;@editor
                                        (not= (str new-rect) (str old-rect))
@@ -38,6 +40,8 @@
                                           new-rect-top (+ rect-top scroll-y)
                                           new-new-rect (assoc new-rect :top new-rect-top)]
                                       (do
+                                        (reset-element-height!)
+                                        (.log js/console "hello")
                                         (reset! rect-data   new-new-rect)
                                         (reset! scroll-top  (.-scrollY js/window)))))))
         :reagent-render
@@ -45,7 +49,7 @@
           @editor
           [:div {:style {:position :absolute
                          :overflow-x :hidden                 
-                         :height (str @element-height "px")
+                         :height (str @element-height "px")                         
                          :width  "100%" 
                          :pointer-events :none}}
            [:div.overlay-wrapper {:style (merge 
