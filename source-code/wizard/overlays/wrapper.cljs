@@ -14,6 +14,7 @@
          get-full-height (fn [] (let [rect (page-rect)]
                                   (+
                                    50                                   
+                                   (.-scrollY js/window)
                                    (max
                                     (:bottom rect)
                                     (- (:bottom rect))))))
@@ -40,7 +41,7 @@
           @editor
           [:div {:style {:position :absolute
                          :overflow-x (if @(subscribe [:db/get [:overlays :areas :dragged]])
-                                      :hidden)                 
+                                      :hidden :visible)                 
                          :height (str @element-height "px")                         
                          :width  "100%"
                          :pointer-events :none}}                                             
