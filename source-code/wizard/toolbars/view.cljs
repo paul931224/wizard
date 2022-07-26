@@ -2,7 +2,6 @@
  (:require 
   [reagent.core :as r]
   [re-frame.core :refer [dispatch subscribe]]
-  [wizard.toolbars.rich-text-editor.core :as rte]
   [wizard.toolbars.components.core :as components]
   [wizard.toolbars.config.core :as config]
   ["react" :as react]
@@ -28,13 +27,6 @@
 
 (defn config-window []
   [:div [config/view]])
-
-(defn rte-window []
-  (let [value-path (subscribe [:db/get [:editor :selected :value-path]])
-        content?   (fn [] (contains? @(subscribe [:db/get @value-path]) :content))]
-     (if (content?)
-        ^{:key @value-path}[rte/view {:value-path (vec (conj @value-path :content))}])))
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -122,11 +114,7 @@
 (defn view []
  (let [selected-element-type (:type @(subscribe [:editor/get-selected-component]))]
   [toolbars 
-     [:<> 
-       (if (= "block" selected-element-type)
-           [toolbar {:id "rte-window"  
-                     :component [rte-window]         
-                     :label "Rich Text Editor"}])          
+     [:<>      
        [toolbar {:id "components-window"  
                      :component [components-window]    
                      :label "Components"}]

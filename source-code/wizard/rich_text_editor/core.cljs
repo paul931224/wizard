@@ -1,4 +1,4 @@
-(ns wizard.toolbars.rich-text-editor.core
+(ns wizard.rich-text-editor.core
   (:require
    [reagent.core :refer [create-class atom] :as reagent]
    [jodit-react :default JoditEditor]
@@ -23,7 +23,8 @@
   [:div {:style {:max-width "400px"}} 
     [:> JoditEditor
      {:config    jodit-settings
-      :value     @editor-content
+      :value     (if (string? @editor-content) 
+                   @editor-content)
       :tabIndex  1
       :onChange    (fn [new-html]
                      (.log js/console (str (remove-most-whitespace new-html)))

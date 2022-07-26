@@ -8,13 +8,14 @@
     [reagent.core     :as reagent]
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
-    [wizard.toolbars.view        :as toolbars]
-    [wizard.overlays.selection   :as selection]
-    [wizard.overlays.area        :as area]
-    [wizard.overlays.grid        :as grid]
-    [wizard.overlays.menu        :as menu]
-    [wizard.breadcrumb.view      :as breadcrumb]
-    [wizard.utils                :as utils]))  
+    [wizard.toolbars.view          :as toolbars]
+    [wizard.overlays.selection     :as selection]
+    [wizard.overlays.area          :as area]
+    [wizard.overlays.block-editor  :as block-editor]
+    [wizard.overlays.grid          :as grid]
+    [wizard.overlays.menu          :as menu]
+    [wizard.breadcrumb.view        :as breadcrumb]
+    [wizard.utils                  :as utils]))  
     
 
 (def color-one "#EEE")
@@ -170,7 +171,10 @@
     [connect-wallet-button])]))
     
 (defn page-wrapper [content]
-  [:div {:on-click (fn [e] (dispatch [:editor/unselect-component!]))                       
+  [:div {:on-click (fn [e] 
+                     (do 
+                       (dispatch [:editor/unselect-component!])
+                       (dispatch [:rich-text-editor/close!])))                       
          :style {:display :flex
                  :justify-content :center
                  :padding-top    "150px"
@@ -220,9 +224,10 @@
                 [hero-title]
                 [the-editor])
               (identity [modal])] 
-             [selection/view @(subscribe [:db/get [:editor]])]
-             [grid/view      @(subscribe [:db/get [:editor]])]
-             [area/view      @(subscribe [:db/get [:editor]])]]]]))}))
+             [selection/view      @(subscribe [:db/get [:editor]])]
+             [grid/view           @(subscribe [:db/get [:editor]])]
+             [block-editor/view   @(subscribe [:db/get [:editor]])]
+             [area/view           @(subscribe [:db/get [:editor]])]]]]))}))
                           
             
             

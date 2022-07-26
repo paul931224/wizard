@@ -15,6 +15,8 @@
    [:div.component-wrapper
     {:on-click (fn [event] 
                 (.stopPropagation event)
+                (if (= type "block")
+                 (dispatch [:rich-text-editor/open!])) 
                 (dispatch [:editor/select-component! path]))
                 
      :id id            
