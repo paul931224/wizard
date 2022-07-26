@@ -8,28 +8,40 @@
          path           (fn [] (-> @editor :selected :value-path))
          id             (fn [] (last (path)))
          element-rect   (fn [] (dom-utils/get-rect-data (dom-utils/get-element-by-id (id))))
-         rect-data      (atom nil)]        
+         page-rect      (fn [] (dom-utils/get-rect-data (dom-utils/get-element-by-id "page")))
+         rect-data      (atom nil)        
+         element-height (atom 0)
+         get-full-height (fn [] (let [rect (page-rect)]
+                                  (+
+                                   50                                   
+                                   (max
+                                    (:bottom rect)
+                                    (- (:bottom rect))))))
+         reset-element-height! (fn [] (reset! element-height (get-full-height)))]            
       (reagent/create-class
-       {:component-did-mount  (fn [e] (reset! rect-data (element-rect)))
+       {:component-did-mount  (fn [e] 
+                                (reset-element-height!)
+                                (reset! rect-data (element-rect)))
         :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
                                 (let [scroll-y (.-scrollY js/window)                                      
-                                      new-rect (element-rect) 
-                                      rect-top     (:top new-rect)
-                                      new-rect-top (+ rect-top scroll-y)
-                                      new-new-rect (assoc new-rect :top new-rect-top)]
-                                  (if
-                                   (= @rect-data new-new-rect)
-                                   nil
-                                   (reset! rect-data   new-new-rect))))
+                                      new-rect (element-rect)]
+                                  (reset-element-height!)
+                                 
+                                  (let [rect-top     (:top new-rect)
+                                        new-rect-top (+ rect-top scroll-y)
+                                        new-new-rect (assoc new-rect :top new-rect-top)]
+                                      (if  
+                                       (= @rect-data new-new-rect)
+                                       nil
+                                       (reset! rect-data   new-new-rect)))))
                                        
         :reagent-render
         (fn [content]          
           @editor
           [:div {:style {:position :absolute
                          :overflow-x (if @(subscribe [:db/get [:overlays :areas :dragged]])
-                                      :hidden
-                                      :visible)                 
-                         :height "100%"                
+                                      :hidden)                 
+                         :height (str @element-height "px")                         
                          :width  "100%"
                          :pointer-events :none}}                                             
            [:div.overlay-wrapper {:style (merge                                          
