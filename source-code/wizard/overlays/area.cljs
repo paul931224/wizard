@@ -460,18 +460,15 @@
         area-width        (:width  @area-rect)
         area-height       (:height @area-rect)]
          
-   {:display  (cond
-                (= dragged-letter letter)      :inherit                
-                (= resized-letter letter)      :inherit
-                (and (= dragged-letter nil)
-                     (= resized-letter nil))   :inherit
-                :else                          :none)
+   {:display  :inherit
     :position :relative    
     :height "100%"
     :width  "100%"
     :transform (cond 
-                dragged-letter (.toString (.-Transform CSS) (clj->js transform))
-                resized-letter (resize-transform {:direction   @resize-direction
+                (= letter dragged-letter) 
+                (.toString (.-Transform CSS) (clj->js transform))
+                (= letter resized-letter)
+                (resize-transform {:direction   @resize-direction
                                                   :area-height area-height 
                                                   :area-width  area-width 
                                                   :delta-x     delta-x 
