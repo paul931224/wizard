@@ -163,26 +163,44 @@
   (let [col-val-path (fn [] (vec (concat value-path [:cols index])))
         col-data     (fn [] (str @(subscribe [:db/get (col-val-path)])))]
     (fn [index value-path]
-      [:input {:style       {:position :absolute
-                             :top "-40px"
-                             :left "50%"
-                             :transform "translateX(-50%)"
-                             :width "50px"
-                             :text-align :center}
-               :value       (col-data)               
-               :on-change   (fn [e] (dispatch [:db/set (col-val-path) (-> e .-target .-value)]))}])))
+      [:div {:style       {:position :absolute
+                           :top "-40px"
+                           :left "50%"
+                           :transform "translateX(-50%)"
+                           :width "100%"
+                           :text-align :center
+                           :background "#333"
+                           :justify-content :center
+                           :display :flex
+                           :padding "5px 10px"
+                           :border-radius "5px"}} 
+       [:div 
+        [:input {:style   {:width "45px"
+                           :text-align :center}
+                 :value       (col-data)               
+                 :on-change   (fn [e] (dispatch [:db/set (col-val-path) (-> e .-target .-value)]))}]]])))
  
 (defn row-modifier [index value-path]
   (let [row-val-path (fn [] (vec (concat value-path [:rows index])))
         row-data     (fn [] @(subscribe [:db/get (row-val-path)]))]
-    [:input {:style {:position    :absolute
-                     :right       "-80px"
-                     :width       "50px"
-                     :top         "50%"
-                     :transform "translateY(-50%)"
-                     :text-align  :center}
-             :value  (str (row-data))
-             :on-change    (fn [e] (dispatch [:db/set (row-val-path) (-> e .-target .-value)]))}]))
+    [:div {:style {:position    :absolute
+                   :right       "-80px"
+                   :width       "45px"
+                   :height "100%"
+                   :top         "50%"
+                   :transform "translateY(-50%)"
+                   :text-align  :center
+                   :background "#333"
+                   :justify-content :center
+                   :align-items :center
+                   :display :flex
+                   :padding "5px 10px"
+                   :border-radius "5px"}}
+      [:div 
+       [:input {:style {:width "45px"
+                        :text-align :center}
+                :value  (str (row-data))
+                :on-change    (fn [e] (dispatch [:db/set (row-val-path) (-> e .-target .-value)]))}]]]))
 
 (defn grid-item [index grid-data value-path]
  (let [cols      (:cols grid-data) 
@@ -204,12 +222,12 @@
                  :position :relative}}                   
    (if (col-indicator? col-count index)
      [:<>
-      [col-modifier index value-path]
-      [:f> col-indicator]])
+      [col-modifier index value-path]])
+      ;[:f> col-indicator]])
    (if (row-indicator? col-count index)
       [:<> 
-       [row-modifier (get-row-index col-count index) value-path]
-       [:f> row-indicator]])
+       [row-modifier (get-row-index col-count index) value-path]])
+       ;[:f> row-indicator]])
    (if (= add-col-index index)
      [modify-col])
    (if (= add-row-index index)

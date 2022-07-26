@@ -277,33 +277,33 @@
 
 (def north-style
   {:position :absolute
-   :height "5px"
+   :height "10px"
    :width  "100%"
-   :background "blue"
+   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
    :top 0
    :cursor "n-resize"})
 
 (def east-style
   {:position :absolute
    :height "100%"
-   :background "red"
-   :width  "5px" 
+   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
+   :width  "10px" 
    :right 0
    :cursor "e-resize"})
 
 (def south-style
   {:position :absolute
-   :height "5px"
+   :height "10px"
    :width  "100%"
-   :background "blue"
+   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
    :bottom 0
    :cursor "s-resize"})
 
 (def west-style
   {:position :absolute
    :height "100%"
-   :background "red"
-   :width  "5px"
+   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
+   :width  "10px"
    :left 0
    :cursor "w-resize"})
 
@@ -400,6 +400,7 @@
                    :justify-content :center
                    :align-items :center
                    :position :relative
+                   :z-index 1000
                    :border-radius "15px"})
 
 (defn area-item-letter [letter]
