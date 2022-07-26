@@ -88,7 +88,7 @@
   (let [overlapped-letter (get config overlapped-index)]
     (cond 
      (= overlapped-letter switch-letter)
-     (vec config)
+     config
      (= overlapped-letter empty-letter)
      (replace-area overlapped-index switch-letter config)
      :else 
@@ -96,8 +96,7 @@
 
 (defn change-area [{:keys [area-to-switch areas-config index-overlapped]}]
   (let [column-count      (count (first areas-config))
-        flattened-config  (vec (flatten areas-config))
-        overlapping?      (fn [index] (= index-overlapped index))                       
+        flattened-config  (vec (flatten areas-config))                           
         new-characters   (change-area-cond index-overlapped area-to-switch flattened-config)
         new-config       (mapv vec (partition column-count new-characters))]
     new-config))
@@ -195,21 +194,6 @@
      (utils/add-pointer-listeners handle-pointer-change-on-drag)
      (dispatch [:db/set [:overlays :areas :active]            area])
      (dispatch [:db/set [:overlays :areas :dragged]           area]))))
-
-(defn handle-drag-move [value-path]
-  (fn [event]
-    (let [{:keys [active over]}  (utils/to-clj-map event)
-          area                   (:id active)
-          pointer                @(subscribe [:db/get [:overlays :areas :pointer]])
-          overlapping-area       (calculate-overlapping-area-by-coordinate pointer)
-          areas-path             (vec (concat value-path [:areas]))
-          areas                  @(subscribe [:db/get areas-path])
-          modified-areas         (change-area {:area-to-switch      area
-                                               :areas-config        areas
-                                               :index-overlapped    overlapping-area})
-          possible-config?       (correct-area-config? modified-areas area)]                            
-      (dispatch [:db/set [:overlays :areas :possible-config?]  possible-config?])
-      (dispatch [:db/set [:overlays :areas :overlapping-area]  overlapping-area]))))
       
 
 (defn handle-drag-end [value-path]
@@ -217,15 +201,15 @@
     (let [{:keys [active over]} (utils/to-clj-map event)
           area                   (:id active)
           areas-path             (vec (concat value-path [:areas]))
-          grid-areas             @(subscribe [:db/get areas-path])
-          overlapping-positions  @(subscribe [:db/get [:overlays :areas :overlapping-areas]])
-          possible-config?       @(subscribe [:db/get [:overlays :areas :possible-config?]])
-          modified-areas         (modify-areas {:area-to-fill        area 
-                                                :areas-config        grid-areas
-                                                :indexes-overlapped  overlapping-positions})]                          
+          pointer                @(subscribe [:db/get [:overlays :areas :pointer]])
+          overlapping-area       (calculate-overlapping-area-by-coordinate pointer)
+          areas-path             (vec (concat value-path [:areas]))
+          areas                  @(subscribe [:db/get areas-path])
+          modified-areas         (change-area {:area-to-switch      area
+                                               :areas-config        areas
+                                               :index-overlapped    overlapping-area})]                    
       (utils/remove-pointer-listeners handle-pointer-change-on-drag)
-      (if possible-config?
-        (dispatch [:db/set areas-path modified-areas]))                            
+      (dispatch [:db/set areas-path modified-areas])                            
       (dispatch [:db/set [:overlays :areas :dragged] nil])
       (dispatch [:db/set [:overlays :areas :possible-config?]  true])
       (dispatch [:db/set [:overlays :areas :overlapping-areas] []]))))
@@ -613,7 +597,7 @@
         
      (if (= :area @overlay)
       [dnd-context {:onDragStart    (handle-drag-start (value-path))
-                    :onDragMove     (handle-drag-move  (value-path))
+                    ;:onDragMove     (handle-drag-move  (value-path))
                     :onDragEnd      (handle-drag-end   (value-path))
                     :sensors            sensors
                     :collisionDetection closestCenter}
