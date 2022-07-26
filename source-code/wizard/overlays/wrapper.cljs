@@ -21,8 +21,7 @@
                                    (max 
                                      (:top rect) 
                                      (- (:top rect))))))
-          reset-element-height! (fn [] (reset! element-height (get-full-height)))
-          editor         (subscribe [:db/get [:editor :selected]])]    
+          reset-element-height! (fn [] (reset! element-height (get-full-height)))]            
       (reagent/create-class
        {:component-did-mount  (fn [e] 
                                 (reset-element-height!)
@@ -40,18 +39,18 @@
                                           new-rect-top (+ rect-top scroll-y)
                                           new-new-rect (assoc new-rect :top new-rect-top)]
                                       (do
-                                        (reset-element-height!)
-                                        (.log js/console "hello")
+                                        (reset-element-height!)                                       
                                         (reset! rect-data   new-new-rect)
                                         (reset! scroll-top  (.-scrollY js/window)))))))
         :reagent-render
         (fn [content]
-          @editor
+          (path)
           [:div {:style {:position :absolute
                          :overflow-x :hidden                 
                          :height (str @element-height "px")                         
-                         :width  "100%" 
-                         :pointer-events :none}}
+                         :width  "100%"
+                         :pointer-events :none}}                          
+                   
            [:div.overlay-wrapper {:style (merge 
                                                   plus-style
                                                   {:pointer-events :none

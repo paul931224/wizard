@@ -24,11 +24,19 @@
     (assoc-in db [:editor :components (str (random-uuid))] 
      (assoc component :position next-comp-count)))))
 
+(reg-event-db
+ :editor/unselect-component!
+ (fn [db [_]]
+   (-> db
+       (assoc-in [:editor :selected :value-path] [:editor])
+       (assoc-in [:overlays :type]  nil))))
 
 (reg-event-db
  :editor/select-component! 
  (fn [db [_ path]]
-   (-> db (assoc-in [:editor :selected :value-path] path))))
+   (-> db 
+       (assoc-in [:editor :selected :value-path] path)
+       (assoc-in [:overlays :type]  :selection))))
 
 
 
@@ -51,12 +59,7 @@
    (-> db
        (assoc-in (vec (conj path :type)) value))))
 
-(reg-event-db
- :editor/unselect-component!
- (fn [db [_ path]]
-   (-> db
-         (assoc-in [:editor :selected :value-path] [:editor]))))
-         
+
 
 (reg-event-db
  :editor/remove-selected-component!

@@ -170,10 +170,11 @@
     [connect-wallet-button])]))
     
 (defn page-wrapper [content]
-  [:div {:style {:display :flex
+  [:div {:on-click (fn [e] (dispatch [:editor/unselect-component!]))                       
+         :style {:display :flex
                  :justify-content :center
-                 :margin-top "60px"
-                 :margin-bottom "60px"}}
+                 :padding-top    "60px"
+                 :padding-bottom "60px"}}
    [:div {:id "page"
           :style {:max-width "1200px"
                   :position :relative                  
