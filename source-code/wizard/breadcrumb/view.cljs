@@ -23,7 +23,9 @@
      [:span {:style {:font-weight :bold}}
       [one-breadcrumb (type) you-are-here]
       (if (> rest-count 0)
-         [:span [:span " > "] [render-path  new-depth path]])]))
+         [:span 
+          [:span {:style {:color :white}} " > "] 
+          [render-path  new-depth path]])]))
       ;[:span (type)])]))
 
 
@@ -31,8 +33,17 @@
   (let [path      (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))]
      (fn []
          [:div {:style {:height "50px"
+                        :width "100%"                        
                         :display :flex
+                        :position :fixed 
+                        :z-index 10
                         :justify-content :center
-                        :align-items :center}}
-          (if (< 0 (count (path)))
-            [render-path 0 (path)])])))
+                        :align-items :center
+                        :pointer-events :none}}
+          [:div 
+           {:style {:background "#333"
+                    :border-radius "10px"
+                    :padding "10px 20px"
+                    :pointer-events :auto}}
+           (if (< 0 (count (path)))
+             [render-path 0 (path)])]])))

@@ -173,7 +173,7 @@
   [:div {:on-click (fn [e] (dispatch [:editor/unselect-component!]))                       
          :style {:display :flex
                  :justify-content :center
-                 :padding-top    "60px"
+                 :padding-top    "150px"
                  :padding-bottom "60px"}}
    [:div {:id "page"
           :style {:max-width "1200px"
