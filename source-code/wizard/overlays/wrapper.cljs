@@ -9,15 +9,26 @@
    ([content plus-style] 
     (let [path           (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
           id             (fn [] (last (path)))
-          element        (fn [] (dom-utils/get-element-by-id (id)))
+          element-rect   (fn [] (dom-utils/get-rect-data (dom-utils/get-element-by-id (id))))
+          page-rect      (fn [] (dom-utils/get-rect-data (dom-utils/get-element-by-id "page")))
           rect-data      (atom nil)
           scroll-top     (atom (.-scrollY js/window))
+          element-height (atom 0)
+          get-full-height (fn [] (let [rect (page-rect)]
+                                  (+
+                                   (:height rect)
+                                   (max 
+                                     (:top rect) 
+                                     (- (:top rect))))))
+          reset-element-height! (reset! element-height (get-full-height))
           editor         (subscribe [:db/get [:editor]])]    
       (reagent/create-class
-       {:component-did-mount  (fn [e] (reset! rect-data (dom-utils/get-rect-data (element))))
+       {:component-did-mount  (fn [e] (reset! rect-data (element-rect)))
         :component-did-update (fn [new-argv old-argv]                ;; reagent provides you the entire "argv", not just the "props"
                                 (let [old-rect @rect-data
-                                      new-rect (dom-utils/get-rect-data (element))]
+                                      new-rect (element-rect)]
+                                      
+                                  (.log js/console (get-full-height))
                                   (if (or
                                       ;@editor
                                        (not= (str new-rect) (str old-rect))
@@ -33,14 +44,15 @@
         (fn [content]
           @editor
           [:div {:style {:position :absolute
-                         :overflow-x :hidden
-                         :height "100%"
+                         :overflow-x :hidden                 
+                         :height (str @element-height "px")
                          :width  "100%" 
                          :pointer-events :none}}
            [:div.overlay-wrapper {:style (merge 
                                                   plus-style
                                                   {:pointer-events :none
-                                                   :position :absolute}
+                                                   :position :absolute} 
+                                                   
                                           
                                            
                                                   @rect-data)}
