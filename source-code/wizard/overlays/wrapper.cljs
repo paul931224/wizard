@@ -27,7 +27,7 @@
                                       new-rect (element-rect)]
                                   (reset-element-height!)
                                   (println (.-scrollY js/window))
-                                  (let [rect-top     (max (:top new-rect) (- (:top new-rect)))
+                                  (let [rect-top     (:top new-rect)
                                         new-rect-top (+ rect-top scroll-y)
                                         new-new-rect (assoc new-rect :top new-rect-top)]
                                       (if  
