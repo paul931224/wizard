@@ -82,7 +82,26 @@
       new-config))
      
      
-
+(defn get-overlapping-areas-with-coordinate [this-area areas]
+  (vec
+   (map
+    first
+    (filter
+     (fn [area]
+       (let [{:keys [x y]}  this-area
+             right  (:right  (second area))
+             left   (:left   (second area))
+             top    (:top    (second area))             
+             bottom (:bottom (second area))]                             
+         (if
+           (and 
+            (< x  right)   
+            (> x  left)    
+            (> y  top)     
+            (< y  bottom))
+           true
+           false)))
+     areas))))
 
 (defn get-overlapping-areas [this-area areas]
   (vec
@@ -111,6 +130,15 @@
      areas))))
 
 
+(defn calculate-overlapping-areas-by-coordinate [pointer-data]
+  (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
+        processed-dropzones (mapv
+                             (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
+                             @area-dropzones)
+        overlapping-areas (get-overlapping-areas-with-coordinate
+                           pointer-data processed-dropzones)]    
+    overlapping-areas))
+
 (defn calculate-overlapping-areas [id]
   (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
         overlapping-areas (get-overlapping-areas
@@ -122,16 +150,14 @@
 
 
 (defn handle-pointer-change-on-drag [pointer-data]
- (.log js/console (str pointer-data)))
+ (dispatch [:db/set [:overlays :areas :pointer] pointer-data]))
  
 
 (defn handle-drag-start [value-path]
   (fn [event] 
    (let [{:keys [active over]} (utils/to-clj-map event)
-         area      (:id active)
-         overlapping-areas      (calculate-overlapping-areas area)]
+         area      (:id active)]         
      (utils/add-pointer-listeners handle-pointer-change-on-drag)
-     (dispatch [:db/set [:overlays :areas :overlapping-areas] overlapping-areas])
      (dispatch [:db/set [:overlays :areas :active]            area])
      (dispatch [:db/set [:overlays :areas :dragged]           area]))))
 
@@ -139,7 +165,8 @@
   (fn [event]
     (let [{:keys [active over]}  (utils/to-clj-map event)
           area                   (:id active)
-          overlapping-areas      (calculate-overlapping-areas area)
+          pointer                @(subscribe [:db/get [:overlays :areas :pointer]])
+          overlapping-areas      (calculate-overlapping-areas-by-coordinate pointer)
           areas-path             (vec (concat value-path [:areas]))
           areas                  @(subscribe [:db/get areas-path])
           modified-areas         (modify-areas {:area-to-fill        area
