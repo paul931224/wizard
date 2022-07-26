@@ -17,10 +17,15 @@
                      :minHeight "300"
                      :cleanHTML true
                      :enter "div"
-                     :cleanWhitespace true})
+                     :cleanWhitespace true
+                     :toolbarButtonSize "middle"
+                     :removeButtons ["image" "table" "undo" "redo" "fullsize" "eraser"
+                                     "copyformat" "brush"]
+                     :textIcons true})
+                    
 
 (defn jodit [value-path editor-content]
-  [:div {:style {:max-width "400px"}} 
+  [:div 
     [:> JoditEditor
      {:config    jodit-settings
       :value     (if (string? @editor-content) 

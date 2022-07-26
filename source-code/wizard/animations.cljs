@@ -43,7 +43,7 @@
         (.to rte-modal 0.4
              (clj->js {:ease  "power3.inOut"
                        :opacity 1
-                       :bottom "0"})))))
+                       :right "0"})))))
 
 (defn close-rte-modal! []
   (let [rte-modal          (.getElementById js/document "rte-modal")
@@ -52,7 +52,7 @@
         (.to rte-modal 0.7
              (clj->js {:ease  "power3.inOut"
                        :opacity 0
-                       :bottom "-100%"
+                       :right "-100%"
                        :onComplete #(.set timeline rte-modal (clj->js {:visibility     :hidden}))}))))) 
                                                                        
                        

@@ -25,20 +25,22 @@
     
     [:div#rte-modal {:style {:position :fixed
                              :z-index 2000
-                             :bottom "-100%"
-                             :left 0
+                             :right "-100%"
+                             :bottom 0
                              :width "100%" 
                              :pointer-events :none}}
      [:div
       {:style {:display :flex
                :justify-content :right
                :height "100vh"
-               :flex-direction :column}} 
+               :flex-direction :row}} 
                
-      [:div {:style {:flex-grow 1 :width "100vw"}}] 
+      [:div {:style {:flex-grow 1}}] 
                      
              ;:on-click #(dispatch [:rich-text-editor/close!])}]
-      [:div {:style {:background :white :pointer-events :auto}}
+      [:div {:style {:width "400px"
+                     :height "100%" 
+                     :background :white :pointer-events :auto}}
        ^{:key (content-path)}[rte/view {:value-path (content-path)}]]]]))
 
 
