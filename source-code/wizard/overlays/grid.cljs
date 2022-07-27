@@ -240,12 +240,13 @@
        value-path            (fn [] @(subscribe [:db/get [:editor :selected :value-path]]))
        components-value-path (fn [] (vec (conj (value-path) :components)))
        grid-data             (fn [] @(subscribe [:db/get (value-path)]))  
+       component-type        (:type (grid-data))
        components            (fn [] @(subscribe [:db/get (components-value-path)]))     
        col-count             (fn [] (count (:cols (grid-data))))
        row-count             (fn [] (count (:rows (grid-data))))
        items                 (fn [] (range (* (col-count) (row-count))))]
                                 
-  (if (= :area (overlay-type))
+  (if (= component-type "grid")
    [overlay-wrapper/view 
     [:div#grid-overlay
        {:style {:height "100%"

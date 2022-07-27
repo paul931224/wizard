@@ -11,11 +11,11 @@
     [wizard.toolbars.view          :as toolbars]
     [wizard.overlays.selection     :as selection]
     [wizard.overlays.area          :as area]
-    [wizard.overlays.block-editor  :as block-editor]
     [wizard.overlays.grid          :as grid]
     [wizard.overlays.menu          :as menu]
     [wizard.breadcrumb.view        :as breadcrumb]
-    [wizard.utils                  :as utils]))  
+    [wizard.utils                  :as utils]
+    [wizard.sidebar.view           :as sidebar]))  
     
 
 (def color-one "#EEE")
@@ -198,7 +198,7 @@
 (defn the-editor []
   [:div {:style {:position :relative}}
         [with-z-index 2 [breadcrumb/view]]
-        [with-z-index 2 [menu/view]]
+        ;[with-z-index 2 [menu/view]]
         [with-z-index 1 [page-wrapper  
                             [:<> 
                              [with-z-index 1 
@@ -223,10 +223,10 @@
               (if @guild-selected
                 [hero-title]
                 [the-editor])
-              (identity [modal])] 
+              (identity [modal])]
+             [sidebar/view]
              [selection/view      @(subscribe [:db/get [:editor]])]
-             [grid/view           @(subscribe [:db/get [:editor]])]
-             [block-editor/view   @(subscribe [:db/get [:editor]])]
+             [grid/view           @(subscribe [:db/get [:editor]])]            
              [area/view           @(subscribe [:db/get [:editor]])]]]]))}))
                           
             

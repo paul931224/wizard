@@ -117,7 +117,7 @@
      [:<>      
        [toolbar {:id "components-window"  
                      :component [components-window]    
-                     :label "Components"}]
-       [toolbar {:id "config-window"  
-                     :component [config-window]    
-                     :label "Config"}]]]))
+                     :label "Components"}]]]))
+       ;[toolbar {:id "config-window"  
+       ;              :component [config-window]    
+       ;              :label "Config"}]]]))

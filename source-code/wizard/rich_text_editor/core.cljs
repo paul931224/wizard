@@ -25,7 +25,7 @@
                     
 
 (defn jodit [value-path editor-content]
-  [:div 
+  [:div {:style {:background :white}}
     [:> JoditEditor
      {:config    jodit-settings
       :value     (if (string? @editor-content) 
