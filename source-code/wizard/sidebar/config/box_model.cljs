@@ -39,15 +39,19 @@
                
 
 (defn box-modal-container []
- [:div#box-model-container {:style {:width "200px"
-                                    :height "200px"
-                                    :position :relative
-                                    :display :flex 
-                                    :justify-content :center 
-                                    :align-items :center}}
-     [margin-box]
-     [border-box]
-     [padding-box]])  
+ [:div 
+  {:style {:width "100%"
+           :display :flex
+           :justify-content :center}}
+  [:div#box-model-container {:style {:width "200px"
+                                     :height "200px"
+                                     :position :relative
+                                     :display :flex 
+                                     :justify-content :center 
+                                     :align-items :center}}
+      [margin-box]
+      [border-box]
+      [padding-box]]])  
 
 (defn view []
  [box-modal-container])

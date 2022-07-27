@@ -9,6 +9,7 @@
    :name "Block"
    :width 100
    :height 100
+   :background-color "white"
    :content "Placeholder element"})
 
 (defn view [comp-router tree path]

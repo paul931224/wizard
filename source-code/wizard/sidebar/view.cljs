@@ -16,6 +16,7 @@
  [:div {:style {:width "400px"
                 :height "100vh"
                 :background "#222"
-                :padding "10px"}}
+                :padding "10px"
+                :color :white}}
        [block-editor]
        [config/view]])
