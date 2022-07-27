@@ -1,7 +1,8 @@
 (ns wizard.sidebar.config.core
  (:require [re-frame.core :refer [dispatch subscribe]]
            [wizard.sidebar.config.box-model       :as box-model]
-           [wizard.sidebar.config.image           :as image]))           
+           [wizard.sidebar.config.image           :as image]
+           [wizard.sidebar.config.add-components  :as add-components]))           
 
 
 (defn change-type []
@@ -64,7 +65,7 @@
     ;"grid"  [grid-customizer/view]
     "block" [block-customizer path]
     "image" [image/view path]
-    [:div {:style {:padding "0px 5px"}} "No config for this type of component."])]))
+    [add-components/view])]))
     
  
 

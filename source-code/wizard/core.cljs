@@ -8,7 +8,6 @@
     [reagent.core     :as reagent]
     [re-frame.core    :refer [dispatch subscribe]]
     [plugins.drag-and-drop :as dnd]
-    [wizard.toolbars.view          :as toolbars]
     [wizard.overlays.selection     :as selection]
     [wizard.overlays.area          :as area]
     [wizard.overlays.grid          :as grid]
@@ -202,8 +201,8 @@
         [with-z-index 1 [page-wrapper  
                             [:<> 
                              [with-z-index 1 
-                              [editor/view]]]]]                   
-        [with-z-index 3 [toolbars/view]]])
+                              [editor/view]]]]]])                   
+        
        
         
 
