@@ -3,7 +3,6 @@
   [reagent.core :as r]
   [re-frame.core :refer [dispatch subscribe]]
   [wizard.toolbars.components.core :as components]
-  [wizard.toolbars.config.core :as config]
   ["react" :as react]
   ["@dnd-kit/core" :refer [useDraggable useDroppable DndContext]]
   ["@dnd-kit/utilities" :refer [CSS]]
@@ -23,10 +22,6 @@
 
 (defn components-window []
   [:div [components/view]])
-
-
-(defn config-window []
-  [:div [config/view]])
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -118,6 +113,4 @@
        [toolbar {:id "components-window"  
                      :component [components-window]    
                      :label "Components"}]]]))
-       ;[toolbar {:id "config-window"  
-       ;              :component [config-window]    
-       ;              :label "Config"}]]]))
+       

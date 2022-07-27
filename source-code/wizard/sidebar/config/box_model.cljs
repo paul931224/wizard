@@ -1,4 +1,4 @@
-(ns wizard.toolbars.config.box-model)
+(ns wizard.sidebar.config.box-model)
 
 
 
