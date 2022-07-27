@@ -416,7 +416,7 @@
             :style {:width "100%" :height "100%"
                     :position :relative
                     :cursor :move
-                    :background (rand-nth utils/random-colors)}}            
+                    :background (str (get utils/random-colors position) "AA")}}            
          [area-item-letter letter]]))
          
 

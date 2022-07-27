@@ -25,16 +25,17 @@
                     
 
 (defn jodit [value-path editor-content]
-  [:div {:style {:background :white :color :black}}
-    [:> JoditEditor
-     {:config    jodit-settings
-      :value     (if (string? @editor-content) 
-                   @editor-content)
-      :tabIndex  1
-      :onChange    (fn [new-html]
-                     (.log js/console (str (remove-most-whitespace new-html)))
-                     (dispatch
-                      [:db/set value-path (remove-most-whitespace new-html)]))}]])
+  [:div {:style {:position :relative}}
+   [:div {:style {:background :white :color :black :width "100%"}}
+     [:> JoditEditor
+      {:config    jodit-settings
+       :value     (if (string? @editor-content) 
+                    @editor-content)
+       :tabIndex  1
+       :onChange    (fn [new-html]
+                      (.log js/console (str (remove-most-whitespace new-html)))
+                      (dispatch
+                       [:db/set value-path (remove-most-whitespace new-html)]))}]]])
 
 
 (defn view [{:keys [value-path]}]
