@@ -182,7 +182,7 @@
                                   (+ (:left   dragged-area) this-width-half))             
              dragged-right       (if west? 
                                    (- (+ dragged-left dragged-width) this-width-half)
-                                   (+ dragged-left dragged-width))]
+                                   (- (+ dragged-left dragged-width) this-width-half))]
          (cond 
           (< offset-right   dragged-left)    false
           (> offset-left    dragged-right)   false
