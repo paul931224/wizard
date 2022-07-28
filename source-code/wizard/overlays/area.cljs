@@ -136,29 +136,58 @@
            false)))
      areas))))
 
-(defn get-overlapping-areas [this-area areas]
+(defn get-overlapping-areas [dragged-area areas resize-direction]
+  (println resize-direction)
   (vec
    (map 
     first
     (filter
      (fn [area]
-       (let [first-width  (:width  this-area)
-             first-height (:height this-area)
-             first-top    (:top    this-area)
-             first-left   (:left   this-area)
-             first-bottom (+ first-top  first-height)            
-             first-right  (+ first-left first-width)
-             second-width  (:width   (second area))
-             second-height (:height  (second area))
-             second-top    (:top     (second area))
-             second-left   (:left    (second area))
-             second-bottom (+ second-top  second-height)
-             second-right  (+ second-left second-width)]      
+       (let [area-data           (second area)
+             this-width          (:width   area-data)
+             this-width-half     (/ this-width 2)
+             this-height         (:height  area-data)
+             this-height-half    (/ this-height 2)
+             west?               (= resize-direction :west)
+             east?               (= resize-direction :east)
+             north?              (= resize-direction :north)
+             south?              (= resize-direction :south)
+             this-top            (:top area-data)
+             this-left           (:left area-data)
+             this-bottom         (+ this-top  this-height)
+             this-right          (+ this-left this-width)
+             offset-right        (if west?
+                                   (- this-right this-width-half)
+                                   (+ this-right this-width-half))
+             offset-left         (if west?
+                                   (- this-left this-width-half)
+                                   (+ this-left this-width-half))
+             offset-bottom       (if north?
+                                   (- this-bottom this-height-half)
+                                   (+ this-bottom this-height-half))
+             offset-top          (if north?
+                                   (- this-top this-height-half)
+                                   (+ this-top this-height-half))
+             dragged-width       (:width  dragged-area)
+             dragged-height      (:height dragged-area)
+             dragged-top         (if north? 
+                                   (:top dragged-area)
+                                   (+ (:top dragged-area) this-height-half))
+             dragged-bottom      (if north? 
+                                   (- (+ dragged-top  dragged-height) this-height-half)
+                                   (- (+ dragged-top  dragged-height) this-height-half))
+                                   
+             dragged-left        (if west? 
+                                  (:left   dragged-area) 
+                                  (+ (:left   dragged-area) this-width-half))             
+             dragged-right       (if west? 
+                                   (- (+ dragged-left dragged-width) this-width-half)
+                                   (+ dragged-left dragged-width))]
          (cond 
-          (> first-left  second-right)  false
-          (> second-left first-right)  false
-          (> first-top  second-bottom) false 
-          (> second-top first-bottom)  false
+          (< offset-right   dragged-left)    false
+          (> offset-left    dragged-right)   false
+          (< offset-bottom  dragged-top)     false 
+          (> offset-top     dragged-bottom)  false
           :else true)))
      areas))))
 
@@ -173,13 +202,14 @@
     (println overlapping-area)
     overlapping-area))
 
-(defn calculate-overlapping-areas [id]
+(defn calculate-overlapping-areas [id resize-direction]
   (let [area-dropzones    (subscribe [:db/get [:overlays :areas :area-dropzones]])
         overlapping-areas (get-overlapping-areas
                            (dom-utils/get-rect-data (.getElementById js/document (str "area-" id)))
                            (mapv
                             (fn [a] [(first a) (dom-utils/get-rect-data (second a))])
-                            @area-dropzones))]
+                            @area-dropzones)
+                           resize-direction)]
     overlapping-areas))
 
 
@@ -219,7 +249,7 @@
      (let [{:keys [active over]}  (utils/to-clj-map event)
              area                   (:id active)
              original-area-rect     (dom-utils/get-rect-data (.getElementById js/document (str "area-" area)))
-             overlapping-areas      (calculate-overlapping-areas area)
+             overlapping-areas      (calculate-overlapping-areas area resize-direction)
              areas-path             (vec (concat value-path [:areas]))
              areas                  @(subscribe [:db/get areas-path])
              modified-areas         (modify-areas {:area-to-fill        area
@@ -242,7 +272,7 @@
           event-delta  (utils/to-clj-map (.-delta event))
           x-delta      (:x event-delta)
           y-delta      (:y event-delta)
-          overlapping-areas      (calculate-overlapping-areas area)
+          overlapping-areas      (calculate-overlapping-areas area resize-direction)
           areas-path             (vec (concat value-path [:areas]))
           areas                  @(subscribe [:db/get areas-path])
           modified-areas         (modify-areas {:area-to-fill        area
@@ -279,14 +309,14 @@
   {:position :absolute
    :height "10px"
    :width  "100%"
-   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
+   :background "rgba(0,0,0,0.4)"
    :top 0
    :cursor "n-resize"})
 
 (def east-style
   {:position :absolute
    :height "100%"
-   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
+   :background "rgba(0,0,0,0.4)"
    :width  "10px" 
    :right 0
    :cursor "e-resize"})
@@ -295,14 +325,14 @@
   {:position :absolute
    :height "10px"
    :width  "100%"
-   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
+   :background "rgba(0,0,0,0.4)"
    :bottom 0
    :cursor "s-resize"})
 
 (def west-style
   {:position :absolute
    :height "100%"
-   :background "linear-gradient(to top, #24c6dcaa, #514a9daa)"
+   :background "rgba(0,0,0,0.4)"
    :width  "10px"
    :left 0
    :cursor "w-resize"})
@@ -416,7 +446,7 @@
             :style {:width "100%" :height "100%"
                     :position :relative
                     :cursor :move
-                    :background (str (get utils/random-colors position) "AA")}}            
+                    :background "transparent"}}            
          [area-item-letter letter]]))
          
 
